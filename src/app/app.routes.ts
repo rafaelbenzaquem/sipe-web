@@ -1,8 +1,9 @@
 import { Routes } from '@angular/router';
-import {CadastroUsuarioComponent} from './cadastro-usuario/cadastro-usuario.component';
-import {ConsultaUsuarioComponent} from './consulta-usuario/consulta-usuario.component';
+import {ConsultaComponent as UsuarioConsultaComponent} from './usuario/ui/consulta/consulta.component';
+import {CadastroComponent as CadastroUsuarioComponent} from './usuario/ui/cadastro/cadastro.component';
+
 
 export const routes: Routes = [
-  {path: 'usuarios/consulta', component: ConsultaUsuarioComponent},
-  {path: 'usuarios/cadastro', component: CadastroUsuarioComponent},
+  {path: 'usuarios/consulta', component: UsuarioConsultaComponent},
+  {path: 'usuarios/cadastro', component: CadastroUsuarioComponent}
 ];

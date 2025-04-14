@@ -1,0 +1,107 @@
+<div fxLayout="row" fxLayoutAlign="center">
+  <div fxLayout="column" fxFlex="60%">
+    <form class="mt-20" #usuarioFrm="ngForm" [formGroup]="profileForm" >
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <mat-card-title>
+            Dados do Usuário
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="mat-20">
+          <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="16px">
+            <div fxLayout="column" fxFlex="60%">
+              <mat-form-field>
+                <mat-label>Nome:</mat-label>
+                <input matInput
+                       [formControl]="nome"
+                       name="nome"
+                       placeholder="Ex: José da Silva"
+                       (blur)="updateNomeErrorMessage()"
+                       required>
+                @if (nome.invalid) {
+                  <mat-error>{{ errorNomeMessage() }}</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="16px">
+            <div fxLayout="column" fxFlex="60%">
+              <mat-form-field>
+                <mat-label>Matrícula:</mat-label>
+                <input matInput
+                       [formControl]="matricula"
+                       name="nome"
+                       placeholder="Ex: RR20999"
+                       minlength="5"
+                       maxlength="20"
+                       required
+                       (blur)="updateMatriculaErrorMessage()"
+                >
+                @if (matricula.invalid) {
+                  <mat-error>{{ errorMatriculaMessage() }}</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="16px">
+            <div fxLayout="column" fxFlex="60%">
+              <mat-form-field>
+                <mat-label>Crachá Ponto:</mat-label>
+                <input matInput
+                       [formControl]="cracha"
+                       name="cracha"
+                       placeholder="Ex: 0000000000020999"
+                       pattern="[0-9]{16}"
+                       required
+                       (blur)="updateCrachaErrorMessage()"
+                >
+                @if (cracha.invalid) {
+                  <mat-error>{{ errorCrachaMessage() }}</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="16px">
+            <div fxLayout="column" fxFlex="60%">
+              <mat-form-field>
+                <mat-label>Horas diária:</mat-label>
+                <input type="number"
+                       matInput
+                       [formControl]="hora_diaria"
+                       name="horas_diaria"
+                       min="4"
+                       max="12"
+                       required
+                       (blur)="updateHoraErrorMessage()"
+                >
+                @if (hora_diaria.invalid) {
+                  <mat-error>{{ errorHoraMessage() }}</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="16px">
+            <div fxLayout="column">
+              <button type="submit"  [disabled]="!profileForm.valid" (submit)="salvar()"  mat-flat-button color="primary">
+                <mat-icon fontIcon="save"/>
+                Salvar
+              </button>
+            </div>
+<!--            <div fxLayout="column">-->
+<!--              <button mat-flat-button color="primary">-->
+<!--                <mat-icon fontIcon="update"/>-->
+<!--                Atualizar-->
+<!--              </button>-->
+<!--            </div>-->
+            <div fxLayout="column">
+              <button type="reset" (click)="reset()" mat-flat-button color="accent" [disabled]="naolimpavel()">
+                <mat-icon fontIcon="backspace"/>
+                Limpar
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </form>
+  </div>
+</div>

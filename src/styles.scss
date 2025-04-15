@@ -1,7 +1,21 @@
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.msg-sucesso {
+  color: darkblue;
+  font-weight: bold;
+  font-size: 16px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
 
 .mt-20 {
   margin-top: 20px;
@@ -15,10 +29,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   margin-top: 60px;
 }
 
-.ml-5{
+.ml-5 {
   margin-left: 5px;
 }
 
-.full-width{
+.full-width {
   width: 100%;
 }

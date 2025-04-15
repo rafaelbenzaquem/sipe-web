@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, signal, inject} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MatCardModule} from '@angular/material/card';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -7,6 +7,14 @@ import {MatInputModule} from '@angular/material/input';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {UsuarioService} from '../../usuario.service';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogActions,
+  MatDialogClose,
+  MatDialogContent, MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
 import {Usuario} from '../../usuario.model';
 import {merge} from 'rxjs';
 import {FlexLayoutModule} from '@angular/flex-layout';
@@ -16,9 +24,12 @@ import {ValidacaoError} from '../../../error/error.model';
   selector: 'app-cadastro',
   templateUrl: './cadastro.component.html',
   styleUrl: './cadastro.component.scss',
-  imports: [FormsModule, FlexLayoutModule, ReactiveFormsModule,
+  imports: [
+    FormsModule, FlexLayoutModule, ReactiveFormsModule,
     MatCardModule, MatFormFieldModule, MatInputModule,
-    MatIconModule, MatButtonModule],
+    MatIconModule, MatButtonModule,
+    MatButtonModule
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CadastroComponent {
@@ -39,6 +50,17 @@ export class CadastroComponent {
     validators: [Validators.required],
     nonNullable: true
   });
+
+  readonly dialog = inject(MatDialog);
+
+  openSucessoDialog(usuario: Usuario) {
+    let matDialogRef = this.dialog.open(MensagemSucessoDialog, {data: usuario});
+  }
+
+  openErroDialog() {
+    this.dialog.open(MensagemErroDialog)
+  }
+
 
   profileForm = new FormGroup({
     nome: this.nome,
@@ -123,11 +145,14 @@ export class CadastroComponent {
           this.usuario.id = success.id;
           console.log("self: " + success._links.self.href);
           console.log("delete: " + success._links.delete.href);
+          this.openSucessoDialog(Usuario.toModel(success));
         },
-        error: err => this.tratarErroValidacao(err)
+        error: err => {
+          this.tratarErroValidacao(err);
+          this.openErroDialog();
+        }
       }
-    )
-
+    );
   }
 
   tratarErroValidacao(error: any) {
@@ -174,5 +199,50 @@ export class CadastroComponent {
     this.errorCrachaMessage = signal('');
     this.errorHoraMessage = signal('');
 
+
   }
+}
+
+
+@Component({
+  imports: [
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule,
+    MatButtonModule,
+    MatDialogTitle,
+    MatDialogContent,
+    MatDialogActions,
+    MatDialogClose,
+  ],
+  template: `
+    <h2 mat-dialog-title> Usuario Cadastrado com Sucesso!</h2>
+    <mat-dialog-content>
+      {{'ID: ' + usuario.id}}<br/>
+      {{'Nome: ' + usuario.nome}}<br/>
+      {{'Matrícula: ' + usuario.matricula}}<br/>
+      {{'Crachá Ponto: ' + usuario.cracha}}<br/>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-button mat-dialog-close>OK</button>
+    </mat-dialog-actions>
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class MensagemSucessoDialog {
+  readonly usuario = inject<Usuario>(MAT_DIALOG_DATA);
+}
+
+@Component({
+  imports: [MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatButtonModule],
+  template: `
+    <h2 mat-dialog-title> Erro ao Cadastrar o usuário!</h2>
+    <mat-dialog-content>Por favor, verifique as mensagem de erro e tente novamente.</mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-button mat-dialog-close>OK</button>
+    </mat-dialog-actions>
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class MensagemErroDialog {
 }

@@ -41,9 +41,9 @@
                   <mat-error>{{ errorMatriculaMessage() }}</mat-error>
                 }
                 @if (matricula.invalid) {
-                <mat-error >
-                  {{ matricula.getError('400') }}
-                </mat-error>
+                  <mat-error>
+                    {{ matricula.getError('400') }}
+                  </mat-error>
                 }
               </mat-form-field>
             </div>
@@ -92,12 +92,12 @@
                 Salvar
               </button>
             </div>
-            <!--            <div fxLayout="column">-->
-            <!--              <button mat-flat-button color="primary">-->
-            <!--                <mat-icon fontIcon="update"/>-->
-            <!--                Atualizar-->
-            <!--              </button>-->
-            <!--            </div>-->
+<!--                        <div fxLayout="column">-->
+<!--                          <button mat-flat-button color="primary">-->
+<!--                            <mat-icon fontIcon="update"/>-->
+<!--                            Atualizar-->
+<!--                          </button>-->
+<!--                        </div>-->
             <div fxLayout="column">
               <button type="reset" (click)="reset()" mat-flat-button color="accent" [disabled]="naolimpavel()">
                 <mat-icon fontIcon="backspace"/>

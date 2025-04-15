@@ -10,6 +10,7 @@ import {UsuarioService} from '../../usuario.service';
 import {Usuario} from '../../usuario.model';
 import {merge} from 'rxjs';
 import {FlexLayoutModule} from '@angular/flex-layout';
+import {ValidacaoError} from '../../../error/error.model';
 
 @Component({
   selector: 'app-cadastro',
@@ -34,7 +35,7 @@ export class CadastroComponent {
     validators: [Validators.required],
     nonNullable: true
   });
-  hora_diaria: FormControl<number|undefined> = new FormControl(undefined, {
+  hora_diaria: FormControl<number | undefined> = new FormControl(undefined, {
     validators: [Validators.required],
     nonNullable: true
   });
@@ -117,15 +118,38 @@ export class CadastroComponent {
 
     console.log("Salvando o usuário: " + this.usuario);
     const obs = this.usuarioService.criarUsuario(this.usuario.toRequest());
-    obs.subscribe(
-      success => {
-        this.usuario.id = success.id;
-        console.log("self: " + success._links.self.href);
-        console.log("delete: " + success._links.delete.href);
+    obs.subscribe({
+        next: success => {
+          this.usuario.id = success.id;
+          console.log("self: " + success._links.self.href);
+          console.log("delete: " + success._links.delete.href);
+        },
+        error: err => this.tratarErroValidacao(err)
       }
     )
 
   }
+
+  tratarErroValidacao(error: any) {
+    if (error.status === 400 && error.error?.erros) {
+      const validacao: ValidacaoError = error.error;
+
+      validacao.erros?.forEach(paramErro => {
+        const control = this.profileForm.get(paramErro.parametro || '');
+        if (control) {
+          control.setErrors({apiError: paramErro.mensagem});
+          if (paramErro.parametro === "matricula") {
+            this.errorMatriculaMessage.set(paramErro.mensagem || '');
+          } else if (paramErro.parametro === "cracha") {
+            this.errorCrachaMessage.set(paramErro.mensagem || '');
+          }
+        }
+      });
+    } else {
+      console.error('Erro inesperado', error);
+    }
+  }
+
 
   naolimpavel(): boolean {
 

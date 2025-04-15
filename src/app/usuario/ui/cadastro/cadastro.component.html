@@ -1,6 +1,6 @@
 <div fxLayout="row" fxLayoutAlign="center">
   <div fxLayout="column" fxFlex="60%">
-    <form class="mt-20" #usuarioFrm="ngForm" [formGroup]="profileForm" >
+    <form class="mt-20" #usuarioFrm="ngForm" [formGroup]="profileForm" (submit)="salvar()">
       <mat-card appearance="outlined">
         <mat-card-header>
           <mat-card-title>
@@ -39,6 +39,11 @@
                 >
                 @if (matricula.invalid) {
                   <mat-error>{{ errorMatriculaMessage() }}</mat-error>
+                }
+                @if (matricula.invalid) {
+                <mat-error >
+                  {{ matricula.getError('400') }}
+                </mat-error>
                 }
               </mat-form-field>
             </div>
@@ -82,17 +87,17 @@
           </div>
           <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="16px">
             <div fxLayout="column">
-              <button type="submit"  [disabled]="!profileForm.valid" (submit)="salvar()"  mat-flat-button color="primary">
+              <button type="submit" [disabled]="!profileForm.valid" mat-flat-button color="primary">
                 <mat-icon fontIcon="save"/>
                 Salvar
               </button>
             </div>
-<!--            <div fxLayout="column">-->
-<!--              <button mat-flat-button color="primary">-->
-<!--                <mat-icon fontIcon="update"/>-->
-<!--                Atualizar-->
-<!--              </button>-->
-<!--            </div>-->
+            <!--            <div fxLayout="column">-->
+            <!--              <button mat-flat-button color="primary">-->
+            <!--                <mat-icon fontIcon="update"/>-->
+            <!--                Atualizar-->
+            <!--              </button>-->
+            <!--            </div>-->
             <div fxLayout="column">
               <button type="reset" (click)="reset()" mat-flat-button color="accent" [disabled]="naolimpavel()">
                 <mat-icon fontIcon="backspace"/>

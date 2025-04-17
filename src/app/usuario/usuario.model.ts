@@ -16,14 +16,25 @@ export class Usuario {
     return usuarioModel;
   }
 
-  toRequest() {
+  toCreateRequest() {
     const usuarioCreteRequest: UsuarioCreateRequest = {
-      cracha: this.cracha === undefined ? "" : this.cracha,
-      hora_diaria: this.hora_diaria === undefined ? 7 : this.hora_diaria,
-      matricula: this.matricula === undefined ? "" : this.matricula,
-      nome: this.nome === undefined ? "" : this.nome,
+      cracha: this.cracha || "",
+      hora_diaria: this.hora_diaria || 7,
+      matricula: this.matricula || "",
+      nome: this.nome || ""
     };
     return usuarioCreteRequest;
+  }
+
+  toUpdateRequest() {
+    const usuarioUpdateRequest: UsuarioUpdateRequest = {
+      id: this.id || 0,
+      cracha: this.cracha || "",
+      hora_diaria: this.hora_diaria || 7,
+      matricula: this.matricula || "",
+      nome: this.nome || ""
+    };
+    return usuarioUpdateRequest;
   }
 
 }
@@ -56,6 +67,14 @@ export interface UsuarioListResponse {
 }
 
 export interface UsuarioCreateRequest {
+  nome: string;
+  matricula: string;
+  cracha: string;
+  hora_diaria: number;
+}
+
+export interface UsuarioUpdateRequest {
+  id: number;
   nome: string;
   matricula: string;
   cracha: string;

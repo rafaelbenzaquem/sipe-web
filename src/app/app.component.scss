@@ -1,3 +1,21 @@
 .spacer{
   flex: 1 1 auto;
 }
+
+.content {
+  padding: 20px;
+  padding-bottom: 20px; // garante espaço suficiente para o footer
+  min-height: calc(100vh - 128px); // altura da tela menos o header + footer (64px cada)
+  box-sizing: border-box;
+}
+
+.footer {
+  //position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}

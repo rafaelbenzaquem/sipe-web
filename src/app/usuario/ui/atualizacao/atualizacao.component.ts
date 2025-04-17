@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, Input, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MatCardModule} from '@angular/material/card';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -7,68 +7,56 @@ import {MatInputModule} from '@angular/material/input';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {UsuarioService} from '../../usuario.service';
-import {MatDialog,} from '@angular/material/dialog';
+import {MatDialogRef,} from '@angular/material/dialog';
 import {Usuario} from '../../usuario.model';
 import {merge} from 'rxjs';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {ValidacaoError} from '../../../error/error.model';
-import {MensagemErroDialog, MensagemSucessoDialog} from '../dialogs/dialogs.utils';
+import {Router} from '@angular/router';
+import {AtualizacaoUsuarioDialog} from '../dialogs/dialogs.utils';
 
 @Component({
-  selector: 'app-cadastro',
-  templateUrl: './cadastro.component.html',
-  styleUrl: './cadastro.component.scss',
+  selector: 'app-atualizacao',
+  templateUrl: './atualizacao.component.html',
+  styleUrl: './atualizacao.component.scss',
   imports: [
     FormsModule, FlexLayoutModule, ReactiveFormsModule,
     MatCardModule, MatFormFieldModule, MatInputModule,
-    MatIconModule, MatButtonModule,
-    MatButtonModule
+    MatIconModule, MatButtonModule, MatButtonModule
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CadastroComponent {
-  usuario: Usuario = new Usuario();
-  nome = new FormControl('', {
-    validators: [Validators.required],
-    nonNullable: true
-  });
-  matricula = new FormControl('', {
-    validators: [Validators.required],
-    nonNullable: true
-  });
-  cracha = new FormControl('', {
-    validators: [Validators.required],
-    nonNullable: true
-  });
-  hora_diaria: FormControl<number | undefined> = new FormControl(undefined, {
-    validators: [Validators.required],
-    nonNullable: true
-  });
+export class AtualizacaoComponent {
 
-  readonly dialog = inject(MatDialog);
+  @Input() usuario: Usuario = new Usuario();
+  @Input() title: string = '';
+  readonly dialogRef = inject(MatDialogRef<AtualizacaoUsuarioDialog>);
 
-  openSucessoDialog(usuario: Usuario) {
-    this.dialog.open(MensagemSucessoDialog, {data: usuario});
+  fecharDialogo() {
+    this.dialogRef.close();
   }
 
-  openErroDialog() {
-    this.dialog.open(MensagemErroDialog)
-  }
+  usuarioInicial: Usuario = new Usuario();
 
+  nome = new FormControl(this.usuario.nome, {
+    validators: [Validators.required],
+    nonNullable: true
+  });
+  matricula = new FormControl(this.usuario.matricula, {
+    validators: [Validators.required],
+    nonNullable: true
+  });
+  cracha = new FormControl(this.usuario.cracha, {
+    validators: [Validators.required],
+    nonNullable: true
+  });
+  hora_diaria = new FormControl(this.usuario.hora_diaria, {
+    validators: [Validators.required],
+    nonNullable: true
+  });
 
-  profileForm = new FormGroup({
-    nome: this.nome,
-    matricula: this.matricula,
-    cracha: this.cracha,
-    hora_diaria: this.hora_diaria
-  })
-
-  errorNomeMessage = signal('');
-  errorMatriculaMessage = signal('');
-  errorCrachaMessage = signal('');
-  errorHoraMessage = signal('');
-
-  constructor(private usuarioService: UsuarioService) {
+  constructor(private usuarioService: UsuarioService,
+              private router: Router) {
     merge(this.nome.statusChanges, this.nome.valueChanges)
       .pipe(takeUntilDestroyed())
       .subscribe(() => this.updateNomeErrorMessage());
@@ -85,6 +73,51 @@ export class CadastroComponent {
       .pipe(takeUntilDestroyed())
       .subscribe(() => this.updateHoraErrorMessage());
   }
+
+
+  formControlInit() {
+    this.nome = new FormControl(this.usuario.nome, {
+      validators: [Validators.required],
+      nonNullable: true
+    });
+    this.matricula = new FormControl(this.usuario.matricula, {
+      validators: [Validators.required],
+      nonNullable: true
+    });
+    this.cracha = new FormControl(this.usuario.cracha, {
+      validators: [Validators.required],
+      nonNullable: true
+    });
+    this.hora_diaria = new FormControl(this.usuario.hora_diaria, {
+      validators: [Validators.required],
+      nonNullable: true
+    });
+    this.profileForm = new FormGroup({
+      nome: this.nome,
+      matricula: this.matricula,
+      cracha: this.cracha,
+      hora_diaria: this.hora_diaria
+    })
+  }
+
+  ngOnInit(): void {
+    this.formControlInit()
+    this.usuarioInicial = this.usuario;
+  }
+
+
+  profileForm = new FormGroup({
+    nome: this.nome,
+    matricula: this.matricula,
+    cracha: this.cracha,
+    hora_diaria: this.hora_diaria
+  })
+
+  errorNomeMessage = signal('');
+  errorMatriculaMessage = signal('');
+  errorCrachaMessage = signal('');
+  errorHoraMessage = signal('');
+
 
   updateNomeErrorMessage() {
     if (this.nome.hasError('required')) {
@@ -126,24 +159,24 @@ export class CadastroComponent {
     }
   }
 
-  salvar() {
+  atualizar() {
     this.usuario.nome = this.nome.value;
     this.usuario.matricula = this.matricula.value;
     this.usuario.cracha = this.cracha.value;
     this.usuario.hora_diaria = this.hora_diaria.value;
 
-    console.log("Salvando o usuário: " + this.usuario);
-    const obs = this.usuarioService.criarUsuario(this.usuario.toCreateRequest());
+    console.log("Atualizando o usuário: " + this.usuario);
+    const obs = this.usuarioService.atualizaUsuario(this.usuario.toUpdateRequest());
     obs.subscribe({
         next: success => {
-          this.usuario.id = success.id;
+          this.usuario = Usuario.toModel(success);
+          this.usuarioInicial = this.usuario;
           console.log("self: " + success._links.self.href);
           console.log("delete: " + success._links.delete.href);
-          this.openSucessoDialog(Usuario.toModel(success));
+          this.dialogRef.close();
         },
         error: err => {
           this.tratarErroValidacao(err);
-          this.openErroDialog();
         }
       }
     );
@@ -170,29 +203,24 @@ export class CadastroComponent {
   }
 
 
-  naolimpavel(): boolean {
+  naoReinicializavel(): boolean {
 
-    let nomeNaoLimpavel: boolean = this.nome.value === undefined || this.nome.value === '';
-    let matriculaNaoLimpavel: boolean = this.matricula.value === undefined || this.matricula.value === '';
-    let crachaNaoLimpavel: boolean = this.cracha.value === undefined || this.cracha.value === '';
-    let horasDiariasNaoLimpaveis: boolean = this.hora_diaria.value === undefined ||
-      (this.hora_diaria.value > 4 || this.hora_diaria.value < 12);
+    let nomeNaoReinicializavel: boolean = this.usuarioInicial.nome === this.nome.value;
+    let matriculaNaoReinicializavel: boolean = this.usuarioInicial.matricula === this.matricula.value;
+    let crachaNaoReinicializavel: boolean = this.usuarioInicial.cracha === this.cracha.value;
+    let horaDiariaReinicializavel: boolean = this.usuarioInicial.hora_diaria === this.hora_diaria.value ||
+      (this.hora_diaria.value === undefined ? true : (this.hora_diaria.value < 4) ||
+        this.hora_diaria.value > 12);
 
-    return nomeNaoLimpavel && matriculaNaoLimpavel && crachaNaoLimpavel && horasDiariasNaoLimpaveis;
+    return nomeNaoReinicializavel && matriculaNaoReinicializavel && crachaNaoReinicializavel && horaDiariaReinicializavel;
   }
 
-  reset() {
-    this.usuario = new Usuario();
-    this.nome.reset();
-    this.matricula.reset();
-    this.cracha.reset();
-    this.hora_diaria.reset();
-    this.profileForm.reset()
+  reiniciar() {
+    this.usuario = this.usuarioInicial;
+    this.formControlInit();
     this.errorNomeMessage = signal('');
     this.errorMatriculaMessage = signal('');
     this.errorCrachaMessage = signal('');
     this.errorHoraMessage = signal('');
-
-
   }
 }

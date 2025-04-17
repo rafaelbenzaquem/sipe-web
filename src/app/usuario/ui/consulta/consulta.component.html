@@ -1,4 +1,4 @@
-<div fxLayout="row" fxLayoutAlign="center" class="mt-20">
+<div fxLayout="row" fxLayoutAlign="center">
   <div fxLayout="column" fxFlex="1000px">
     <mat-card appearance="outlined">
       <mat-card-header>
@@ -71,7 +71,7 @@
           <ng-container matColumnDef="acoes">
             <th mat-header-cell *matHeaderCellDef></th>
             <td mat-cell *matCellDef="let usuario">
-              <button type="button" mat-button (click)="preparaEditar(usuario.id)">
+              <button type="button" mat-button (click)="preparaEditar(usuario)">
                 <mat-icon fontIcon="edit"></mat-icon>
                 Editar
               </button>

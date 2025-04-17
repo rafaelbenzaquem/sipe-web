@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatInputModule} from '@angular/material/input'
 import {MatCardModule} from '@angular/material/card'
@@ -7,11 +7,12 @@ import {MatIconModule} from '@angular/material/icon'
 import {FormsModule} from '@angular/forms'
 import {MatTableModule} from '@angular/material/table'
 import {MatButtonModule} from '@angular/material/button';
-import {Router} from '@angular/router';
 import {Usuario} from '../../usuario.model';
 import {UsuarioService} from '../../usuario.service';
 import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {MatDialog,} from '@angular/material/dialog';
+import {AtualizacaoUsuarioDialog} from '../dialogs/dialogs.utils';
 
 @Component({
   selector: 'app-consulta',
@@ -36,12 +37,11 @@ export class ConsultaComponent implements OnInit {
   nomeBusca: string = '';
   usuarios: Usuario[] = [];
   colunasTable: string[] = ["id", "nome", "matricula", "cracha", "hora_diaria", "acoes"]
-
+  readonly dialog = inject(MatDialog);
   private debouncedBuscaUsuarios: (page: number, size: number, nome: string) => void;
 
   constructor(
-    private usuarioService: UsuarioService,
-    private router: Router
+    private usuarioService: UsuarioService
   ) {
     this.debouncedBuscaUsuarios = this.debounce(this.buscaUsuarios.bind(this), 1000);
   }
@@ -75,9 +75,12 @@ export class ConsultaComponent implements OnInit {
     this.debouncedBuscaUsuarios(0, 5, this.nomeBusca);
   }
 
-  preparaEditar(id: string) {
-    console.log("preparaEditar " + id)
-    // this.router.navigate(['/cadastro'], { queryParams: { "id": id } } )
+  preparaEditar(usuario: Usuario) {
+
+    this.dialog.open(AtualizacaoUsuarioDialog, {
+      width: '500px',
+      data: usuario
+    });
   }
 
 
@@ -90,5 +93,5 @@ export class ConsultaComponent implements OnInit {
       }, delay);
     };
   }
-
 }
+

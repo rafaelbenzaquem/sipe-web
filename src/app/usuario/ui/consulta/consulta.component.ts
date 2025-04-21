@@ -13,6 +13,7 @@ import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatDialog,} from '@angular/material/dialog';
 import {AtualizacaoUsuarioDialog} from '../dialogs/dialogs.utils';
+import {Router, RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-consulta',
@@ -26,7 +27,8 @@ import {AtualizacaoUsuarioDialog} from '../dialogs/dialogs.utils';
     FormsModule,
     CommonModule,
     MatPaginatorModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    RouterLink
   ],
   templateUrl: './consulta.component.html',
   styleUrl: './consulta.component.scss'
@@ -41,7 +43,8 @@ export class ConsultaComponent implements OnInit {
   private debouncedBuscaUsuarios: (page: number, size: number, nome: string) => void;
 
   constructor(
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private router: Router,
   ) {
     this.debouncedBuscaUsuarios = this.debounce(this.buscaUsuarios.bind(this), 1000);
   }

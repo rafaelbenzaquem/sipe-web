@@ -36,7 +36,6 @@ export class Usuario {
     };
     return usuarioUpdateRequest;
   }
-
 }
 
 export interface UsuarioResponse {

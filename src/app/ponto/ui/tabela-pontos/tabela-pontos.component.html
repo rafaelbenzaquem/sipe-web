@@ -1,0 +1,54 @@
+<table>
+  <thead>
+  <tr>
+    <th>
+      <div style="display: flex; flex-direction: column; text-align: center;">
+        Dia
+      </div>
+    </th>
+    <th [attr.colspan]="tamanhoRegistros+1">
+      <div style="display: flex; flex-direction: column; text-align: center;">
+        Registros
+      </div>
+    </th>
+    <th>
+      <div style="display: flex; flex-direction: column; text-align: center;  width: 150px">
+        Descrição
+      </div>
+    </th>
+    <th>
+      <div style="display: flex; flex-direction: column; text-align: center">
+
+      </div>
+    </th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let ponto of pontosTableModel">
+    <td>
+      <div style="display: flex; flex-direction: column; text-align: center;">
+        {{ ponto.dia }}
+      </div>
+    </td>
+    <td *ngFor="let registro of ponto.registros">
+      <div style="display: flex; flex-direction: column; text-align: center;">
+        <span>{{ registro.sentido }}</span>
+        <span>{{ registro.hora }}</span>
+      </div>
+    </td>
+    <td>
+      <div style="display: flex; flex-direction: column; text-align: center;">
+        <span>Total</span>
+        <span>{{ ponto.total }}</span>
+      </div>
+    </td>
+    <td>{{ ponto.descricao }}</td>
+    <td>
+      <button type="button" mat-button (click)="0">
+        <mat-icon fontIcon="edit"></mat-icon>
+        Editar
+      </button>
+    </td>
+  </tr>
+  </tbody>
+</table>

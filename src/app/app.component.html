@@ -1,13 +1,18 @@
 <mat-toolbar color="primary">
   <span>Sistemas Integrados de Ponto Eletrônico - SIPE</span>
   <span class="spacer"></span>
-  <a mat-button routerLink="/usuarios/cadastro" >
-    <mat-icon fontIcon="feed"></mat-icon>
-    Fomulário Usuário</a>
-
-  <a mat-button routerLink="/usuarios/consulta" >
+  <a mat-button routerLink="/usuarios/consulta">
     <mat-icon fontIcon="search"></mat-icon>
-    Lista de Usuários</a>
+    Busca de Usuários
+  </a>
+  <a mat-button routerLink="/usuarios/cadastro">
+    <mat-icon fontIcon="feed"></mat-icon>
+    Cadastro de Usuário
+  </a>
+  <a mat-button>
+    <mat-icon fontIcon="settings"></mat-icon>
+    Configuração
+  </a>
 </mat-toolbar>
 <div class="content">
   <router-outlet></router-outlet>

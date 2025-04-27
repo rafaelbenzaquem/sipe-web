@@ -2,13 +2,15 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {RegistroListResponse, RegistroResponse} from './registro.model';
+import {environment as env} from '../../environments/environment';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class RegistroService {
 
-  private readonly API_BASE = 'http://localhost:8084/v1/sipe';
+  private readonly API_BASE = env.SIPE_API_URL + '/v1/sipe';
 
   constructor(private http: HttpClient) {
   }

@@ -9,8 +9,18 @@
   box-sizing: border-box;
 }
 
+.header-bar1{
+  background-color: #006ead;
+  height: 30px;
+}
+
+.header-bar2{
+  height: 90px;
+}
+
 .footer {
   //position: fixed;
+  background-color: #006ead;
   bottom: 0;
   width: 100%;
   height: 64px;

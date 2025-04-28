@@ -13,6 +13,8 @@ import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {provideNativeDateAdapter} from '@angular/material/core';
 import {Registro} from '../../../registro/registro.model';
+import {MatDialog} from '@angular/material/dialog';
+import {AtualizacaoComponent} from '../../../registro/ui/atualizacao/atualizacao.component';
 import {TabelaPontosComponent} from '../tabela-pontos/tabela-pontos.component';
 import {Ponto} from '../../ponto.model';
 import {RelatorioService} from './relatorio.service';
@@ -62,11 +64,13 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
     console.log("Entra em OnChanges...");
   }
 
-  constructor(private route: ActivatedRoute,
-              private pontoService: PontoService,
-              private registroService: RegistroService,
-              private relatorioService: RelatorioService) {
-  }
+  constructor(
+    private route: ActivatedRoute,
+    private pontoService: PontoService,
+    private registroService: RegistroService,
+    private relatorioService: RelatorioService,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -183,6 +187,24 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
     let ano = date.getFullYear() + '';
 
     return dia + mes + ano;
+  }
+
+  /**
+   * Abre diálogo para atualizar lista de registros de um ponto
+   */
+  openAtualizacao(ponto: Ponto): void {
+    const dialogRef = this.dialog.open(AtualizacaoComponent, {
+      data: ponto,
+      width: '800px'
+    });
+    dialogRef.afterClosed().subscribe((result: { registros?: Registro[] }) => {
+      if (result?.registros) {
+        const idx = this.pontos.findIndex(p => p.dia === ponto.dia);
+        if (idx >= 0) {
+          this.pontos[idx].registros = result.registros!;
+        }
+      }
+    });
   }
 
   verificaMaiorListaDeRegistro(pontos

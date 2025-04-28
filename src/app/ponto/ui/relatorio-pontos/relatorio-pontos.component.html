@@ -75,7 +75,11 @@
               {{ exibirPeriodo() }} <br/>
             }
             @if (pontos.length !== 0) {
-              <app-tabela-pontos [pontos]="pontos" [tamanhoRegistros]="verificaMaiorListaDeRegistro(pontos)"/>
+              <app-tabela-pontos
+                [pontos]="pontos"
+                [tamanhoRegistros]="verificaMaiorListaDeRegistro(pontos)"
+                (editar)="openAtualizacao($event)">
+              </app-tabela-pontos>
             }
           </div>
         </div>

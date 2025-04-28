@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {DatePipe, NgForOf} from '@angular/common';
 import {Ponto} from '../../ponto.model';
 import {FormsModule} from '@angular/forms';
@@ -73,6 +73,7 @@ export class TabelaPontosComponent implements OnChanges, OnInit {
 
 
   @Input() pontos: Ponto[] = [];
+  @Output() editar = new EventEmitter<Ponto>();
   @Input() tamanhoRegistros = 2;
   pontosTableModel: PontoTableModel[] = [];
 

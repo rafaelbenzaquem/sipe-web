@@ -12,6 +12,7 @@ import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {Registro} from '../../registro.model';
 import {Ponto} from '../../../ponto/ponto.model';
 import {MatCard, MatCardModule} from '@angular/material/card';
+import {RegistroService} from '../../registro.service';
 
 @Component({
   standalone: true,
@@ -39,10 +40,11 @@ export class AtualizacaoComponent {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: Ponto,
-    private dialogRef: MatDialogRef<AtualizacaoComponent>
+    private dialogRef: MatDialogRef<AtualizacaoComponent>,
+    private registroService: RegistroService
   ) {
     // duplicar para edição sem afetar o original até salvar
-    this.registros = data.registros.map(r => ({...r}));
+    this.registros = data.registros;
   }
 
   moveUp(index: number): void {
@@ -57,11 +59,40 @@ export class AtualizacaoComponent {
     }
   }
 
+  ativar(index: number): void {
+    var registro = this.registros[index];
+    if (registro) {
+      registro.ativo = true
+    }
+  }
+
+  desativar(index: number): void {
+    var registro = this.registros[index];
+    if (registro) {
+      registro.ativo = false
+    }
+  }
+
   remove(index: number): void {
     this.registros.splice(index, 1);
   }
 
   save(): void {
+    this.registros.forEach(registro => {
+      if (registro.id === 0)
+        this.registroService.cria(registro, this.data.matricula, this.data.dia.replaceAll('/','')).subscribe(
+          rr => {
+            registro = Registro.toModel(rr)
+          }
+        )
+      else
+        this.registroService.atualiza(registro, this.data.matricula, this.data.dia.replaceAll('/','')).subscribe(
+          rr => {
+            registro = Registro.toModel(rr)
+          }
+        )
+    })
+
     this.dialogRef.close({registros: this.registros});
   }
 

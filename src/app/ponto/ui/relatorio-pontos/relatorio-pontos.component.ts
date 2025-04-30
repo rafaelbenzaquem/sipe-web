@@ -126,7 +126,7 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
       if (pontoListResponse && pontoListResponse._embedded && pontoListResponse._embedded.pontos) {
         pontos = await Promise.all(pontoListResponse._embedded.pontos.map(async pr => {
           let ponto = Ponto.toModel(pr);
-          let registroListResponse = await this.registroService.getRegistros(matricula, pr.dia.replaceAll("/", "")).toPromise();
+          let registroListResponse = await this.registroService.lista(matricula, pr.dia.replaceAll("/", "")).toPromise();
           if (registroListResponse && registroListResponse._embedded && registroListResponse._embedded.registros) {
             ponto.registros = registroListResponse._embedded.registros.map(Registro.toModel);
           }

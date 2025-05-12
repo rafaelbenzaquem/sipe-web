@@ -28,7 +28,7 @@ import {environment as env} from '../environments/environment';
       useValue: {
         placeholderResolution: 40
       }
-    }
+    },
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
@@ -38,4 +38,14 @@ export class AppComponent {
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
 
   URL_BASE = env.SIPE_API_URL;
+
+  login(): void {
+    const clientId = 'angular-client';
+    const redirectUri = encodeURIComponent('http://localhost:4200/login/oauth2/code/angular-client');
+    const scope = 'openid read';
+    const state = 'abc123'; // opcional, pode gerar dinamicamente
+
+    const authUrl = `http://localhost:9000/oauth2/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
+    window.location.href = authUrl;
+  }
 }

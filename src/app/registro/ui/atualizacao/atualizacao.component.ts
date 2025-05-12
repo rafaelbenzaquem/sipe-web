@@ -37,6 +37,7 @@ import {RegistroService} from '../../registro.service';
 })
 export class AtualizacaoComponent {
   registros: Registro[];
+  registrosParaApagar: Registro[] = [];
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: Ponto,
@@ -74,6 +75,7 @@ export class AtualizacaoComponent {
   }
 
   remove(index: number): void {
+    this.registrosParaApagar.push(this.registros[index]);
     this.registros.splice(index, 1);
   }
 
@@ -92,6 +94,15 @@ export class AtualizacaoComponent {
           }
         )
     })
+
+    this.registrosParaApagar.forEach((registro: Registro) => {
+      if (registro.id !== 0){
+        this.registroService.apaga(registro.id).subscribe(
+          registroApagado => { console.log(registroApagado); },
+        )
+      }
+    })
+
 
     this.dialogRef.close({registros: this.registros});
   }

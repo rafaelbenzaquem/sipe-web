@@ -56,6 +56,8 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
   inicioSelecionado?: Date | null = null;
   fimSelecionado?: Date | null = null;
 
+  tamanhoMaximo = 0;
+
   foiBuscado = false;
 
   isLoading = false;
@@ -79,12 +81,11 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
     });
   }
 
-  definePeriodo(): void {
+   definePeriodo(): void {
     this.inicioSelecionado = this.periodo.value.inicio;
     this.fimSelecionado = this.periodo.value.fim;
-    console.log(this.inicioSelecionado);
-    console.log(this.fimSelecionado);
     this.foiBuscado = false;
+    this.buscaPontos()
   }
 
   public async buscaPontos() {
@@ -92,6 +93,7 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
     console.log("Exibir Pontos...");
     if (this.usuario.matricula && this.periodo.value.inicio && this.periodo.value.fim) {
       this.pontos = await this.funcPontos(this.usuario.matricula, this.periodo.value.inicio, this.periodo.value.fim, false);
+      this.tamanhoMaximo = this.verificaMaiorListaDeRegistro(this.pontos);
     } else {
       this.pontos = []; // Garante que this.pontos seja um array mesmo se a condição falhar
     }
@@ -104,6 +106,7 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
     console.log("Exibir Pontos...");
     if (this.usuario.matricula && this.periodo.value.inicio && this.periodo.value.fim) {
       this.pontos = await this.funcPontos(this.usuario.matricula, this.periodo.value.inicio, this.periodo.value.fim, true);
+      this.tamanhoMaximo = this.verificaMaiorListaDeRegistro(this.pontos);
     } else {
       this.pontos = []; // Garante que this.pontos seja um array mesmo se a condição falhar
     }
@@ -113,11 +116,13 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
 
   async funcPontos(matricula: string, inicioSelecionado: Date, fimSelecionado: Date, isUpdate: boolean): Promise<Ponto[]> {
     console.log('buscarPontos');
-    console.log('inicio: ' + RelatorioPontosComponent.formataDataDeSaida(inicioSelecionado));
-    console.log('fim: ' + RelatorioPontosComponent.formataDataDeSaida(fimSelecionado));
     let inicio = RelatorioPontosComponent.formataDataDeEntrada(inicioSelecionado);
     let fim = RelatorioPontosComponent.formataDataDeEntrada(fimSelecionado);
-    let pontosUsuarioObservable = isUpdate ? this.pontoService.atualizaPontosUsuario(matricula, inicio, fim).toPromise()
+    console.log('inicio: ' + inicio);
+    console.log('fim: ' + fim);
+
+    let pontosUsuarioObservable =
+      isUpdate ? this.pontoService.atualizaPontosUsuario(matricula, inicio, fim).toPromise()
       : this.pontoService.getPontosUsuario(matricula, inicio, fim).toPromise();
     let pontos: Ponto[] = [];
 
@@ -193,25 +198,19 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
    * Abre diálogo para atualizar lista de registros de um ponto
    */
   openAtualizacao(ponto: Ponto): void {
+    console.log("RelatorioPontosComponent:openAtualizacao");
     const dialogRef = this.dialog.open(AtualizacaoComponent, {
       data: ponto,
       width: '800px'
     });
+
     dialogRef.afterClosed().subscribe((result: { registros?: Registro[] }) => {
-      if (result?.registros) {
-        const idx = this.pontos.findIndex(p => p.dia === ponto.dia);
-        if (idx >= 0) {
-          this.pontos[idx].registros = result.registros!;
-        }
-      }
+      console.log("RelatorioPontosComponent:openAtualizacao:afterClosed");
+      this.tamanhoMaximo = this.verificaMaiorListaDeRegistro(this.pontos);
     });
   }
 
-  verificaMaiorListaDeRegistro(pontos
-                               :
-                               Ponto[]
-  ) {
-
+  verificaMaiorListaDeRegistro(pontos: Ponto[]) {
     let maiorListaDeRegistrosEncontrada = 0;
     pontos.forEach(ponto => {
       if (ponto.registros) {

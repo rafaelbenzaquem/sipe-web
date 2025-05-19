@@ -71,16 +71,17 @@
         </div>
         <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="16px">
           <div fxLayout="column" fxFlex="100%" class="mt-20">
-            @if (foiBuscado) {
+            <div *ngIf="foiBuscado">
               {{ exibirPeriodo() }} <br/>
-            }
-            @if (pontos.length !== 0) {
+            </div>
+            <div *ngIf="pontos.length > 0">
+<!--              Componente da tabela-->
               <app-tabela-pontos
                 [pontos]="pontos"
-                [tamanhoRegistros]="verificaMaiorListaDeRegistro(pontos)"
+                [tamanhoRegistros]="tamanhoMaximo"
                 (editar)="openAtualizacao($event)">
               </app-tabela-pontos>
-            }
+            </div>
           </div>
         </div>
       </mat-card-content>

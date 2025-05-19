@@ -1,9 +1,9 @@
 <div fxLayout="row" fxLayoutAlign="center">
   <div fxLayout="column" fxFlex="100%">
-    <mat-card >
+    <mat-card>
       <mat-card-header>
         <mat-card-title>
-          <h2>Atualizar registros - {{ data.dia }}</h2>
+          <h2>Atualizar registros - {{ ponto.dia }}</h2>
         </mat-card-title>
       </mat-card-header>
       <mat-card-content class="mat-20">
@@ -12,7 +12,6 @@
             <table class="mat-elevation-z1">
               <thead>
               <tr>
-                <th>Posição</th>
                 <th>Sentido</th>
                 <th>Hora</th>
                 <th>Ativo</th>
@@ -21,10 +20,9 @@
               </thead>
               <tbody>
               <tr *ngFor="let reg of registros; index as i">
-                <td>{{ i + 1 }}</td>
                 <td>
                   <mat-form-field appearance="fill">
-                    <mat-select [(ngModel)]="reg.sentido">
+                    <mat-select [(ngModel)]="reg.sentido" [disabled]="reg.codigo_acesso !== 0">
                       <mat-option value="Entrada">Entrada</mat-option>
                       <mat-option value="Saída">Saída</mat-option>
                     </mat-select>
@@ -32,20 +30,14 @@
                 </td>
                 <td>
                   <mat-form-field appearance="fill">
-                    <input matInput [(ngModel)]="reg.hora" placeholder="HH:mm:ss" pattern="([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])">
+                    <input matInput [(ngModel)]="reg.hora" placeholder="HH:mm:ss"
+                           pattern="([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])"
+                           [disabled]="reg.codigo_acesso !== 0">
                   </mat-form-field>
                 </td>
 
                 <td>
-                  @if (reg.ativo) {
-                    <button mat-icon-button color="primary" (click)="desativar(i)" >
-                      <mat-icon>check_box</mat-icon>
-                    </button>
-                  }@else{
-                    <button mat-icon-button color="primary" (click)="ativar(i)">
-                      <mat-icon>check_box_outline_blank</mat-icon>
-                    </button>
-                  }
+                  <app-check-box [(value)]="reg.ativo"/>
                 </td>
                 <td>
 
@@ -55,7 +47,8 @@
                   <button mat-icon-button color="primary" (click)="moveDown(i)" [disabled]="i === registros.length - 1">
                     <mat-icon>arrow_downward</mat-icon>
                   </button>
-                  <button mat-icon-button color="warn" (click)="remove(i)" [disabled]="reg.codigo_acesso !== 0">
+                  <button mat-icon-button color="warn" (click)="remove(i)"
+                          [disabled]="reg.codigo_acesso !== 0">
                     <mat-icon>delete</mat-icon>
                   </button>
                 </td>
@@ -65,14 +58,29 @@
           </div>
         </div>
         <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="16px" class="mt-20">
-          <div fxLayout="column">
-            <button mat-flat-button (click)="cancel()" color="accent" >Cancelar</button>
+          <div fxLayout="column" fxFlexAlign="center">
+            <button mat-flat-button (click)="cancel()" color="accent">Cancelar</button>
           </div>
-          <div fxLayout="column">
+          <div fxLayout="column" fxFlexAlign="center">
             <button mat-flat-button color="primary" (click)="save()">Salvar</button>
           </div>
-          <div fxLayout="column">
+          <div fxLayout="column" fxFlexAlign="center">
             <button mat-stroked-button color="primary" (click)="add()">Adicionar</button>
+          </div>
+          <div fxLayout="column" fxFlexAlign="center">
+            <button mat-stroked-button color="accent" (click)="reset()">reset</button>
+          </div>
+          <div fxLayout="column" fxFlexAlign="center">
+            <div style="display: flex; flex-direction: column; text-align: center;">
+              <span>Ativos</span>
+              <app-check-box/>
+            </div>
+          </div>
+          <div fxLayout="column" fxFlexAlign="center">
+            <div style="display: flex; flex-direction: column; text-align: center;">
+              <span>Inativos</span>
+              <app-check-box/>
+            </div>
           </div>
         </div>
       </mat-card-content>

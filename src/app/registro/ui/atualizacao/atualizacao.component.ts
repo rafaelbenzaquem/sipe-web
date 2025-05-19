@@ -13,6 +13,7 @@ import {Registro} from '../../registro.model';
 import {Ponto} from '../../../ponto/ponto.model';
 import {MatCard, MatCardModule} from '@angular/material/card';
 import {RegistroService} from '../../registro.service';
+import {CheckBoxComponent} from '../../../check-box/check-box.component';
 
 @Component({
   standalone: true,
@@ -31,6 +32,7 @@ import {RegistroService} from '../../registro.service';
     FlexLayoutModule,
     ReactiveFormsModule,
     MatCardModule,
+    CheckBoxComponent
   ],
   templateUrl: './atualizacao.component.html',
   styleUrls: ['./atualizacao.component.scss']
@@ -40,12 +42,12 @@ export class AtualizacaoComponent {
   registrosParaApagar: Registro[] = [];
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: Ponto,
+    @Inject(MAT_DIALOG_DATA) public ponto: Ponto,
     private dialogRef: MatDialogRef<AtualizacaoComponent>,
     private registroService: RegistroService
   ) {
     // duplicar para edição sem afetar o original até salvar
-    this.registros = data.registros;
+    this.registros = ponto.registros;
   }
 
   moveUp(index: number): void {
@@ -60,21 +62,8 @@ export class AtualizacaoComponent {
     }
   }
 
-  ativar(index: number): void {
-    var registro = this.registros[index];
-    if (registro) {
-      registro.ativo = true
-    }
-  }
-
-  desativar(index: number): void {
-    var registro = this.registros[index];
-    if (registro) {
-      registro.ativo = false
-    }
-  }
-
   remove(index: number): void {
+    console.log("remove index:"+index);
     this.registrosParaApagar.push(this.registros[index]);
     this.registros.splice(index, 1);
   }
@@ -82,29 +71,43 @@ export class AtualizacaoComponent {
   save(): void {
     this.registros.forEach(registro => {
       if (registro.id === 0)
-        this.registroService.cria(registro, this.data.matricula, this.data.dia.replaceAll('/','')).subscribe(
+        this.registroService.cria(registro, this.ponto.matricula, this.ponto.dia.replaceAll('/', '')).subscribe(
           rr => {
             registro = Registro.toModel(rr)
           }
         )
       else
-        this.registroService.atualiza(registro, this.data.matricula, this.data.dia.replaceAll('/','')).subscribe(
+        this.registroService.atualiza(registro, this.ponto.matricula, this.ponto.dia.replaceAll('/', '')).subscribe(
           rr => {
             registro = Registro.toModel(rr)
           }
         )
     })
 
+    this.registros.forEach((registro, index) => {
+      if (!registro.ativo) {
+        console.log("save:registros.forEach:index:"+index);
+        this.registros.splice(index, 1);
+      }
+    })
+
     this.registrosParaApagar.forEach((registro: Registro) => {
-      if (registro.id !== 0){
+      if (registro.id !== 0) {
         this.registroService.apaga(registro.id).subscribe(
-          registroApagado => { console.log(registroApagado); },
+          registroApagado => {
+            console.log(registroApagado);
+          },
         )
       }
     })
 
 
     this.dialogRef.close({registros: this.registros});
+  }
+
+  reset(){
+    this.registros = this.ponto.registros;
+    this.registrosParaApagar = [];
   }
 
   add(): void {

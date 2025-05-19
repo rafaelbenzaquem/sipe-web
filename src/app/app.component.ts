@@ -28,7 +28,7 @@ import {environment as env} from '../environments/environment';
       useValue: {
         placeholderResolution: 40
       }
-    }
+    },
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'

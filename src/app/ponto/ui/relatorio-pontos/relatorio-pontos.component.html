@@ -3,7 +3,7 @@
     <mat-card appearance="outlined">
       <mat-card-header>
         <mat-card-title>
-          Usuário: {{ usuario.nome }}
+          Usuário: {{ usuario.nome }} , matrícula: {{ usuario.matricula }}
         </mat-card-title>
       </mat-card-header>
       <mat-card-content class="mat-20">
@@ -71,12 +71,17 @@
         </div>
         <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="16px">
           <div fxLayout="column" fxFlex="100%" class="mt-20">
-            @if (foiBuscado) {
+            <div *ngIf="foiBuscado">
               {{ exibirPeriodo() }} <br/>
-            }
-            @if (pontos.length !== 0) {
-              <app-tabela-pontos [pontos]="pontos" [tamanhoRegistros]="verificaMaiorListaDeRegistro(pontos)"/>
-            }
+            </div>
+            <div *ngIf="pontos.length > 0">
+<!--              Componente da tabela-->
+              <app-tabela-pontos
+                [pontos]="pontos"
+                [tamanhoRegistros]="tamanhoMaximo"
+                (editar)="openAtualizacao($event)">
+              </app-tabela-pontos>
+            </div>
           </div>
         </div>
       </mat-card-content>

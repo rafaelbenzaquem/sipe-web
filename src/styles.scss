@@ -1,5 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
 
+//@use '@angular/material' as mat;
+//
+//// Customize the entire app. Change :root to your selector if you want to scope the styles.
+//:root {
+//  @include mat.button-overrides((
+//    filled-container-color: orange,
+//    filled-label-text-color: red,
+//  ));
+//}
 html, body {
   height: 100%;
 }
@@ -33,14 +42,19 @@ body {
   margin-left: 5px;
 }
 
-.m-20{
+.m-20 {
   margin: 20px 20px;
 }
 
-.m-15{
+.m-15 {
   margin: 15px 15px;
 }
 
 .full-width {
   width: 100%;
+}
+
+.btn-verde {
+  background-color: #007b2c;
+  color: white;
 }

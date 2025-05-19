@@ -1,10 +1,10 @@
 export class Registro {
+
   id: number = 0;
   hora: string = '';
   sentido: 'Entrada' | 'Saída' | '-----' = '-----';
+  ativo: boolean = true;
   codigo_acesso: number = 0;
-  versao: number = 0;
-
 
   static toModel(registroResponse: RegistroResponse) {
     let registro = new Registro();
@@ -12,11 +12,58 @@ export class Registro {
     registro.hora = registroResponse.hora;
     registro.sentido = registroResponse.sentido;
     registro.codigo_acesso = registroResponse.codigo_acesso;
-    registro.versao = registroResponse.versao;
+    registro.ativo = registroResponse.ativo;
     return registro;
   }
 
+  toNovoRequest(): RegistroNovoRequest {
+    return new RegistroNovoRequest(
+      this.hora.replaceAll(':',''),
+      this.sentido,
+      this.ativo,
+      this.codigo_acesso
+    );
+  }
 
+  toAtualizadoRequest(): RegistroAtualizadoRequest {
+    return new RegistroAtualizadoRequest(
+      this.id,
+      this.hora.replaceAll(':',''),
+      this.sentido,
+      this.ativo,
+      this.codigo_acesso
+    );
+  }
+}
+
+export class RegistroAtualizadoRequest {
+  id?: number;
+  hora?: string;
+  sentido?: string;
+  ativo?: boolean;
+  codigo_acesso?: number;
+
+  constructor(id: number, hora: string, sentido: string, ativo: boolean, codigo_acesso: number) {
+    this.id = id;
+    this.hora = hora;
+    this.sentido = sentido;
+    this.ativo = ativo;
+    this.codigo_acesso = codigo_acesso;
+  }
+}
+
+export class RegistroNovoRequest {
+  hora?: string;
+  sentido?: string;
+  ativo?: boolean;
+  codigo_acesso?: number;
+
+  constructor(hora: string, sentido: string, ativo: boolean, codigo_acesso: number) {
+    this.hora = hora;
+    this.sentido = sentido;
+    this.ativo = ativo;
+    this.codigo_acesso = codigo_acesso;
+  }
 }
 
 export interface RegistroResponse {
@@ -24,7 +71,7 @@ export interface RegistroResponse {
   hora: string;
   sentido: 'Entrada' | 'Saída';
   codigo_acesso: number;
-  versao: number;
+  ativo: boolean;
   _links: {
     self: {
       href: string;

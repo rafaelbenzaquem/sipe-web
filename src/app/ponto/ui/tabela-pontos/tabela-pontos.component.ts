@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {DatePipe, NgForOf} from '@angular/common';
 import {Ponto} from '../../ponto.model';
 import {FormsModule} from '@angular/forms';
@@ -69,34 +69,37 @@ export class RegistroListModel {
   styleUrl: './tabela-pontos.component.scss',
   providers: [DatePipe]
 })
-export class TabelaPontosComponent implements OnChanges, OnInit {
+export class TabelaPontosComponent {
 
 
-  @Input() pontos: Ponto[] = [];
-  @Input() tamanhoRegistros = 2;
+  private _pontos: Ponto[] = [];
+  /** Pontos de entrada; reconstrói o modelo da tabela quando alterar */
+  @Input()
+  set pontos(v: Ponto[]) {
+    this._pontos = v || [];
+    this.updateTableModel();
+  }
+  get pontos(): Ponto[] {
+    return this._pontos;
+  }
+  @Output() editar = new EventEmitter<Ponto>();
+  private _tamanhoRegistros = 2;
+  /** Número de colunas de registros; reconstrói o modelo da tabela quando alterar */
+  @Input()
+  set tamanhoRegistros(v: number) {
+    this._tamanhoRegistros = v || 0;
+    this.updateTableModel();
+  }
+  get tamanhoRegistros(): number {
+    return this._tamanhoRegistros;
+  }
   pontosTableModel: PontoTableModel[] = [];
 
 
-  ngOnChanges(changes: SimpleChanges): void {
-    console.log("TabelaPontosComponent ngOnChanges... ponto.length " + this.pontos.length);
-    console.log("TabelaPontosComponent ngOnChanges... tamanhoRegistros " + this.tamanhoRegistros);
-    if (changes['pontos']) {
-      this.pontosTableModel = this.criaPontosTableModel(this.pontos, this.tamanhoRegistros);
-    }
+  /** Reconstrói o modelo de exibição a partir dos inputs atuais */
+  private updateTableModel(): void {
+    this.pontosTableModel = this.criaPontosTableModel(this._pontos, this._tamanhoRegistros);
   }
-
-  ngOnInit(): void {
-    console.log("TabelaPontosComponent ngOnInit... ponto.length " + this.pontos.length);
-    console.log("TabelaPontosComponent ngOnInit... tamanhoRegistros " + this.tamanhoRegistros);
-    this.pontosTableModel = this.criaPontosTableModel(this.pontos, this.tamanhoRegistros);
-  }
-
-  // constructor() {
-  //   console.log("TabelaPontosComponent constructor... ponto.length"+ this.pontos.length);
-  //   this.pontosTableModel = this.criaPontosTableModel(this.pontos);
-  //   this.tamanhoRegistros = this.verificaMaiorListaDeRegistro(this.pontos) + 1;
-  //
-  // }
 
 
   criaPontosTableModel(pontos: Ponto[], maiorLista: number) {
@@ -115,4 +118,5 @@ export class TabelaPontosComponent implements OnChanges, OnInit {
     })
     return pontosTableModel;
   }
+
 }

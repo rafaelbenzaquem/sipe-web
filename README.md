@@ -1,59 +1,108 @@
-# SipeWeb
+ # SipeWeb
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.7.
+ Aplicação frontend do Sistema Integrado de Ponto Eletrônico (SIPE) da Justiça Federal de Roraima (JFRR), para gerenciamento de usuários e relatórios de ponto.
 
-## Development server
+ Gerado com [Angular CLI](https://github.com/angular/angular-cli) v19.2.7.
 
-To start a local development server, run:
+ ## Pré-requisitos
 
-```bash
-ng serve
-```
+ - Node.js >= 18
+ - npm >= 8
+ - Docker (opcional, para containerização)
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+ ## Instalação
 
-## Code scaffolding
+ 1. Clone este repositório:
+    ```bash
+    git clone <URL_DO_REPOSITORIO>
+    cd sipe-web
+    ```
+ 2. Instale as dependências:
+    ```bash
+    npm install
+    ```
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+ ## Configuração
 
-```bash
-ng generate component component-name
-```
+ As URLs da API devem ser ajustadas em `src/environments`:
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+ - **Desenvolvimento**: `src/environments/environment.development.ts` (padrão `http://localhost:8084`)
+ - **Produção**: `src/environments/environment.production.ts` (padrão `http://192.168.100.7:8084`)
 
-```bash
-ng generate --help
-```
+ ## Execução em Desenvolvimento
 
-## Building
+ Inicie o servidor de desenvolvimento:
+ ```bash
+ npm start
+ # ou
+ ng serve
+ ```
+ Acesse em `http://localhost:4200`.
 
-To build the project run:
+ ## Build para Produção
 
-```bash
-ng build
-```
+ Gere os artefatos otimizados:
+ ```bash
+ npm run build -- --configuration production
+ ```
+ Os arquivos compilados serão gerados em `dist/sipe-web`.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+ ## Execução com Docker
 
-## Running unit tests
+ 1. Construa a imagem:
+    ```bash
+    docker build -t sipe-web .
+    ```
+ 2. Execute o container:
+    ```bash
+    docker run -d -p 80:80 --name sipe-web sipe-web
+    ```
+ Acesse em `http://localhost`.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+ ## Funcionalidades Principais
 
-```bash
-ng test
-```
+ - Cadastro e consulta de usuários com paginação e filtros.
+ - Atualização de perfil de usuário via diálogo.
+ - Relatórios de pontos diários e exibição de registros.
+ - Interface responsiva com Angular Material e Flex-Layout.
+ - Locale em Português (pt-BR) e formatação de data com Moment.js.
 
-## Running end-to-end tests
+ ## Tecnologias Utilizadas
 
-For end-to-end (e2e) testing, run:
+ - Angular 19, TypeScript, RxJS
+ - Angular Material & @angular/flex-layout
+ - Moment.js & @angular/material-moment-adapter
+ - Docker & Nginx (para build de produção)
+ - Karma + Jasmine (testes unitários)
+ - (E2E: escolha seu framework preferido)
 
-```bash
-ng e2e
-```
+ ## Testes
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+ - **Unitários**:
+   ```bash
+   ng test
+   ```
+ - **E2E**:
+   ```bash
+   ng e2e
+   ```
 
-## Additional Resources
+ ## Estrutura do Projeto
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+ ```
+ .
+ ├── src/app            Módulos e componentes Angular
+ ├── src/environments   Configurações de ambiente (API)
+ ├── public             Imagens e ativos estáticos
+ ├── dockerfile         Dockerfile para produção
+ ├── angular.json       Configurações do Angular CLI
+ └── package.json       Scripts npm e dependências
+ ```
+
+ ## Contribuição
+
+ Pull requests e issues são bem-vindos. Sinta-se à vontade para contribuir!
+
+ ## Licença
+
+ Este projeto é privado (`"private": true` no `package.json`). Defina uma licença caso seja aberto ao público.

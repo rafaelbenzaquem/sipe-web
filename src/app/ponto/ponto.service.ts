@@ -2,13 +2,14 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {PontoListResponse, PontoResponse} from './ponto.model';
+import {environment as env} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PontoService {
 
-  private readonly API_BASE = 'http://localhost:8084/v1/sipe/pontos';
+  private readonly API_BASE = env.SIPE_API_URL + '/v1/sipe/pontos';
 
   constructor(private http: HttpClient) {
   }

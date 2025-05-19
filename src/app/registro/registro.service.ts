@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {RegistroListResponse, RegistroResponse} from './registro.model';
+import {Registro, RegistroListResponse, RegistroResponse} from './registro.model';
 import {environment as env} from '../../environments/environment';
 
 
@@ -10,17 +10,31 @@ import {environment as env} from '../../environments/environment';
 })
 export class RegistroService {
 
-  private readonly API_BASE = env.SIPE_API_URL + '/v1/sipe';
+  private readonly API_BASE = env.SIPE_API_URL + '/v1/sipe/registros';
 
   constructor(private http: HttpClient) {
   }
 
-  getRegistro(id: number): Observable<RegistroResponse> {
-    return this.http.get<RegistroResponse>(`${this.API_BASE}/pontos/registros/${id}`);
+  cria(registro: Registro, matricula: string, dia: string): Observable<RegistroResponse> {
+    return this.http.post<RegistroResponse>(`${this.API_BASE}/pontos?matricula=${matricula}&dia=${dia}`,
+      [registro.toNovoRequest()]);
   }
 
-  getRegistros(matricula: string, dia: string): Observable<RegistroListResponse> {
-    return this.http.get<RegistroListResponse>(`${this.API_BASE}/registros/pontos?matricula=${matricula}&dia=${dia}`);
+  atualiza(registro: Registro, matricula: string, dia: string): Observable<RegistroResponse> {
+    return this.http.put<RegistroResponse>(`${this.API_BASE}/pontos?matricula=${matricula}&dia=${dia}`,
+      registro.toAtualizadoRequest());
+  }
+
+  busca(id: number): Observable<RegistroResponse> {
+    return this.http.get<RegistroResponse>(`${this.API_BASE}/${id}`);
+  }
+
+  lista(matricula: string, dia: string): Observable<RegistroListResponse> {
+    return this.http.get<RegistroListResponse>(`${this.API_BASE}/pontos?matricula=${matricula}&dia=${dia}`);
+  }
+
+  apaga(id: number): Observable<RegistroResponse> {
+    return this.http.delete<RegistroResponse>(`${this.API_BASE}/${id}`);
   }
 
 }

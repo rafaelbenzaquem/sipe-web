@@ -1,0 +1,10 @@
+<div *ngIf="value">
+  <button mat-icon-button color="primary" (click)="changeValue()">
+    <mat-icon>check_box</mat-icon>
+  </button>
+</div>
+<div *ngIf="!value">
+  <button mat-icon-button color="primary" (click)="changeValue()">
+    <mat-icon>check_box_outline_blank</mat-icon>
+  </button>
+</div>

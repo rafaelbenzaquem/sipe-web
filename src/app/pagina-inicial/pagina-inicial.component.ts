@@ -54,8 +54,9 @@ export class PaginaInicialComponent {
       login: this.loginForm.value.matricula || "",
       authorities: this.loginForm.value.authorities || []
     };
-    this.authService.login(perfil).subscribe(() => {
-      this.router.navigate(['/pontos/relatorio']);
+    this.authService.login(perfil).subscribe(usuario => {
+      console.log(usuario);
+      this.router.navigate(['/pontos/relatorio'], {state: {usuario}});
     });
   }
 }

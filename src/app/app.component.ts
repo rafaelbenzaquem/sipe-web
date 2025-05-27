@@ -58,6 +58,10 @@ export class AppComponent {
     return this.authService.getPerfil();
   }
 
+  get usuario(){
+    return this.authService.getUsuario();
+  }
+
   /**
    * Verifica se possui determinada permissão
    */

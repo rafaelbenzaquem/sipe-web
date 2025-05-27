@@ -1,8 +1,12 @@
-<ng-container *ngIf="isLoggedIn()">
-  <mat-toolbar color="primary" class="header-bar1">
-    <span>Sistemas Integrados de Ponto Eletrônico - SIPE</span>
+<ng-container>
+  <mat-toolbar color="primary" class="header-bar1" *ngIf="!isLoggedIn()">
+    <span>Sistema Integrado de Ponto Eletrônico - SIPE</span>
+  </mat-toolbar>
+  <mat-toolbar color="primary" class="header-bar1" *ngIf="isLoggedIn()">
+    <span>Sistema Integrado de Ponto Eletrônico - SIPE</span>
     <span class="spacer"></span>
-    <a *ngIf="hasAnyRole(['GRP_SIPE_ADMIN','GRP_SIPE_DIRETOR','GRP_SIPE_RH'])" mat-button routerLink="/usuarios/consulta">
+    <a *ngIf="hasAnyRole(['GRP_SIPE_ADMIN','GRP_SIPE_DIRETOR','GRP_SIPE_RH'])" mat-button
+       routerLink="/usuarios/consulta">
       <mat-icon>search</mat-icon>
       Busca de Usuários
     </a>
@@ -10,7 +14,9 @@
       <mat-icon>person_add</mat-icon>
       Cadastro de Usuário
     </a>
-    <a *ngIf="hasAnyRole(['GRP_SIPE_ADMIN','GRP_SIPE_DIRETOR','GRP_SIPE_USERS'])" mat-button routerLink="/pontos/relatorio">
+    <a *ngIf="hasAnyRole(['GRP_SIPE_ADMIN','GRP_SIPE_DIRETOR','GRP_SIPE_USERS'])" mat-button
+       [routerLink]="['/pontos/relatorio']"
+       [state]="{'usuario': usuario}">
       <mat-icon>assignment</mat-icon>
       Relatório de Pontos
     </a>
@@ -19,7 +25,7 @@
       Configuração
     </a>
     <span class="spacer"></span>
-    <span>Bem-vindo, {{ perfil?.login }}</span>
+    <span>Bem-vindo, {{ usuario?.nome }}</span>
     <button mat-icon-button color="accent" (click)="logout()" title="Logout">
       <mat-icon>exit_to_app</mat-icon>
     </button>

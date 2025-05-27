@@ -1,31 +1,38 @@
-<mat-toolbar color="primary" class="header-bar1">
-  <span>Sistemas Integrados de Ponto Eletrônico - SIPE</span>
-  <span class="spacer"></span>
+<ng-container *ngIf="isLoggedIn()">
+  <mat-toolbar color="primary" class="header-bar1">
+    <span>Sistemas Integrados de Ponto Eletrônico - SIPE</span>
+    <span class="spacer"></span>
+    <a *ngIf="hasAnyRole(['GRP_SIPE_ADMIN','GRP_SIPE_DIRETOR','GRP_SIPE_RH'])" mat-button routerLink="/usuarios/consulta">
+      <mat-icon>search</mat-icon>
+      Busca de Usuários
+    </a>
+    <a *ngIf="hasAnyRole(['GRP_SIPE_ADMIN','GRP_SIPE_RH'])" mat-button routerLink="/usuarios/cadastro">
+      <mat-icon>person_add</mat-icon>
+      Cadastro de Usuário
+    </a>
+    <a *ngIf="hasAnyRole(['GRP_SIPE_ADMIN','GRP_SIPE_DIRETOR','GRP_SIPE_USERS'])" mat-button routerLink="/pontos/relatorio">
+      <mat-icon>assignment</mat-icon>
+      Relatório de Pontos
+    </a>
+    <a *ngIf="hasRole('GRP_SIPE_ADMIN')" mat-button>
+      <mat-icon>settings</mat-icon>
+      Configuração
+    </a>
+    <span class="spacer"></span>
+    <span>Bem-vindo, {{ perfil?.login }}</span>
+    <button mat-icon-button color="accent" (click)="logout()" title="Logout">
+      <mat-icon>exit_to_app</mat-icon>
+    </button>
+  </mat-toolbar>
 
-
-  <a mat-button routerLink="/usuarios/consulta">
-    <mat-icon fontIcon="search"></mat-icon>
-    Busca de Usuários
-  </a>
-  <a mat-button routerLink="/usuarios/cadastro">
-    <mat-icon fontIcon="feed"></mat-icon>
-    Cadastro de Usuário
-  </a>
-  <a mat-button>
-    <mat-icon fontIcon="settings"></mat-icon>
-    Configuração
-  </a>
-</mat-toolbar>
-
-
-<mat-toolbar class="header-bar2">
-  <div fxLayout="row" fxLayoutAlign="center">
-    <div fxLayout="column" fxFlex="100%">
-      <img ngSrc="{{URL_BASE}}/v1/sipe/arquivos/nome/logoImagem.png" width="240" height="60"
-           alt="img">
+  <mat-toolbar class="header-bar2">
+    <div fxLayout="row" fxLayoutAlign="center">
+      <div fxLayout="column" fxFlex="100%">
+        <img ngSrc="{{URL_BASE}}/v1/sipe/arquivos/nome/logoImagem.png" width="240" height="60" alt="img">
+      </div>
     </div>
-  </div>
-</mat-toolbar>
+  </mat-toolbar>
+</ng-container>
 
 <div class="content">
   <router-outlet></router-outlet>

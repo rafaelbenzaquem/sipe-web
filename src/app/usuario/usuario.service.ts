@@ -27,8 +27,10 @@ export class UsuarioService {
   // }
 
 
-  getUsuarios(page = 0, size = 5, nome: string = ''): Observable<UsuarioListResponse> {
-    let uri = `${this.API_BASE}?page=${page}&size=${size}${(nome === undefined || nome === '') ? '' : `&nome=${nome}`}`;
+  getUsuarios(page = 0, size = 5, nome = '', matricula = ''): Observable<UsuarioListResponse> {
+    let uri = `${this.API_BASE}?page=${page}&size=${size}
+    ${(nome === undefined || nome === '') ? '' : `&nome=${nome}`}
+    ${(matricula === undefined || matricula === '') ? '' : `&matricula=${matricula}`}`;
     return this.http.get<UsuarioListResponse>(uri);
   }
 

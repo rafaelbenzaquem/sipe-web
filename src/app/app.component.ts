@@ -1,5 +1,7 @@
 import {Component, inject, signal} from '@angular/core';
-import {RouterLink, RouterOutlet} from '@angular/router';
+import { NgIf } from '@angular/common';
+import { RouterLink, RouterOutlet, Router } from '@angular/router';
+import { AuthService } from './auth/auth.service';
 import {MatButtonModule} from '@angular/material/button';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatIconModule} from '@angular/material/icon';
@@ -13,13 +15,15 @@ import {FlexModule} from '@angular/flex-layout';
 import {environment as env} from '../environments/environment';
 
 @Component({
+  standalone: true,
   selector: 'app-root',
   imports: [
-    RouterOutlet, RouterLink,
+    RouterOutlet, RouterLink, NgIf,
     MatButtonModule, MatToolbarModule,
     MatIconModule, MatTableModule,
     MatPaginatorModule,
-    NgOptimizedImage, FlexModule],
+    NgOptimizedImage, FlexModule
+  ],
   providers: [
     {provide: MAT_DATE_LOCALE, useValue: 'pt-BR'},
     provideMomentDateAdapter(),
@@ -38,4 +42,40 @@ export class AppComponent {
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
 
   URL_BASE = env.SIPE_API_URL;
+  constructor(private authService: AuthService, private router: Router) {}
+
+  /**
+   * Verifica se o usuário está logado
+   */
+  isLoggedIn(): boolean {
+    return this.authService.isLoggedIn();
+  }
+
+  /**
+   * Retorna o perfil do usuário logado
+   */
+  get perfil() {
+    return this.authService.getPerfil();
+  }
+
+  /**
+   * Verifica se possui determinada permissão
+   */
+  hasRole(role: string): boolean {
+    return this.authService.hasRole(role);
+  }
+
+  /**
+   * Verifica se possui ao menos uma das permissões
+   */
+  hasAnyRole(roles: string[]): boolean {
+    return this.authService.hasAnyRole(roles);
+  }
+
+  /**
+   * Realiza logout e redireciona para login
+   */
+  logout(): void {
+    this.authService.logout();
+  }
 }

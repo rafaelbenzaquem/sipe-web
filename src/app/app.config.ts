@@ -1,6 +1,7 @@
 import {ApplicationConfig, provideZoneChangeDetection} from '@angular/core';
 import {provideRouter} from '@angular/router';
 import {provideHttpClient, withFetch, withInterceptorsFromDi} from '@angular/common/http';
+import { provideOAuthClient } from 'angular-oauth2-oidc';
 
 import {routes} from './app.routes';
 
@@ -11,6 +12,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withFetch(),
       withInterceptorsFromDi()
-    )
+    ),
+    provideOAuthClient()
   ]
 };

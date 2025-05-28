@@ -13,6 +13,8 @@ import 'moment/locale/pt-br'
 import {IMAGE_CONFIG, NgOptimizedImage} from '@angular/common';
 import {FlexModule} from '@angular/flex-layout';
 import {environment as env} from '../environments/environment';
+import {MatMenuModule} from '@angular/material/menu';
+import {MatChipsModule} from '@angular/material/chips';
 
 @Component({
   standalone: true,
@@ -22,7 +24,7 @@ import {environment as env} from '../environments/environment';
     MatButtonModule, MatToolbarModule,
     MatIconModule, MatTableModule,
     MatPaginatorModule,
-    NgOptimizedImage, FlexModule
+    NgOptimizedImage, FlexModule, MatMenuModule, MatChipsModule
   ],
   providers: [
     {provide: MAT_DATE_LOCALE, useValue: 'pt-BR'},

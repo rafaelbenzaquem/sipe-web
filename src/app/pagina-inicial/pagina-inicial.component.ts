@@ -9,6 +9,8 @@ import {MatButtonModule} from '@angular/material/button';
 import {Router} from '@angular/router';
 import {AuthService} from '../auth/auth.service';
 import {Perfil} from './perfil.model';
+import {OAuthService} from 'angular-oauth2-oidc';
+import {authCodeFlowConfig} from '../auth/auth.code.flow.config';
 
 @Component({
   standalone: true,
@@ -42,8 +44,16 @@ export class PaginaInicialComponent {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private oauthService: OAuthService,
   ) {
+
+    this.oauthService.configure(authCodeFlowConfig);
+    this.oauthService.loadDiscoveryDocumentAndTryLogin();
+
+    let token = this.oauthService.getAccessToken()
+
+    console.log('token', token);
   }
 
   onSubmit(): void {
@@ -58,5 +68,14 @@ export class PaginaInicialComponent {
       console.log(usuario);
       this.router.navigate(['/pontos/relatorio'], {state: {usuario}});
     });
+  }
+
+  login(): void {
+    var claims = this.oauthService.getIdentityClaims();
+    console.log(claims);
+    if (claims==null) {
+      console.log("Entrado no fluxo de autenticação");
+      this.oauthService.initImplicitFlow();
+    }
   }
 }

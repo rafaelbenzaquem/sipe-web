@@ -18,8 +18,10 @@
        [routerLink]="['/pontos/relatorio']"
        [state]="{'usuario': usuario}">
       <mat-icon>assignment</mat-icon>
-      Relatório de Pontos
+      Relatório Pessoal de Ponto
     </a>
+
+
     <a *ngIf="hasRole('GRP_SIPE_ADMIN')" mat-button>
       <mat-icon>settings</mat-icon>
       Configuração

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { OAuthService } from 'angular-oauth2-oidc';
 import { Perfil } from '../pagina-inicial/perfil.model';
 import { Usuario } from '../usuario/usuario.model';
 import { UsuarioService } from '../usuario/usuario.service';
@@ -15,7 +16,8 @@ export class AuthService {
 
   constructor(
     private usuarioService: UsuarioService,
-    private router: Router
+    private router: Router,
+    private oauthService: OAuthService  // serviço OAuth para logout federado
   ) {}
 
   /**
@@ -33,12 +35,16 @@ export class AuthService {
   }
 
   /**
-   * Logout limpa perfil e navega para página de login.
+   * Logout federado:
+   * - Limpa o estado local da aplicação
+   * - Redireciona o usuário ao Identity Provider para encerrar a sessão
    */
   logout(): void {
+    // Limpa perfil e dados do usuário localmente
     this.perfilSubject.next(null);
     this.usuarioSubject.next(null);
-    this.router.navigate(['/']);
+    // Executa logout no provedor de identidade (end-session endpoint)
+    this.oauthService.logOut();
   }
 
   /**

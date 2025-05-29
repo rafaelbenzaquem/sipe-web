@@ -41,6 +41,7 @@ import {MatChipsModule} from '@angular/material/chips';
 })
 export class AppComponent {
   title = 'SIPE';
+  logoPath = 'assets/logoImagem.png';
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
 
   URL_BASE = env.SIPE_API_URL;
@@ -79,7 +80,9 @@ export class AppComponent {
   }
 
   /**
-   * Realiza logout e redireciona para login
+   * Inicia logout federado:
+   * - Limpa estado local e redireciona ao Identity Provider para encerrar sessão
+   * - Após logout no provedor, o usuário retorna à aplicação em postLogoutRedirectUri
    */
   logout(): void {
     this.authService.logout();

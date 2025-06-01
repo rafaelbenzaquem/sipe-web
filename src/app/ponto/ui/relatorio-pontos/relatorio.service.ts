@@ -1,31 +1,34 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http'; // Se estiver usando Angular
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpResponse} from '@angular/common/http';
+import {firstValueFrom} from 'rxjs';
+import {environment as env} from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RelatorioService {
-  private baseUrl = 'http://localhost:8084/v1/sipe/relatorios';
 
-  constructor(private http: HttpClient) {} // Se estiver usando Angular
+  private baseUrl = env.SIPE_API_URL + '/v1/sipe/relatorios';
+
+  constructor(private http: HttpClient) {
+  }
 
   async downloadRelatorio(matricula: string, inicio: Date, fim: Date): Promise<void> {
-    const inicioFormatado = this.formatarData(inicio); // Implemente sua função de formatação
-    const fimFormatado = this.formatarData(fim);     // Implemente sua função de formatação
+    const inicioFormatado = this.formatarData(inicio);
+    const fimFormatado = this.formatarData(fim);
     const url = `${this.baseUrl}/${matricula.toUpperCase()}?inicio=${inicioFormatado}&fim=${fimFormatado}`;
 
     try {
-      const response = await fetch(url);
+      const response: HttpResponse<Blob> = await firstValueFrom(
+        this.http.get(url, {
+          observe: 'response',
+          responseType: 'blob',
+        })
+      );
 
-      if (!response.ok) {
-        const errorBody = await response.text();
-        console.error(`Erro ao baixar relatório: ${response.status} - ${errorBody}`);
-        throw new Error(`Erro ao baixar relatório: ${response.status}`);
-      }
-
-      const blob = await response.blob();
+      const blob = response.body!;
       const contentDisposition = response.headers.get('Content-Disposition');
-      let filename = matricula + '.pdf'; // Valor padrão
+      let filename = matricula + '.pdf';
 
       if (contentDisposition && contentDisposition.includes('filename=')) {
         const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);

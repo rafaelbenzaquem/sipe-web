@@ -1,51 +1,99 @@
-<ng-container>
-  <mat-toolbar color="primary" class="header-bar1" *ngIf="!isLoggedIn()">
-    <span>Sistema Integrado de Ponto Eletrônico - SIPE</span>
-  </mat-toolbar>
-  <mat-toolbar color="primary" class="header-bar1" *ngIf="isLoggedIn()">
-    <span>Sistema Integrado de Ponto Eletrônico - SIPE</span>
-    <span class="spacer"></span>
-    <a *ngIf="hasAnyRole(['GRP_SIPE_ADMIN','GRP_SIPE_DIRETOR','GRP_SIPE_RH'])" mat-button
-       routerLink="/usuarios/consulta">
-      <mat-icon>search</mat-icon>
-      Busca de Usuários
-    </a>
-    <a *ngIf="hasAnyRole(['GRP_SIPE_ADMIN','GRP_SIPE_RH'])" mat-button routerLink="/usuarios/cadastro">
-      <mat-icon>person_add</mat-icon>
-      Cadastro de Usuário
-    </a>
-    <a *ngIf="hasAnyRole(['GRP_SIPE_ADMIN','GRP_SIPE_DIRETOR','GRP_SIPE_USERS'])" mat-button
-       [routerLink]="['/pontos/relatorio']"
-       [state]="{'usuario': usuario}">
-      <mat-icon>assignment</mat-icon>
-      Relatório Pessoal de Ponto
-    </a>
-
-
-    <a *ngIf="hasRole('GRP_SIPE_ADMIN')" mat-button>
-      <mat-icon>settings</mat-icon>
-      Configuração
-    </a>
-    <span class="spacer"></span>
-    <span>Bem-vindo, {{ usuario?.nome }}</span>
-    <button mat-icon-button color="accent" (click)="logout()" title="Logout">
-      <mat-icon>exit_to_app</mat-icon>
-    </button>
-  </mat-toolbar>
-
-  <mat-toolbar class="header-bar2">
+<mat-drawer-container class="example-container" autosize>
+  <mat-drawer #drawer mode="side">
+    <div class="drawer-block">
+      <img [ngSrc]="logoPath" alt="Logo" width="240" height="60">
+    </div>
+    <div class="drawer-block">
+      <span>Sistema Integrado de Ponto Eletrônico - SIPE</span>
+    </div>
+    <div class="drawer-block">
+      <span>v 0.1.2</span>
+    </div>
+    <span class="after-version-space"></span>
     <div fxLayout="row" fxLayoutAlign="center">
       <div fxLayout="column" fxFlex="100%">
-        <img [ngSrc]="logoPath" alt="Logo" width="240" height="60">
+
+        <mat-divider></mat-divider>
+        <a class="drawer-link" *ngIf="hasAnyRole(['GRP_SIPE_ADMIN','GRP_SIPE_DIRETOR','GRP_SIPE_RH'])"
+           routerLink="/usuarios/consulta">
+          <mat-icon>search</mat-icon>
+          Busca de Usuários
+        </a>
       </div>
     </div>
-  </mat-toolbar>
-</ng-container>
+    <div fxLayout="row" fxLayoutAlign="center">
+      <div fxLayout="column" fxFlex="100%">
+        <mat-divider></mat-divider>
+        <a class="drawer-link" *ngIf="hasAnyRole(['GRP_SIPE_ADMIN','GRP_SIPE_RH'])" routerLink="/usuarios/cadastro">
+          <mat-icon>person_add</mat-icon>
+          Cadastro de Usuário
+        </a>
+      </div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="center">
+      <div fxLayout="column" fxFlex="100%">
+        <mat-divider></mat-divider>
+        <a class="drawer-link" *ngIf="hasAnyRole(['GRP_SIPE_ADMIN','GRP_SIPE_DIRETOR','GRP_SIPE_USERS'])"
+           [routerLink]="['/pontos/relatorio']"
+           [state]="{'usuario': usuario}">
+          <mat-icon>assignment</mat-icon>
+          Relatório Pessoal de Ponto
+        </a>
+      </div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="center">
+      <div fxLayout="column" fxFlex="100%">
+        <mat-divider></mat-divider>
+        <a class="drawer-link" *ngIf="hasRole('GRP_SIPE_ADMIN')" routerLink="/">
+          <mat-icon>settings</mat-icon>
+          Configuração
+        </a>
+      </div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="center">
+      <div fxLayout="column" fxFlex="100%">
+        <mat-divider></mat-divider>
+        <a class="drawer-link-exit" color="accent" (click)="logout()" title="Logout">
+          <mat-icon>exit_to_app</mat-icon>
+          SAIR
+        </a>
+      </div>
+    </div>
 
-<div class="content">
-  <router-outlet></router-outlet>
-</div>
+  </mat-drawer>
+  <mat-drawer-content>
+    <ng-container>
+      <mat-toolbar color="primary" class="header-bar" *ngIf="!isLoggedIn()">
+        <div class="header-block">
+          <img [ngSrc]="logoPath" alt="Logo" width="240" height="60">
+        </div>
+      </mat-toolbar>
 
-<mat-toolbar color="primary" class="footer">
-  <span>© Justiça Federal de Roraima - JFRR - 2025 SIPE - Todos os direitos reservados</span>
-</mat-toolbar>
+      <mat-toolbar color="primary" class="header-bar" *ngIf="isLoggedIn()">
+        <div class="header-block">
+          <a (click)="drawer.toggle()">
+            <mat-icon>menu</mat-icon>
+          </a>
+        </div>
+        <div class="header-block">
+          <img [ngSrc]="logoPath" alt="Logo" width="240" height="60" *ngIf="!drawer.opened">
+        </div>
+
+
+        <span class="spacer"></span>
+        <span>Bem-vindo, {{ usuario?.nome }}</span>
+        <button mat-icon-button color="accent" (click)="logout()" title="Logout">
+          <mat-icon>exit_to_app</mat-icon>
+        </button>
+      </mat-toolbar>
+    </ng-container>
+
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+    <mat-toolbar color="primary" class="footer">
+      <span>© Justiça Federal de Roraima - JFRR - 2025 SIPE - Todos os direitos reservados</span>
+    </mat-toolbar>
+
+  </mat-drawer-content>
+</mat-drawer-container>

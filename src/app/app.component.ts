@@ -15,6 +15,8 @@ import {FlexModule} from '@angular/flex-layout';
 import {environment as env} from '../environments/environment';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatChipsModule} from '@angular/material/chips';
+import {MatSidenavModule} from '@angular/material/sidenav';
+import {MatDividerModule} from '@angular/material/divider';
 
 @Component({
   standalone: true,
@@ -23,8 +25,10 @@ import {MatChipsModule} from '@angular/material/chips';
     RouterOutlet, RouterLink, NgIf,
     MatButtonModule, MatToolbarModule,
     MatIconModule, MatTableModule,
-    MatPaginatorModule,
-    NgOptimizedImage, FlexModule, MatMenuModule, MatChipsModule
+    MatPaginatorModule, NgOptimizedImage,
+    FlexModule, MatMenuModule,
+    MatChipsModule,MatSidenavModule,
+    MatDividerModule
   ],
   providers: [
     {provide: MAT_DATE_LOCALE, useValue: 'pt-BR'},

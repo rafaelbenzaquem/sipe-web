@@ -5,6 +5,7 @@ import {FormsModule} from '@angular/forms';
 import {Registro} from '../../../registro/registro.model';
 import {MatButton, MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
+import {MatTableModule} from '@angular/material/table';
 
 
 export class PontoTableModel {
@@ -63,7 +64,8 @@ export class RegistroListModel {
     FormsModule,
     MatButton,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatTableModule
   ],
   templateUrl: './tabela-pontos.component.html',
   styleUrl: './tabela-pontos.component.scss',
@@ -96,10 +98,10 @@ export class TabelaPontosComponent {
   pontosTableModel: PontoTableModel[] = [];
 
 
-  /** Reconstrói o modelo de exibição a partir dos inputs atuais */
-  private updateTableModel(): void {
-    this.pontosTableModel = this.criaPontosTableModel(this._pontos, this._tamanhoRegistros);
-  }
+  // /** Reconstrói o modelo de exibição a partir dos inputs atuais */
+  // private updateTableModel(): void {
+  //   this.pontosTableModel = this.criaPontosTableModel(this._pontos, this._tamanhoRegistros);
+  // }
 
 
   criaPontosTableModel(pontos: Ponto[], maiorLista: number) {
@@ -118,5 +120,30 @@ export class TabelaPontosComponent {
     })
     return pontosTableModel;
   }
+
+
+  displayedColumns: string[] = [];
+
+  ngOnInit(): void {
+    this.atualizaColunas();
+  }
+
+  private updateTableModel(): void {
+    this.pontosTableModel = this.criaPontosTableModel(this._pontos, this._tamanhoRegistros);
+    this.atualizaColunas();
+  }
+
+  private atualizaColunas(): void {
+    this.displayedColumns = ['dia'];
+    for (let i = 0; i < this.tamanhoRegistros; i++) {
+      this.displayedColumns.push('registro' + i);
+    }
+    this.displayedColumns.push('total', 'descricao', 'acoes');
+  }
+
+  getRegistroIndices(): number[] {
+    return Array.from({ length: this.tamanhoRegistros }, (_, i) => i);
+  }
+
 
 }

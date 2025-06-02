@@ -83,22 +83,23 @@
           </div>
           <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="16px">
             <div fxLayout="column">
-              <button type="submit" [disabled]="!profileForm.valid||naoReinicializavel()" mat-flat-button
-                      color="primary">
+              <button matButton="filled"
+                      type="submit" [disabled]="!profileForm.valid||naoReinicializavel()">
                 <mat-icon fontIcon="update"/>
                 Atualizar
               </button>
             </div>
 
             <div fxLayout="column">
-              <button type="reset" (click)="reiniciar()" mat-flat-button color="accent"
+              <button matButton="tonal"
+                type="reset" (click)="reiniciar()"
                       [disabled]="naoReinicializavel()">
                 <mat-icon fontIcon="backspace"/>
                 Reiniciar
               </button>
             </div>
             <div fxLayout="column">
-              <button type="button" (click)="fecharDialogo()" mat-stroked-button color="accent">
+              <button matButton="outlined" type="button" (click)="fecharDialogo()">
                 <mat-icon fontIcon="close"/>
                 Fechar
               </button>

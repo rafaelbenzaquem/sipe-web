@@ -59,13 +59,13 @@
         </div>
         <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="16px" class="mt-20">
           <div fxLayout="column" fxFlexAlign="center">
-            <button mat-flat-button (click)="cancel()" color="accent">Cancelar</button>
+            <button matButton="tonal" (click)="cancel()" >Cancelar</button>
           </div>
           <div fxLayout="column" fxFlexAlign="center">
-            <button mat-flat-button color="primary" (click)="save()">Salvar</button>
+            <button matButton="filled" (click)="save()">Salvar</button>
           </div>
           <div fxLayout="column" fxFlexAlign="center">
-            <button mat-stroked-button color="primary" (click)="add()">Adicionar</button>
+            <button matButton="outlined" (click)="add()">Adicionar</button>
           </div>
           <div fxLayout="column" fxFlexAlign="center">
             <button mat-stroked-button color="accent" (click)="reset()">reset</button>

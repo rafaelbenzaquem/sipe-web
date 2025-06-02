@@ -1,7 +1,7 @@
 import {Component, inject, signal} from '@angular/core';
-import { NgIf } from '@angular/common';
-import { RouterLink, RouterOutlet, Router } from '@angular/router';
-import { AuthService } from './auth/auth.service';
+import {IMAGE_CONFIG, NgIf, NgOptimizedImage} from '@angular/common';
+import {Router, RouterLink, RouterOutlet} from '@angular/router';
+import {AuthService} from './auth/auth.service';
 import {MatButtonModule} from '@angular/material/button';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatIconModule} from '@angular/material/icon';
@@ -10,13 +10,13 @@ import {MatPaginatorModule} from '@angular/material/paginator';
 import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
 import {MAT_DATE_LOCALE} from '@angular/material/core';
 import 'moment/locale/pt-br'
-import {IMAGE_CONFIG, NgOptimizedImage} from '@angular/common';
 import {FlexModule} from '@angular/flex-layout';
 import {environment as env} from '../environments/environment';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatDividerModule} from '@angular/material/divider';
+import {MatBadgeModule} from '@angular/material/badge';
 
 @Component({
   standalone: true,
@@ -27,8 +27,9 @@ import {MatDividerModule} from '@angular/material/divider';
     MatIconModule, MatTableModule,
     MatPaginatorModule, NgOptimizedImage,
     FlexModule, MatMenuModule,
-    MatChipsModule,MatSidenavModule,
-    MatDividerModule
+    MatChipsModule, MatSidenavModule,
+    MatDividerModule, MatBadgeModule,
+    MatMenuModule
   ],
   providers: [
     {provide: MAT_DATE_LOCALE, useValue: 'pt-BR'},

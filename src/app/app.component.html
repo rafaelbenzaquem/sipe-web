@@ -81,7 +81,29 @@
 
 
         <span class="spacer"></span>
-        <span>Bem-vindo, {{ usuario?.nome }}</span>
+        <div class="header-block">
+          <span>Bem-vindo, {{ usuario?.nome }}</span>
+        </div>
+        <div class="header-block">
+          <a [matMenuTriggerFor]="menu">
+            <mat-icon matBadge="15">notifications_active</mat-icon>
+          </a>
+        </div>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item>
+            <mat-icon>dialpad</mat-icon>
+            <span>Redial</span>
+          </button>
+          <button mat-menu-item disabled>
+            <mat-icon>voicemail</mat-icon>
+            <span>Check voice mail</span>
+          </button>
+          <button mat-menu-item>
+            <mat-icon>notifications_off</mat-icon>
+            <span>Disable alerts</span>
+          </button>
+        </mat-menu>
+
         <button mat-icon-button color="accent" (click)="logout()" title="Logout">
           <mat-icon>exit_to_app</mat-icon>
         </button>

@@ -83,13 +83,15 @@
           </div>
           <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="16px">
             <div fxLayout="column">
-              <button type="submit" [disabled]="!profileForm.valid" mat-flat-button color="primary">
+              <button matButton="filled"
+                      type="submit" [disabled]="!profileForm.valid">
                 <mat-icon fontIcon="save"/>
                 Salvar
               </button>
             </div>
             <div fxLayout="column">
-              <button type="reset" (click)="reset()" mat-flat-button color="accent" [disabled]="naolimpavel()">
+              <button matButton="tonal"
+                      type="reset" (click)="reset()"  [disabled]="naolimpavel()">
                 <mat-icon fontIcon="backspace"/>
                 Limpar
               </button>

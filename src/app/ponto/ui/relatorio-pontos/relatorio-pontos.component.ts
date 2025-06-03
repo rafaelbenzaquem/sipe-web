@@ -85,7 +85,7 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
     this.inicioSelecionado = this.periodo.value.inicio;
     this.fimSelecionado = this.periodo.value.fim;
     this.foiBuscado = false;
-    this.buscaPontos()
+    this.atualizaPontos()
   }
 
   public async buscaPontos() {
@@ -108,7 +108,7 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
       this.pontos = await this.funcPontos(this.usuario.matricula, this.periodo.value.inicio, this.periodo.value.fim, true);
       this.tamanhoMaximo = this.verificaMaiorListaDeRegistro(this.pontos);
     } else {
-      this.pontos = []; // Garante que this.pontos seja um array mesmo se a condição falhar
+      this.buscaPontos(); // Garante que this.pontos seja um array mesmo se a condição falhar
     }
     console.log("Exibir Pontos... Pontos length " + this.pontos.length);
     this.isLoading = false;
@@ -204,9 +204,12 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
       width: '800px'
     });
 
-    dialogRef.afterClosed().subscribe((result: { registros?: Registro[] }) => {
-      console.log("RelatorioPontosComponent:openAtualizacao:afterClosed");
-      this.tamanhoMaximo = this.verificaMaiorListaDeRegistro(this.pontos);
+    dialogRef.afterClosed().subscribe(async (result: { registros?: Registro[] }) => {
+      console.log("RelatorioPontosComponent:openAtualizacao:afterClosed", result);
+      // if registros were updated, refresh pontos (and table) to update totals and data
+      if (result?.registros) {
+        await this.atualizaPontos();
+      }
     });
   }
 

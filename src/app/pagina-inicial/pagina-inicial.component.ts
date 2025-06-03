@@ -1,12 +1,12 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { Router } from '@angular/router';
-import { AuthService } from '../auth/auth.service';
-import { OAuthService } from 'angular-oauth2-oidc';
-import { authCodeFlowConfig } from '../auth/auth.code.flow.config';
-import { Perfil } from './perfil.model';
+import {Component} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {MatCardModule} from '@angular/material/card';
+import {MatButtonModule} from '@angular/material/button';
+import {Router} from '@angular/router';
+import {AuthService} from '../auth/auth.service';
+import {OAuthService} from 'angular-oauth2-oidc';
+import {authCodeFlowConfig} from '../auth/auth.code.flow.config';
+import {Perfil} from './perfil.model';
 
 @Component({
   standalone: true,
@@ -29,16 +29,18 @@ export class PaginaInicialComponent {
     this.oauthService.configure(authCodeFlowConfig);
     this.oauthService.loadDiscoveryDocumentAndTryLogin().then(() => {
       if (this.oauthService.hasValidAccessToken()) {
-        console.log("hasValidAccessToken")
         this.handleAuthentication();
       }
-      console.log("NohasValidAccessToken")
     });
     this.oauthService.events.subscribe((e) => {
       if (e.type === 'token_received') {
         this.handleAuthentication();
       }
     });
+  }
+
+  isLoggedIn(): boolean {
+    return this.authService.isLoggedIn();
   }
 
   login(): void {

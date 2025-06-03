@@ -1,54 +1,54 @@
-<table>
-  <thead>
-  <tr>
-    <th>
-      <div style="display: flex; flex-direction: column; text-align: center;">
-        Dia
-      </div>
-    </th>
-    <th [attr.colspan]="tamanhoRegistros+1">
-      <div style="display: flex; flex-direction: column; text-align: center;">
-        Registros
-      </div>
-    </th>
-    <th>
-      <div style="display: flex; flex-direction: column; text-align: center;  width: 150px">
-        Descrição
-      </div>
-    </th>
-    <th>
-      <div style="display: flex; flex-direction: column; text-align: center">
+<table mat-table [dataSource]="pontosTableModel"  multiTemplateDataRows>
 
-      </div>
+  <!-- Dia -->
+  <ng-container matColumnDef="dia">
+    <th mat-header-cell *matHeaderCellDef style="text-align: center;">Dia</th>
+    <td mat-cell *matCellDef="let ponto" style="text-align: center;">
+      {{ ponto.dia }}
+    </td>
+  </ng-container>
+
+  <!-- Registros -->
+  <ng-container *ngFor="let index of getRegistroIndices()" [matColumnDef]="'registro' + index">
+    <th mat-header-cell *matHeaderCellDef style="text-align: center;">
+      Registro {{ index + 1 }}
     </th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr *ngFor="let ponto of pontosTableModel">
-    <td>
-      <div style="display: flex; flex-direction: column; text-align: center;">
-        {{ ponto.dia }}
+    <td mat-cell *matCellDef="let ponto" style="text-align: center;">
+      <div style="display: flex; flex-direction: column;">
+        <span>{{ ponto.registros[index]?.sentido }}</span>
+        <span>{{ ponto.registros[index]?.hora }}</span>
       </div>
     </td>
-    <td *ngFor="let registro of ponto.registros">
-      <div style="display: flex; flex-direction: column; text-align: center;">
-        <span>{{ registro.sentido }}</span>
-        <span>{{ registro.hora }}</span>
-      </div>
+  </ng-container>
+
+  <!-- Total -->
+  <ng-container matColumnDef="total">
+    <th mat-header-cell *matHeaderCellDef style="text-align: center;">Total</th>
+    <td mat-cell *matCellDef="let ponto" style="text-align: center;">
+      {{ ponto.total }}
     </td>
-    <td>
-      <div style="display: flex; flex-direction: column; text-align: center;">
-        <span>Total</span>
-        <span>{{ ponto.total }}</span>
-      </div>
+  </ng-container>
+
+  <!-- Descrição -->
+  <ng-container matColumnDef="descricao">
+    <th mat-header-cell *matHeaderCellDef style="text-align: center;">Descrição</th>
+    <td mat-cell *matCellDef="let ponto" style="text-align: center;">
+      {{ ponto.descricao }}
     </td>
-    <td>{{ ponto.descricao }}</td>
-    <td>
-      <button type="button" mat-button (click)="editar.emit(ponto.ponto)">
-        <mat-icon fontIcon="edit"></mat-icon>
+  </ng-container>
+
+  <!-- Ações -->
+  <ng-container matColumnDef="acoes">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let ponto" style="text-align: center;">
+      <button mat-button  (click)="editar.emit(ponto.ponto)">
+        <mat-icon>edit</mat-icon>
         Editar
       </button>
     </td>
-  </tr>
-  </tbody>
+  </ng-container>
+
+  <!-- Render headers and rows -->
+  <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>

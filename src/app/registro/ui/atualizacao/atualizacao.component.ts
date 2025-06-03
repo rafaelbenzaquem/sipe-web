@@ -38,16 +38,23 @@ import {CheckBoxComponent} from '../../../check-box/check-box.component';
   styleUrls: ['./atualizacao.component.scss']
 })
 export class AtualizacaoComponent {
-  registros: Registro[];
+  /** Original snapshot of registros for reset */
+  private originalRegistros: Registro[] = [];
+  /** Working copy of registros being edited */
+  registros: Registro[] = [];
   registrosParaApagar: Registro[] = [];
+  /** Filter flags */
+  showActive: boolean = true;
+  showInactive: boolean = true;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public ponto: Ponto,
     private dialogRef: MatDialogRef<AtualizacaoComponent>,
     private registroService: RegistroService
   ) {
-    // duplicar para edição sem afetar o original até salvar
-    this.registros = ponto.registros;
+    // snapshot registros and create working copy for editing
+    this.originalRegistros = ponto.registros.map(r => Object.assign(new Registro(), r));
+    this.registros = this.originalRegistros.map(r => Object.assign(new Registro(), r));
   }
 
   moveUp(index: number): void {
@@ -105,14 +112,20 @@ export class AtualizacaoComponent {
     this.dialogRef.close({registros: this.registros});
   }
 
-  reset(){
-    this.registros = this.ponto.registros;
+  /** Restore working copy to original snapshot, clearing pending deletions */
+  reset(): void {
+    this.registros = this.originalRegistros.map(r => Object.assign(new Registro(), r));
     this.registrosParaApagar = [];
   }
 
   add(): void {
     let registro = new Registro();
     this.registros.push(registro);
+  }
+
+  /** Determine whether a registro should be shown based on filter flags */
+  shouldDisplay(reg: Registro): boolean {
+    return (reg.ativo && this.showActive) || (!reg.ativo && this.showInactive);
   }
 
   cancel(): void {

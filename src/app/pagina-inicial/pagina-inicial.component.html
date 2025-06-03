@@ -1,10 +1,12 @@
 <div class="login-container">
-  <mat-card>
+  <mat-card appearance="outlined" *ngIf="!isLoggedIn()">
     <mat-card-header>
       <mat-card-title>Login</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <button mat-raised-button color="primary" (click)="login()">Entrar com OAuth2</button>
     </mat-card-content>
+    <mat-card-actions>
+      <button matButton="filled"  (click)="login()">Entrar</button>
+    </mat-card-actions>
   </mat-card>
 </div>

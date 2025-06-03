@@ -204,9 +204,12 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
       width: '800px'
     });
 
-    dialogRef.afterClosed().subscribe((result: { registros?: Registro[] }) => {
-      console.log("RelatorioPontosComponent:openAtualizacao:afterClosed");
-      this.tamanhoMaximo = this.verificaMaiorListaDeRegistro(this.pontos);
+    dialogRef.afterClosed().subscribe(async (result: { registros?: Registro[] }) => {
+      console.log("RelatorioPontosComponent:openAtualizacao:afterClosed", result);
+      // if registros were updated, refresh pontos (and table) to update totals and data
+      if (result?.registros) {
+        await this.atualizaPontos();
+      }
     });
   }
 

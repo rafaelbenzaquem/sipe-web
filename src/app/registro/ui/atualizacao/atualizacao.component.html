@@ -19,7 +19,8 @@
               </tr>
               </thead>
               <tbody>
-              <tr *ngFor="let reg of registros; index as i">
+                <ng-container *ngFor="let reg of registros; index as i">
+                  <tr *ngIf="shouldDisplay(reg)">
                 <td>
                   <mat-form-field appearance="fill">
                     <mat-select [(ngModel)]="reg.sentido" [disabled]="reg.codigo_acesso !== 0">
@@ -52,7 +53,8 @@
                     <mat-icon>delete</mat-icon>
                   </button>
                 </td>
-              </tr>
+                  </tr>
+                </ng-container>
               </tbody>
             </table>
           </div>
@@ -73,13 +75,13 @@
           <div fxLayout="column" fxFlexAlign="center">
             <div style="display: flex; flex-direction: column; text-align: center;">
               <span>Ativos</span>
-              <app-check-box/>
+              <app-check-box [(value)]="showActive"></app-check-box>
             </div>
           </div>
           <div fxLayout="column" fxFlexAlign="center">
             <div style="display: flex; flex-direction: column; text-align: center;">
               <span>Inativos</span>
-              <app-check-box/>
+              <app-check-box [(value)]="showInactive"></app-check-box>
             </div>
           </div>
         </div>

@@ -63,7 +63,17 @@
 
  - Cadastro e consulta de usuários com paginação e filtros.
  - Atualização de perfil de usuário via diálogo.
- - Relatórios de pontos diários e exibição de registros.
+ - Relatórios de pontos diários com visualização e edição de registros:
+   - Exibição tabular de registros de entrada/saída.
+   - Edição de registros via diálogo com:
+     - Adição de novos registros.
+     - Remoção de registros criados pelo usuário.
+     - Movimentação (ordenar para cima/baixo) de registros.
+     - Edição de horário e sentido (Entrada/Saída) para registros personalizados.
+     - Ativação/desativação de registros importados do sistema de acesso.
+     - Filtros para exibir apenas registros ativos, inativos ou ambos.
+     - Botão de reset (rollback) para desfazer alterações antes de salvar.
+   - Integração automática: ao salvar registros, a lista de pontos e totais é recarregada.
  - Interface responsiva com Angular Material e Flex-Layout.
  - Locale em Português (pt-BR) e formatação de data com Moment.js.
 
@@ -91,12 +101,17 @@
 
  ```
  .
- ├── src/app            Módulos e componentes Angular
- ├── src/environments   Configurações de ambiente (API)
- ├── public             Imagens e ativos estáticos
- ├── dockerfile         Dockerfile para produção
- ├── angular.json       Configurações do Angular CLI
- └── package.json       Scripts npm e dependências
+ ├── src/app           Fonte Angular
+ │   ├── registro      Modelos, serviços e UI de registros de ponto
+ │   │   └── ui/atualizacao  Diálogo de edição de registros (add, remove, reset, filtros)
+ │   ├── ponto         Módulo de relatórios de ponto (relatório, tabela, atualização via diálogo)
+ │   ├── usuario       Cadastro e gerenciamento de usuários
+ │   └── check-box     Componente customizado de checkbox
+ ├── src/environments  Configurações por ambiente (API URLs)
+ ├── public            Imagens e ativos estáticos
+ ├── dockerfile        Dockerfile para produção
+ ├── angular.json      Configurações do Angular CLI
+ └── package.json      Scripts npm e dependências
  ```
 
  ## Contribuição

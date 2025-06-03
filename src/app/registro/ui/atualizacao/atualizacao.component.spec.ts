@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 import { AtualizacaoComponent } from './atualizacao.component';
 
@@ -8,7 +9,11 @@ describe('AtualizacaoComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AtualizacaoComponent]
+      imports: [AtualizacaoComponent],
+      providers: [
+        { provide: MAT_DIALOG_DATA, useValue: { registros: [], matricula: '000', dia: '01/01/2021' } },
+        { provide: MatDialogRef, useValue: { close: () => {} } }
+      ]
     })
     .compileComponents();
 

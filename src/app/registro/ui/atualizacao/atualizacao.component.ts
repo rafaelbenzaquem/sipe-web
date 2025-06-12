@@ -70,20 +70,23 @@ export class AtualizacaoComponent {
   }
 
   remove(index: number): void {
-    console.log("remove index:"+index);
+    console.log("remove index:" + index);
     this.registrosParaApagar.push(this.registros[index]);
     this.registros.splice(index, 1);
   }
 
   save(): void {
+
+
     this.registros.forEach(registro => {
-      if (registro.id === 0)
+      let registroOld = AtualizacaoComponent.encontrarRegistroPorId(this.originalRegistros, registro.id);
+      if (registroOld == undefined)
         this.registroService.cria(registro, this.ponto.matricula, this.ponto.dia.replaceAll('/', '')).subscribe(
           rr => {
             registro = Registro.toModel(rr)
           }
         )
-      else
+      else if (registroOld.registroFoiAlterado(registro))
         this.registroService.atualiza(registro, this.ponto.matricula, this.ponto.dia.replaceAll('/', '')).subscribe(
           rr => {
             registro = Registro.toModel(rr)
@@ -93,7 +96,7 @@ export class AtualizacaoComponent {
 
     this.registros.forEach((registro, index) => {
       if (!registro.ativo) {
-        console.log("save:registros.forEach:index:"+index);
+        console.log("save:registros.forEach:index:" + index);
         this.registros.splice(index, 1);
       }
     })
@@ -111,6 +114,11 @@ export class AtualizacaoComponent {
 
     this.dialogRef.close({registros: this.registros});
   }
+
+  static encontrarRegistroPorId(registros: Registro[], id: number): Registro | undefined {
+    return registros.find(registro => registro.id === id);
+  }
+
 
   /** Restore working copy to original snapshot, clearing pending deletions */
   reset(): void {

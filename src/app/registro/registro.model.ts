@@ -16,6 +16,21 @@ export class Registro {
     return registro;
   }
 
+   registroFoiAlterado(novo: Registro): boolean {
+    if (this.id !== novo.id) {
+      throw new Error('Registros com IDs diferentes não devem ser comparados.');
+    }
+
+    return this.hora !== novo.hora ||
+      this.sentido !== novo.sentido ||
+      this.ativo !== novo.ativo ||
+      this.codigo_acesso !== novo.codigo_acesso;
+  }
+
+  existeNaLista(registros: Registro[]): boolean {
+    return registros.some(registro => registro.id === this.id);
+  }
+
   toNovoRequest(): RegistroNovoRequest {
     return new RegistroNovoRequest(
       this.hora.replaceAll(':',''),

@@ -21,7 +21,7 @@ export class AuthService {
   ) {}
 
   /**
-   * Simula login definindo perfil e buscando dados do usuário.
+   * Login definindo perfil e buscando dados do usuário.
    */
   login(perfil: Perfil): Observable<Usuario> {
     this.perfilSubject.next(perfil);

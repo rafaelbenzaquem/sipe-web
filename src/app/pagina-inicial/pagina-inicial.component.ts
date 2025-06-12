@@ -37,6 +37,9 @@ export class PaginaInicialComponent {
         this.handleAuthentication();
       }
     });
+    this.oauthService.refreshToken();
+    this.oauthService.setupAutomaticSilentRefresh();
+
   }
 
   isLoggedIn(): boolean {

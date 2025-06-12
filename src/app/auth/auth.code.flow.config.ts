@@ -9,6 +9,8 @@ export const authCodeFlowConfig: AuthConfig = {
   tokenEndpoint: env.SIPE_AUTH_URL+'/oauth2/token',
   userinfoEndpoint: env.SIPE_AUTH_URL+'/oauth2/userinfo',
   logoutUrl: env.SIPE_AUTH_URL+'oauth2/logout',
+  silentRefreshRedirectUri: env.SIPE_AUTH_URL+'/oauth2/token',
+  timeoutFactor: 0.8,
   requireHttps: false,
   responseType: 'code',
   disablePKCE: false,

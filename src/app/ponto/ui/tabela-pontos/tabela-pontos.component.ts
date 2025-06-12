@@ -45,6 +45,7 @@ export class PontoTableModel {
 export class RegistroListModel {
   sentido: string = '-----';
   hora: string = '--:--';
+  codigo_acesso: number = 0;
   registro: Registro = new Registro();
 
 
@@ -52,6 +53,7 @@ export class RegistroListModel {
     let registroListModel = new RegistroListModel();
     registroListModel.sentido = registro.sentido;
     registroListModel.hora = registro.hora;
+    registroListModel.codigo_acesso = registro.codigo_acesso;
     registroListModel.registro = registro;
     return registroListModel;
   }
@@ -81,9 +83,11 @@ export class TabelaPontosComponent {
     this._pontos = v || [];
     this.updateTableModel();
   }
+
   get pontos(): Ponto[] {
     return this._pontos;
   }
+
   @Output() editar = new EventEmitter<Ponto>();
   private _tamanhoRegistros = 2;
   /** Número de colunas de registros; reconstrói o modelo da tabela quando alterar */
@@ -92,9 +96,11 @@ export class TabelaPontosComponent {
     this._tamanhoRegistros = v || 0;
     this.updateTableModel();
   }
+
   get tamanhoRegistros(): number {
     return this._tamanhoRegistros;
   }
+
   pontosTableModel: PontoTableModel[] = [];
 
 
@@ -142,7 +148,7 @@ export class TabelaPontosComponent {
   }
 
   getRegistroIndices(): number[] {
-    return Array.from({ length: this.tamanhoRegistros }, (_, i) => i);
+    return Array.from({length: this.tamanhoRegistros}, (_, i) => i);
   }
 
 

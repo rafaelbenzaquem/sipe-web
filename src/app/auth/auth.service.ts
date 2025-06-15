@@ -1,13 +1,13 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { Router } from '@angular/router';
-import { OAuthService } from 'angular-oauth2-oidc';
-import { Perfil } from '../pagina-inicial/perfil.model';
-import { Usuario } from '../usuario/usuario.model';
-import { UsuarioService } from '../usuario/usuario.service';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
+import {Router} from '@angular/router';
+import {OAuthService} from 'angular-oauth2-oidc';
+import {Perfil} from '../pagina-inicial/perfil.model';
+import {Usuario} from '../usuario/usuario.model';
+import {UsuarioService} from '../usuario/usuario.service';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class AuthService {
   private perfilSubject = new BehaviorSubject<Perfil | null>(null);
   private usuarioSubject = new BehaviorSubject<Usuario | null>(null);
@@ -18,7 +18,8 @@ export class AuthService {
     private usuarioService: UsuarioService,
     private router: Router,
     private oauthService: OAuthService  // serviço OAuth para logout federado
-  ) {}
+  ) {
+  }
 
   /**
    * Login definindo perfil e buscando dados do usuário.
@@ -40,11 +41,15 @@ export class AuthService {
    * - Redireciona o usuário ao Identity Provider para encerrar a sessão
    */
   logout(): void {
+    this.cleanProfile()
+    // Executa logout no provedor de identidade (end-session endpoint)
+    this.oauthService.logOut();
+  }
+
+  cleanProfile(): void {
     // Limpa perfil e dados do usuário localmente
     this.perfilSubject.next(null);
     this.usuarioSubject.next(null);
-    // Executa logout no provedor de identidade (end-session endpoint)
-    this.oauthService.logOut();
   }
 
   /**

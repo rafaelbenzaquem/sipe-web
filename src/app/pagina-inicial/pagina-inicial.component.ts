@@ -20,6 +20,7 @@ import {Perfil} from './perfil.model';
   styleUrl: './pagina-inicial.component.scss'
 })
 export class PaginaInicialComponent {
+
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -29,7 +30,12 @@ export class PaginaInicialComponent {
     this.oauthService.configure(authCodeFlowConfig);
     this.oauthService.loadDiscoveryDocumentAndTryLogin().then(() => {
       if (this.oauthService.hasValidAccessToken()) {
+        let access_token =this.oauthService.getAccessToken();
+        console.log("PaginaInicialComponent:constructor: "+access_token);
         this.handleAuthentication();
+      }else{
+        console.log("PaginaInicialComponent:constructor: não está logado");
+         this.authService.cleanProfile();
       }
     });
     this.oauthService.events.subscribe((e) => {
@@ -37,9 +43,6 @@ export class PaginaInicialComponent {
         this.handleAuthentication();
       }
     });
-    this.oauthService.refreshToken();
-    this.oauthService.setupAutomaticSilentRefresh();
-
   }
 
   isLoggedIn(): boolean {

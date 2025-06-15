@@ -2,6 +2,9 @@ import {Component, inject, signal} from '@angular/core';
 import {IMAGE_CONFIG, NgIf, NgOptimizedImage} from '@angular/common';
 import {Router, RouterLink, RouterOutlet} from '@angular/router';
 import {AuthService} from './auth/auth.service';
+import {MatDialog, MatDialogModule} from '@angular/material/dialog';
+import {OAuthService} from 'angular-oauth2-oidc';
+import {SessionExpiredDialog} from './auth/session-expired-dialog.component';
 import {MatButtonModule} from '@angular/material/button';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatIconModule} from '@angular/material/icon';
@@ -29,7 +32,9 @@ import {MatBadgeModule} from '@angular/material/badge';
     FlexModule, MatMenuModule,
     MatChipsModule, MatSidenavModule,
     MatDividerModule, MatBadgeModule,
-    MatMenuModule
+    MatMenuModule,
+    MatDialogModule,
+    SessionExpiredDialog
   ],
   providers: [
     {provide: MAT_DATE_LOCALE, useValue: 'pt-BR'},
@@ -50,7 +55,21 @@ export class AppComponent {
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
 
   URL_BASE = env.SIPE_API_URL;
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private oauthService: OAuthService,
+    private dialog: MatDialog
+  ) {
+    this.oauthService.events.subscribe((e) => {
+      if (e.type === 'token_expires') {
+        const dialogRef = this.dialog.open(SessionExpiredDialog, { disableClose: true });
+        dialogRef.afterClosed().subscribe(() => {
+          this.authService.logout();
+        });
+      }
+    });
+  }
 
   /**
    * Verifica se o usuário está logado

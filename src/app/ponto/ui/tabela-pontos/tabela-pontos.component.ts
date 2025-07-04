@@ -6,6 +6,7 @@ import {Registro} from '../../../registro/registro.model';
 import {MatButton, MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTableModule} from '@angular/material/table';
+import {MatTooltip, MatTooltipModule} from '@angular/material/tooltip';
 
 
 export class PontoTableModel {
@@ -42,10 +43,19 @@ export class PontoTableModel {
 
 }
 
+
 export class RegistroListModel {
   sentido: string = '-----';
   hora: string = '--:--';
+
+  criador: string = 'sem criador';
+  data_criacao: string = '';
+
   codigo_acesso: number = 0;
+
+  aprovador: string = 'Não aprovado';
+  data_aprovacao: string = 'Não aprovado';
+
   registro: Registro = new Registro();
 
 
@@ -54,9 +64,38 @@ export class RegistroListModel {
     registroListModel.sentido = registro.sentido;
     registroListModel.hora = registro.hora;
     registroListModel.codigo_acesso = registro.codigo_acesso;
+
+    registroListModel.criador = registro.matricula_criador;
+    registroListModel.data_criacao = RegistroListModel.formatarData(registro.data_criacao);
+
+    registroListModel.aprovador = registro.matricula_aprovador;
+    registroListModel.data_aprovacao = RegistroListModel.formatarData(registro.data_aprovacao);
+
     registroListModel.registro = registro;
     return registroListModel;
   }
+
+  static formatarData(dataStr: string): string {
+    if (dataStr) {
+
+      const data = new Date(dataStr);
+      if (isNaN(data.getTime())) {
+        return 'Não disponível!';
+      }
+
+      const dia = String(data.getDate()).padStart(2, '0');
+      const mes = String(data.getMonth() + 1).padStart(2, '0'); // meses começam do zero
+      const ano = data.getFullYear();
+
+      const horas = String(data.getHours()).padStart(2, '0');
+      const minutos = String(data.getMinutes()).padStart(2, '0');
+      const segundos = String(data.getSeconds()).padStart(2, '0');
+
+      return `${dia}/${mes}/${ano} ${horas}:${minutos}:${segundos}`;
+    }
+    return 'Não disponível!';
+  }
+
 }
 
 @Component({
@@ -67,7 +106,8 @@ export class RegistroListModel {
     MatButton,
     MatButtonModule,
     MatIconModule,
-    MatTableModule
+    MatTableModule,
+    MatTooltip
   ],
   templateUrl: './tabela-pontos.component.html',
   styleUrl: './tabela-pontos.component.scss',
@@ -151,5 +191,20 @@ export class TabelaPontosComponent {
     return Array.from({length: this.tamanhoRegistros}, (_, i) => i);
   }
 
+
+  formataTooltip(registro: RegistroListModel): string {
+
+    if (registro.aprovador) {
+      return `Criado por: ${registro.criador} - ${registro.data_criacao}\n
+      Aprovado por: ${registro.aprovador} - ${registro.data_aprovacao}`;
+    }
+
+
+    return `Criado por: ${registro.criador} - ${registro.data_criacao}`;
+  }
+
+  isNullOrBlank(str: string | null | undefined): boolean {
+    return str == null || str.trim() === '';
+  }
 
 }

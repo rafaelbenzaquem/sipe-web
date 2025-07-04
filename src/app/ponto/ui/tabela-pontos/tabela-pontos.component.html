@@ -14,8 +14,15 @@
       {{ index + 1 }}° Registro
     </th>
     <td mat-cell *matCellDef="let ponto" style="text-align: center;">
-      @if (ponto.registros[index]?.codigo_acesso == 0 && ponto.registros[index]?.sentido != '-----' ) {
-        <div style="display: flex; flex-direction: column; color: red">
+      @if (ponto.registros[index]?.codigo_acesso == 0 && ponto.registros[index]?.sentido != '-----' && isNullOrBlank(ponto.registros[index]?.aprovador)) {
+        <div [matTooltip]="formataTooltip(ponto.registros[index])"
+             style="display: flex; flex-direction: column; color: red">
+          <span>{{ ponto.registros[index]?.sentido }}</span>
+          <span>{{ ponto.registros[index]?.hora }}</span>
+        </div>
+      } @else if (ponto.registros[index]?.codigo_acesso == 0 && ponto.registros[index]?.sentido != '-----') {
+        <div [matTooltip]="formataTooltip(ponto.registros[index])"
+             style="display: flex; flex-direction: column; color: blue">
           <span>{{ ponto.registros[index]?.sentido }}</span>
           <span>{{ ponto.registros[index]?.hora }}</span>
         </div>

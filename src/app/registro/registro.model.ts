@@ -5,6 +5,10 @@ export class Registro {
   sentido: 'Entrada' | 'Saída' | '-----' = '-----';
   ativo: boolean = true;
   codigo_acesso: number = 0;
+  matricula_aprovador: string = 'Não aprovado';
+  data_aprovacao: string = 'Não aprovado';
+  data_criacao: string = '';
+  matricula_criador: string = '';
 
   static toModel(registroResponse: RegistroResponse) {
     let registro = new Registro();
@@ -13,6 +17,10 @@ export class Registro {
     registro.sentido = registroResponse.sentido;
     registro.codigo_acesso = registroResponse.codigo_acesso;
     registro.ativo = registroResponse.ativo;
+    registro.matricula_aprovador = registroResponse.matricula_aprovador;
+    registro.data_aprovacao = registroResponse.data_aprovacao;
+    registro.data_criacao = registroResponse.data_criacao;
+    registro.matricula_criador = registroResponse.matricula_criador;
     return registro;
   }
 
@@ -86,6 +94,10 @@ export interface RegistroResponse {
   hora: string;
   sentido: 'Entrada' | 'Saída';
   codigo_acesso: number;
+  matricula_aprovador: string;
+  data_aprovacao: string;
+  data_criacao: string;
+  matricula_criador: string;
   ativo: boolean;
   _links: {
     self: {

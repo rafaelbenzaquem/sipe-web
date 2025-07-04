@@ -33,8 +33,7 @@ import {MatBadgeModule} from '@angular/material/badge';
     MatChipsModule, MatSidenavModule,
     MatDividerModule, MatBadgeModule,
     MatMenuModule,
-    MatDialogModule,
-    SessionExpiredDialog
+    MatDialogModule
   ],
   providers: [
     {provide: MAT_DATE_LOCALE, useValue: 'pt-BR'},

@@ -38,23 +38,28 @@ import {CheckBoxComponent} from '../../../check-box/check-box.component';
   styleUrls: ['./atualizacao.component.scss']
 })
 export class AtualizacaoComponent {
-  /** Original snapshot of registros for reset */
+
   private originalRegistros: Registro[] = [];
-  /** Working copy of registros being edited */
   registros: Registro[] = [];
   registrosParaApagar: Registro[] = [];
-  /** Filter flags */
   showActive: boolean = true;
-  showInactive: boolean = true;
+  showInactive: boolean = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public ponto: Ponto,
     private dialogRef: MatDialogRef<AtualizacaoComponent>,
     private registroService: RegistroService
   ) {
-    // snapshot registros and create working copy for editing
-    this.originalRegistros = ponto.registros.map(r => Object.assign(new Registro(), r));
-    this.registros = this.originalRegistros.map(r => Object.assign(new Registro(), r));
+    let diaFormatado = ponto.dia.replaceAll("/", "");
+
+    let todosRegistros = registroService.listaTodos(ponto.matricula, diaFormatado);
+
+    todosRegistros.subscribe(rlr => {
+      let listaRegistros = rlr._embedded.registros.map(rr => Registro.toModel(rr))
+      this.originalRegistros = listaRegistros.map(r => Object.assign(new Registro(), r));
+      this.registros = this.originalRegistros.map(r => Object.assign(new Registro(), r));
+    });
+
   }
 
   moveUp(index: number): void {

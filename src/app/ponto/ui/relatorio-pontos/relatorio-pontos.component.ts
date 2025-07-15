@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnChanges, OnInit, SimpleChanges} from '@angular/core';
+import {Component, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {FlexModule} from '@angular/flex-layout';
 import {MatTableModule} from '@angular/material/table';
 import {MatButtonModule} from '@angular/material/button';
@@ -17,9 +17,9 @@ import {MatDialog} from '@angular/material/dialog';
 import {AtualizacaoComponent} from '../../../registro/ui/atualizacao/atualizacao.component';
 import {TabelaPontosComponent} from '../tabela-pontos/tabela-pontos.component';
 import {Ponto} from '../../ponto.model';
+import {AprovacaoComponent} from '../../../registro/ui/aprovacao/aprovacao.component';
 import {RelatorioService} from './relatorio.service';
 import {MatProgressBar} from '@angular/material/progress-bar';
-import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-relatorio-pontos',
@@ -37,8 +37,7 @@ import {NgIf} from '@angular/common';
     MatDatepickerModule,
     FormsModule,
     TabelaPontosComponent,
-    MatProgressBar,
-    NgIf
+    MatProgressBar
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './relatorio-pontos.component.html',
@@ -131,7 +130,7 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
       if (pontoListResponse && pontoListResponse._embedded && pontoListResponse._embedded.pontos) {
         pontos = await Promise.all(pontoListResponse._embedded.pontos.map(async pr => {
           let ponto = Ponto.toModel(pr);
-          let registroListResponse = await this.registroService.lista(matricula, pr.dia.replaceAll("/", "")).toPromise();
+          let registroListResponse = await this.registroService.listaAtuais(matricula, pr.dia.replaceAll("/", "")).toPromise();
           if (registroListResponse && registroListResponse._embedded && registroListResponse._embedded.registros) {
             ponto.registros = registroListResponse._embedded.registros.map(Registro.toModel);
           }
@@ -201,13 +200,28 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
     console.log("RelatorioPontosComponent:openAtualizacao");
     const dialogRef = this.dialog.open(AtualizacaoComponent, {
       data: ponto,
-      width: '800px'
+      width: '900px',
+      height: '600px'
     });
 
     dialogRef.afterClosed().subscribe(async (result: { registros?: Registro[] }) => {
       console.log("RelatorioPontosComponent:openAtualizacao:afterClosed", result);
       // if registros were updated, refresh pontos (and table) to update totals and data
       if (result?.registros) {
+        await this.atualizaPontos();
+      }
+    });
+  }
+
+  /** Abre diálogo de aprovação de registros atualizados/desativados */
+  openAprovacao(ponto: Ponto): void {
+    const dialogRef = this.dialog.open(AprovacaoComponent, {
+      data: ponto,
+      width: '850px'
+    });
+
+    dialogRef.afterClosed().subscribe(async approved => {
+      if (approved) {
         await this.atualizaPontos();
       }
     });

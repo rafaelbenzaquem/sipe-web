@@ -25,12 +25,21 @@ export class RegistroService {
       registro.toAtualizadoRequest());
   }
 
+
+  aprova(id_registro: number): Observable<RegistroResponse> {
+    return this.http.put<RegistroResponse>(`${this.API_BASE}/${id_registro}`, null);
+  }
+
   busca(id: number): Observable<RegistroResponse> {
     return this.http.get<RegistroResponse>(`${this.API_BASE}/${id}`);
   }
 
-  lista(matricula: string, dia: string): Observable<RegistroListResponse> {
-    return this.http.get<RegistroListResponse>(`${this.API_BASE}/pontos?matricula=${matricula}&dia=${dia}`);
+  listaAtuais(matricula: string, dia: string): Observable<RegistroListResponse> {
+    return this.http.get<RegistroListResponse>(`${this.API_BASE}/pontos?matricula=${matricula}&dia=${dia}&todos=false`);
+  }
+
+  listaTodos(matricula: string, dia: string): Observable<RegistroListResponse> {
+    return this.http.get<RegistroListResponse>(`${this.API_BASE}/pontos?matricula=${matricula}&dia=${dia}&todos=true`);
   }
 
   apaga(id: number): Observable<RegistroResponse> {

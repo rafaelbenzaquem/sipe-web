@@ -45,26 +45,27 @@
         </div>
         <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="16px">
           <div fxLayout="column" fxFlex="100%" class="mt-20">
-            <mat-progress-bar
-              *ngIf="isLoading"
-              mode="indeterminate"
-              color="primary">
-            </mat-progress-bar>
+            @if (isLoading) {
+              <mat-progress-bar
+                mode="indeterminate"
+                color="primary">
+              </mat-progress-bar>
+            }
           </div>
         </div>
         <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="16px">
           <div fxLayout="column" fxFlex="100%" class="mt-20">
-            <div *ngIf="foiBuscado">
+            @if (foiBuscado) {
               {{ exibirPeriodo() }} <br/>
-            </div>
-            <div *ngIf="pontos.length > 0">
-<!--              Componente da tabela-->
+            }
+            @if (pontos.length > 0) {
               <app-tabela-pontos
                 [pontos]="pontos"
                 [tamanhoRegistros]="tamanhoMaximo"
-                (editar)="openAtualizacao($event)">
+                (editar)="openAtualizacao($event)"
+                (aprovar)="openAprovacao($event)">
               </app-tabela-pontos>
-            </div>
+            }
           </div>
         </div>
       </mat-card-content>

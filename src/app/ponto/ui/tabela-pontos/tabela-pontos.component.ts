@@ -6,7 +6,7 @@ import {Registro} from '../../../registro/registro.model';
 import {MatButton, MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTableModule} from '@angular/material/table';
-import {MatTooltip, MatTooltipModule} from '@angular/material/tooltip';
+import {TimerComponent} from '../../../registro/ui/timer/timer.component'
 
 
 export class PontoTableModel {
@@ -107,7 +107,7 @@ export class RegistroListModel {
     MatButtonModule,
     MatIconModule,
     MatTableModule,
-    MatTooltip
+    TimerComponent
   ],
   templateUrl: './tabela-pontos.component.html',
   styleUrl: './tabela-pontos.component.scss',
@@ -129,6 +129,9 @@ export class TabelaPontosComponent {
   }
 
   @Output() editar = new EventEmitter<Ponto>();
+  @Output() aprovar = new EventEmitter<Ponto>();
+
+
   private _tamanhoRegistros = 2;
   /** Número de colunas de registros; reconstrói o modelo da tabela quando alterar */
   @Input()
@@ -150,11 +153,11 @@ export class TabelaPontosComponent {
   // }
 
 
-  criaPontosTableModel(pontos: Ponto[], maiorLista: number) {
+  criaPontosTableModel(pontos: Ponto[], maiorLista: number): PontoTableModel[] {
     // let maiorLista = this.verificaMaiorListaDeRegistro(pontos);
-    let pontosTableModel: PontoTableModel[] = [];
-    pontosTableModel = pontos.map(PontoTableModel.toPontoTableModel)
-    pontosTableModel.forEach(ponto => {
+    let pontoTableModelList: PontoTableModel[] = [];
+    pontoTableModelList = pontos.map(PontoTableModel.toPontoTableModel)
+    pontoTableModelList.forEach(ponto => {
       if (ponto.registros) {
 
         let elementosFaltantes = maiorLista - ponto.registros.length;
@@ -164,7 +167,7 @@ export class TabelaPontosComponent {
         }
       }
     })
-    return pontosTableModel;
+    return pontoTableModelList;
   }
 
 

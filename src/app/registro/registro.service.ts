@@ -15,13 +15,13 @@ export class RegistroService {
   constructor(private http: HttpClient) {
   }
 
-  cria(registro: Registro, matricula: string, dia: string): Observable<RegistroResponse> {
-    return this.http.post<RegistroResponse>(`${this.API_BASE}/pontos?matricula=${matricula}&dia=${dia}`,
+  cria(registro: Registro, matricula: string, dia: string, idPedidoAlteracao: number): Observable<RegistroResponse> {
+    return this.http.post<RegistroResponse>(`${this.API_BASE}/pontos?matricula=${matricula}&dia=${dia}&id_pedido_alteracao=${idPedidoAlteracao}`,
       [registro.toNovoRequest()]);
   }
 
-  atualiza(registro: Registro, matricula: string, dia: string): Observable<RegistroResponse> {
-    return this.http.put<RegistroResponse>(`${this.API_BASE}/pontos?matricula=${matricula}&dia=${dia}`,
+  atualiza(registro: Registro, matricula: string, dia: string, idPedidoAlteracao: number): Observable<RegistroResponse> {
+    return this.http.put<RegistroResponse>(`${this.API_BASE}/pontos?matricula=${matricula}&dia=${dia}&id_pedido_alteracao=${idPedidoAlteracao}`,
       registro.toAtualizadoRequest());
   }
 

@@ -14,6 +14,8 @@ import {Ponto} from '../../../ponto/ponto.model';
 import {MatCard, MatCardModule} from '@angular/material/card';
 import {RegistroService} from '../../registro.service';
 import {CheckBoxComponent} from '../../../check-box/check-box.component';
+import {Pedido} from '../../../alteracao/pedido/pedido.model';
+import {PedidoService} from '../../../alteracao/pedido/pedido.service';
 
 @Component({
   standalone: true,
@@ -39,6 +41,8 @@ import {CheckBoxComponent} from '../../../check-box/check-box.component';
 })
 export class AtualizacaoComponent {
 
+  diaFormatado = "";
+  pedido: Pedido = new Pedido();
   private originalRegistros: Registro[] = [];
   registros: Registro[] = [];
   registrosParaApagar: Registro[] = [];
@@ -48,11 +52,12 @@ export class AtualizacaoComponent {
   constructor(
     @Inject(MAT_DIALOG_DATA) public ponto: Ponto,
     private dialogRef: MatDialogRef<AtualizacaoComponent>,
-    private registroService: RegistroService
+    private registroService: RegistroService,
+    private pedidoService: PedidoService,
   ) {
-    let diaFormatado = ponto.dia.replaceAll("/", "");
+    this.diaFormatado = ponto.dia.replaceAll("/", "");
 
-    let todosRegistros = registroService.listaTodos(ponto.matricula, diaFormatado);
+    let todosRegistros = registroService.listaTodos(ponto.matricula, this.diaFormatado);
 
     todosRegistros.subscribe(rlr => {
       let listaRegistros = rlr._embedded.registros.map(rr => Registro.toModel(rr))
@@ -83,38 +88,43 @@ export class AtualizacaoComponent {
   save(): void {
 
 
-    this.registros.forEach(registro => {
-      let registroOld = AtualizacaoComponent.encontrarRegistroPorId(this.originalRegistros, registro.id);
-      if (registroOld == undefined)
-        this.registroService.cria(registro, this.ponto.matricula, this.ponto.dia.replaceAll('/', '')).subscribe(
-          rr => {
-            registro = Registro.toModel(rr)
-          }
-        )
-      else if (registroOld.registroFoiAlterado(registro))
-        this.registroService.atualiza(registro, this.ponto.matricula, this.ponto.dia.replaceAll('/', '')).subscribe(
-          rr => {
-            registro = Registro.toModel(rr)
-          }
-        )
-    })
+    this.pedidoService.realizarPedido(this.ponto.matricula, this.diaFormatado, this.pedido.justificativa).subscribe(
+      pedidoResponse => {
+        this.pedido = Pedido.toModel(pedidoResponse);
+        this.registros.forEach(registro => {
+          let registroOld = AtualizacaoComponent.encontrarRegistroPorId(this.originalRegistros, registro.id);
+          if (registroOld == undefined)
+            this.registroService.cria(registro, this.ponto.matricula, this.ponto.dia.replaceAll('/', ''),this.pedido.id).subscribe(
+              rr => {
+                registro = Registro.toModel(rr)
+              }
+            )
+          else if (registroOld.registroFoiAlterado(registro))
+            this.registroService.atualiza(registro, this.ponto.matricula, this.ponto.dia.replaceAll('/', ''),this.pedido.id).subscribe(
+              rr => {
+                registro = Registro.toModel(rr)
+              }
+            )
+        })
 
-    this.registros.forEach((registro, index) => {
-      if (!registro.ativo) {
-        console.log("save:registros.forEach:index:" + index);
-        this.registros.splice(index, 1);
-      }
-    })
+        this.registros.forEach((registro, index) => {
+          if (!registro.ativo) {
+            console.log("save:registros.forEach:index:" + index);
+            this.registros.splice(index, 1);
+          }
+        })
 
-    this.registrosParaApagar.forEach((registro: Registro) => {
-      if (registro.id !== 0) {
-        this.registroService.apaga(registro.id).subscribe(
-          registroApagado => {
-            console.log(registroApagado);
-          },
-        )
+        this.registrosParaApagar.forEach((registro: Registro) => {
+          if (registro.id !== 0) {
+            this.registroService.apaga(registro.id).subscribe(
+              registroApagado => {
+                console.log(registroApagado);
+              },
+            )
+          }
+        })
       }
-    })
+    )
 
 
     this.dialogRef.close({registros: this.registros});

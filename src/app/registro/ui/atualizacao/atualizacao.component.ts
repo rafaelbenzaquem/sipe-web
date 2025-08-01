@@ -16,6 +16,7 @@ import {RegistroService} from '../../registro.service';
 import {CheckBoxComponent} from '../../../check-box/check-box.component';
 import {Pedido} from '../../../alteracao/pedido/pedido.model';
 import {PedidoService} from '../../../alteracao/pedido/pedido.service';
+import {MatDividerModule} from '@angular/material/divider';
 
 @Component({
   standalone: true,
@@ -34,7 +35,8 @@ import {PedidoService} from '../../../alteracao/pedido/pedido.service';
     FlexLayoutModule,
     ReactiveFormsModule,
     MatCardModule,
-    CheckBoxComponent
+    CheckBoxComponent,
+    MatDividerModule
   ],
   templateUrl: './atualizacao.component.html',
   styleUrls: ['./atualizacao.component.scss']

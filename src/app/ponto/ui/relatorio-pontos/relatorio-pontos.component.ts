@@ -20,6 +20,8 @@ import {Ponto} from '../../ponto.model';
 import {AprovacaoComponent} from '../../../registro/ui/aprovacao/aprovacao.component';
 import {RelatorioService} from './relatorio.service';
 import {MatProgressBar} from '@angular/material/progress-bar';
+import {Pedido} from '../../../alteracao/pedido/pedido.model';
+import {PedidoService} from '../../../alteracao/pedido/pedido.service';
 
 @Component({
   selector: 'app-relatorio-pontos',
@@ -70,6 +72,7 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
     private pontoService: PontoService,
     private registroService: RegistroService,
     private relatorioService: RelatorioService,
+    private pedidoService: PedidoService,
     private dialog: MatDialog
   ) {}
 
@@ -215,16 +218,22 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
 
   /** Abre diálogo de aprovação de registros atualizados/desativados */
   openAprovacao(ponto: Ponto): void {
-    const dialogRef = this.dialog.open(AprovacaoComponent, {
-      data: ponto,
-      width: '850px'
-    });
 
-    dialogRef.afterClosed().subscribe(async approved => {
-      if (approved) {
-        await this.atualizaPontos();
-      }
-    });
+    this.pedidoService.obterPorPonto(ponto.matricula, ponto.dia.replaceAll('/', ''))
+      .subscribe(pr => {
+        console.log("pedido: " + JSON.stringify(pr));
+         let pedido = Pedido.toModel(pr);
+        const dialogRef = this.dialog.open(AprovacaoComponent, {
+          data: pedido,
+          width: '850px'
+        });
+
+        dialogRef.afterClosed().subscribe(async approved => {
+          if (approved) {
+            await this.atualizaPontos();
+          }
+        });
+      });
   }
 
   verificaMaiorListaDeRegistro(pontos: Ponto[]) {

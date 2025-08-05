@@ -1,79 +1,95 @@
 <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="10px" class="mt-20">
-  <div fxFlex="47%" >
+  <div fxFlex="94%">
+    <mat-form-field class="text-full-width">
+      <mat-label>Justificativa</mat-label>
+      <input matInput  value="{{pedido.justificativa}}" disabled="true">
+    </mat-form-field>
+
+  </div>
+</div>
+
+<div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="10px" class="mt-5">
+  <div fxFlex="47%">
     <mat-card appearance="outlined">
       <mat-card-header>
-        <mat-card-title>Estado Original - {{ ponto.dia }}</mat-card-title>
+        <mat-card-title>Estado Original</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <table mat-table [dataSource]="rows" >
-          <ng-container matColumnDef="sentido">
-            <th mat-header-cell *matHeaderCellDef>Sentido</th>
-            <td mat-cell *matCellDef="let row">{{ row.before.sentido }}</td>
+        <table>
+          <thead>
+          <tr>
+            <th>Sentido</th>
+            <th>Hora</th>
+            <th>Ativo</th>
+            <th>Código de Acesso</th>
+          </tr>
+          </thead>
+          <tbody>
+          <ng-container *ngFor="let row of rows; index as i">
+            <tr>
+              <td>
+                {{ row.before.sentido }}
+              </td>
+              <td>
+                {{ row.before.hora }}
+              </td>
+              <td>
+                <mat-icon>{{ row.before.ativo ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+              </td>
+              <td>
+                {{ row.before.codigo_acesso }}
+              </td>
+            </tr>
           </ng-container>
-
-          <ng-container matColumnDef="hora">
-            <th mat-header-cell *matHeaderCellDef>Hora</th>
-            <td mat-cell *matCellDef="let row">{{ row.before.hora }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="ativo">
-            <th mat-header-cell *matHeaderCellDef>Ativo</th>
-            <td mat-cell *matCellDef="let row">
-              <mat-icon>{{ row.before.ativo ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="codigo_acesso">
-            <th mat-header-cell *matHeaderCellDef>Código Acesso</th>
-            <td mat-cell *matCellDef="let row">{{ row.before.codigo_acesso }}</td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </tbody>
         </table>
       </mat-card-content>
     </mat-card>
   </div>
 
-  <div fxFlex="47%" >
+  <div fxFlex="47%">
     <mat-card appearance="outlined">
       <mat-card-header>
-        <mat-card-title>Estado Após Alterações - {{ ponto.dia }}</mat-card-title>
+        <mat-card-title>Estado Após Alterações</mat-card-title>
       </mat-card-header>
-      <mat-card-content >
-        <table mat-table [dataSource]="rows" >
-          <ng-container matColumnDef="sentido">
-            <th mat-header-cell *matHeaderCellDef>Sentido</th>
-            <td mat-cell *matCellDef="let row">{{ row.after.sentido }}</td>
-          </ng-container>
+      <mat-card-content>
+        <table>
+          <thead>
+          <tr>
+            <th>Sentido</th>
+            <th>Hora</th>
+            <th>Ativo</th>
+            <th>Código de Acesso</th>
+          </tr>
+          </thead>
+          <tbody>
+          <ng-container *ngFor="let row of rows; index as i">
 
-          <ng-container matColumnDef="hora">
-            <th mat-header-cell *matHeaderCellDef>Hora</th>
-            <td mat-cell *matCellDef="let row">{{ row.after.hora }}</td>
-          </ng-container>
+            <tr>
+              <td>
+                {{ row.after.sentido }}
+              </td>
+              <td>
+                {{ row.after.hora }}
+              </td>
+              <td>
+                <mat-icon>{{ row.after.ativo ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+              </td>
+              <td>
+                {{ row.after.codigo_acesso }}
+              </td>
+            </tr>
 
-          <ng-container matColumnDef="ativo">
-            <th mat-header-cell *matHeaderCellDef>Ativo</th>
-            <td mat-cell *matCellDef="let row">
-              <mat-icon>{{ row.after.ativo ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
-            </td>
           </ng-container>
-
-          <ng-container matColumnDef="codigo_acesso">
-            <th mat-header-cell *matHeaderCellDef>Código Acesso</th>
-            <td mat-cell *matCellDef="let row">{{ row.after.codigo_acesso }}</td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </tbody>
         </table>
       </mat-card-content>
     </mat-card>
   </div>
 </div>
 
-<div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="10px"  class="mt-20">
-  <div fxFlex = "94%" >
+<div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="10px" class="mtb-20">
+  <div fxFlex="94%">
     <button matButton="tonal" (click)="cancel()">Cancelar</button>
     <button matButton="filled" (click)="aprovar()" class="ml-5">Aprovar</button>
   </div>

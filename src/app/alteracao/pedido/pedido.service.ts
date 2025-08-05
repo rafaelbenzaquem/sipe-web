@@ -20,8 +20,16 @@ export class PedidoService {
       new PedidoNovoRequest(matriculaPonto, diaPonto, justificativa));
   }
 
-  apaga(id: number): Observable<PedidoResponse> {
+  apagar(id: number): Observable<PedidoResponse> {
     return this.http.delete<PedidoResponse>(`${this.API_BASE}/${id}`);
+  }
+
+  obter(id: number): Observable<PedidoResponse> {
+    return this.http.get<PedidoResponse>(`${this.API_BASE}/${id}`);
+  }
+
+  obterPorPonto(matricula: string, dia: string): Observable<PedidoResponse> {
+    return this.http.get<PedidoResponse>(`${this.API_BASE}/${matricula}/${dia}/pontos`);
   }
 
 }

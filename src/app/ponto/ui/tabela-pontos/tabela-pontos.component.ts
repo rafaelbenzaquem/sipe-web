@@ -7,6 +7,7 @@ import {MatButton, MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTableModule} from '@angular/material/table';
 import {TimerComponent} from '../../../registro/ui/timer/timer.component'
+import {PedidoService} from '../../../alteracao/pedido/pedido.service';
 
 
 export class PontoTableModel {
@@ -124,6 +125,9 @@ export class TabelaPontosComponent {
     this.updateTableModel();
   }
 
+  constructor(private pedidoService: PedidoService) {
+  }
+
   get pontos(): Ponto[] {
     return this._pontos;
   }
@@ -209,5 +213,4 @@ export class TabelaPontosComponent {
   isNullOrBlank(str: string | null | undefined): boolean {
     return str == null || str.trim() === '';
   }
-
 }

@@ -45,6 +45,7 @@ export class AtualizacaoComponent {
 
   diaFormatado = "";
   pedido: Pedido = new Pedido();
+  justificativa: string = "";
   private originalRegistros: Registro[] = [];
   registros: Registro[] = [];
   registrosParaApagar: Registro[] = [];
@@ -90,7 +91,7 @@ export class AtualizacaoComponent {
   save(): void {
 
 
-    this.pedidoService.realizarPedido(this.ponto.matricula, this.diaFormatado, this.pedido.justificativa).subscribe(
+    this.pedidoService.realizarPedido(this.ponto.matricula, this.diaFormatado, this.justificativa).subscribe(
       pedidoResponse => {
         this.pedido = Pedido.toModel(pedidoResponse);
         this.registros.forEach(registro => {

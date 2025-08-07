@@ -66,10 +66,11 @@
           <mat-divider></mat-divider>
         </div>
 
-        <div  class="mat-20">
+        <div class="mat-20">
           <mat-form-field class="text-full-width">
             <mat-label>Justificativa</mat-label>
-            <textarea  required="true" matInput placeholder="Ex. Erro na coleta do registro de acesso..."></textarea>
+            <textarea required="true" matInput placeholder="Ex. Erro na coleta do registro de acesso..."
+                      [value]="justificativa"></textarea>
           </mat-form-field>
         </div>
 

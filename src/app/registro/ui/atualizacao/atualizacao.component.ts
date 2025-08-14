@@ -145,7 +145,7 @@ export class AtualizacaoComponent {
 
     this.registrosParaApagar.forEach((registro: Registro) => {
       if (registro.id !== 0) {
-        this.registroService.apaga(registro.id).subscribe(
+        this.registroService.apaga(registro.id, pedido.id).subscribe(
           registroApagado => {
             console.log(registroApagado);
           },

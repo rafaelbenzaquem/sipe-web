@@ -26,7 +26,7 @@ export class RegistroService {
   }
 
 
-  aprova(id_registro: number): Observable<RegistroResponse> {
+  aprova(id_registro: number, idPedidoAlteracao: number): Observable<RegistroResponse> {
     return this.http.put<RegistroResponse>(`${this.API_BASE}/${id_registro}`, null);
   }
 
@@ -42,8 +42,8 @@ export class RegistroService {
     return this.http.get<RegistroListResponse>(`${this.API_BASE}/pontos?matricula=${matricula}&dia=${dia}&todos=true`);
   }
 
-  apaga(id: number): Observable<RegistroResponse> {
-    return this.http.delete<RegistroResponse>(`${this.API_BASE}/${id}`);
+  apaga(id: number, idPedidoAlteracao: number): Observable<RegistroResponse> {
+    return this.http.delete<RegistroResponse>(`${this.API_BASE}/${id}?id_pedido_alteracao=${idPedidoAlteracao}`);
   }
 
 }

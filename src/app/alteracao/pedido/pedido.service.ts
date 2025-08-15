@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {PedidoNovoRequest, PedidoResponse} from './pedido.model';
+import {PedidoAtualizadoRequest, PedidoNovoRequest, PedidoResponse} from './pedido.model';
 import {environment as env} from '../../../environments/environment';
 
 
@@ -18,6 +18,21 @@ export class PedidoService {
   realizarPedido(matriculaPonto: string, diaPonto: string, justificativa: string): Observable<PedidoResponse> {
     return this.http.post<PedidoResponse>(`${this.API_BASE}`,
       new PedidoNovoRequest(matriculaPonto, diaPonto, justificativa));
+  }
+
+  atualizaPedido(matriculaPonto: string, diaPonto: string, justificativa: string): Observable<PedidoResponse> {
+    return this.http.patch<PedidoResponse>(`${this.API_BASE}`,
+      new PedidoAtualizadoRequest(matriculaPonto, diaPonto, justificativa));
+  }
+
+  aprovaPedido(matriculaPonto: string, diaPonto: string, justificativa: string, justificativa_aprovador: string): Observable<PedidoResponse> {
+    return this.http.patch<PedidoResponse>(`${this.API_BASE}`,
+      new PedidoAtualizadoRequest(matriculaPonto, diaPonto, justificativa, justificativa_aprovador, 'APROVADO'));
+  }
+
+  rejeitaPedido(matriculaPonto: string, diaPonto: string, justificativa: string, justificativa_aprovador: string): Observable<PedidoResponse> {
+    return this.http.patch<PedidoResponse>(`${this.API_BASE}`,
+      new PedidoAtualizadoRequest(matriculaPonto, diaPonto, justificativa, justificativa_aprovador, 'REJEITADO'));
   }
 
   apagar(id: number): Observable<PedidoResponse> {

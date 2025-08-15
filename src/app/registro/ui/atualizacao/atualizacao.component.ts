@@ -167,6 +167,16 @@ export class AtualizacaoComponent {
 
   add(): void {
     let registro = new Registro();
+    let ultimoRegistro = this.registros.at(this.registros.length - 1);
+    if (ultimoRegistro) {
+      if (ultimoRegistro.sentido == "Entrada") {
+        registro.sentido = "Saída";
+      } else {
+        registro.sentido = "Entrada";
+      }
+    } else {
+      registro.sentido = "Entrada";
+    }
     this.registros.push(registro);
   }
 

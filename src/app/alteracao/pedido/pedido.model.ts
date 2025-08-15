@@ -65,3 +65,19 @@ export class PedidoNovoRequest {
     this.justificativa = justificativa;
   }
 }
+
+export class PedidoAtualizadoRequest {
+  matricula_ponto: string = "";
+  dia_ponto: string = "";
+  justificativa: string = "";
+  status: 'PENDENTE' | 'APROVADO' | 'REJEITADO' = 'PENDENTE';
+  justificativa_aprovador: string = "";
+
+  constructor(matricula_ponto: string, dia_ponto: string, justificativa: string, justificativa_aprovador: string = '', status: 'PENDENTE' | 'APROVADO' | 'REJEITADO' = 'PENDENTE') {
+    this.matricula_ponto = matricula_ponto;
+    this.dia_ponto = dia_ponto;
+    this.justificativa = justificativa;
+    this.justificativa_aprovador = justificativa_aprovador;
+    this.status = status;
+  }
+}

@@ -94,6 +94,7 @@ export class AtualizacaoComponent {
     this.pedidoService.obterPorPonto(this.ponto.matricula, this.diaFormatado).pipe(
       tap(pedidoResponse => {
         this.pedido = Pedido.toModel(pedidoResponse);
+        this.pedidoService.atualizaPedido(pedidoResponse.id, this.ponto.matricula, this.diaFormatado, this.justificativa);
         this.fazerPedido(this.pedido);
       }),
       // Se encontrar, só retorna o pedido

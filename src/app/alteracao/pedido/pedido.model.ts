@@ -6,6 +6,7 @@ export class Pedido {
   dia_ponto: string = "";
   status: 'PENDENTE' | 'APROVADO' | 'REJEITADO' = 'PENDENTE';
   justificativa: string = "";
+  justificativa_aprovador: string = "";
   alteracoes: Alteracao[] = [];
 
   static toModel(pedidoResponse: PedidoResponse): Pedido {
@@ -15,6 +16,7 @@ export class Pedido {
     pedido.dia_ponto = pedidoResponse.dia_ponto;
     pedido.status = pedidoResponse.status;
     pedido.justificativa = pedidoResponse.justificativa;
+    pedido.justificativa_aprovador = pedidoResponse.justificativa_aprovador;
     pedido.alteracoes = pedidoResponse.alteracoes.map(pr => Alteracao.toModel(pr))
     return pedido;
   }
@@ -51,6 +53,7 @@ export interface PedidoResponse {
   dia_ponto: string;
   status: 'PENDENTE' | 'APROVADO' | 'REJEITADO';
   justificativa: string;
+  justificativa_aprovador: string;
   alteracoes: AlteracaoResponse[];
 }
 
@@ -67,13 +70,15 @@ export class PedidoNovoRequest {
 }
 
 export class PedidoAtualizadoRequest {
+  id: number = 0;
   matricula_ponto: string = "";
   dia_ponto: string = "";
   justificativa: string = "";
   status: 'PENDENTE' | 'APROVADO' | 'REJEITADO' = 'PENDENTE';
   justificativa_aprovador: string = "";
 
-  constructor(matricula_ponto: string, dia_ponto: string, justificativa: string, justificativa_aprovador: string = '', status: 'PENDENTE' | 'APROVADO' | 'REJEITADO' = 'PENDENTE') {
+  constructor(id: number, matricula_ponto: string, dia_ponto: string, justificativa: string, justificativa_aprovador: string = '', status: 'PENDENTE' | 'APROVADO' | 'REJEITADO' = 'PENDENTE') {
+    this.id = id;
     this.matricula_ponto = matricula_ponto;
     this.dia_ponto = dia_ponto;
     this.justificativa = justificativa;

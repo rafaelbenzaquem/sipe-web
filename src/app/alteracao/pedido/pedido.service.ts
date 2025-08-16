@@ -20,19 +20,19 @@ export class PedidoService {
       new PedidoNovoRequest(matriculaPonto, diaPonto, justificativa));
   }
 
-  atualizaPedido(matriculaPonto: string, diaPonto: string, justificativa: string): Observable<PedidoResponse> {
+  atualizaPedido(id: number, matriculaPonto: string, diaPonto: string, justificativa: string): Observable<PedidoResponse> {
     return this.http.patch<PedidoResponse>(`${this.API_BASE}`,
-      new PedidoAtualizadoRequest(matriculaPonto, diaPonto, justificativa));
+      new PedidoAtualizadoRequest(id, matriculaPonto, diaPonto, justificativa));
   }
 
-  aprovaPedido(matriculaPonto: string, diaPonto: string, justificativa: string, justificativa_aprovador: string): Observable<PedidoResponse> {
+  aprovaPedido(id: number, matriculaPonto: string, diaPonto: string, justificativa: string, justificativa_aprovador: string): Observable<PedidoResponse> {
     return this.http.patch<PedidoResponse>(`${this.API_BASE}`,
-      new PedidoAtualizadoRequest(matriculaPonto, diaPonto, justificativa, justificativa_aprovador, 'APROVADO'));
+      new PedidoAtualizadoRequest(id, matriculaPonto, diaPonto, justificativa, justificativa_aprovador, 'APROVADO'));
   }
 
-  rejeitaPedido(matriculaPonto: string, diaPonto: string, justificativa: string, justificativa_aprovador: string): Observable<PedidoResponse> {
+  rejeitaPedido(id: number, matriculaPonto: string, diaPonto: string, justificativa: string, justificativa_aprovador: string): Observable<PedidoResponse> {
     return this.http.patch<PedidoResponse>(`${this.API_BASE}`,
-      new PedidoAtualizadoRequest(matriculaPonto, diaPonto, justificativa, justificativa_aprovador, 'REJEITADO'));
+      new PedidoAtualizadoRequest(id, matriculaPonto, diaPonto, justificativa, justificativa_aprovador, 'REJEITADO'));
   }
 
   apagar(id: number): Observable<PedidoResponse> {

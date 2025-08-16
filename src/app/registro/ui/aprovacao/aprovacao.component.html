@@ -1,0 +1,110 @@
+<div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="10px" class="mt-20">
+  <div fxFlex="94%">
+    <mat-form-field class="text-full-width">
+      <mat-label>Justificativa servidor</mat-label>
+      <input matInput value="{{pedido.justificativa}}" disabled="true">
+    </mat-form-field>
+
+  </div>
+</div>
+
+<div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="10px" class="mt-5">
+  <div fxFlex="47%">
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Estado Original</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table>
+          <thead>
+          <tr>
+            <th>Sentido</th>
+            <th>Hora</th>
+            <th>Ativo</th>
+            <th>Código de Acesso</th>
+          </tr>
+          </thead>
+          <tbody>
+          <ng-container *ngFor="let row of rows; index as i">
+            <tr>
+              <td>
+                {{ row.before.sentido }}
+              </td>
+              <td>
+                {{ row.before.hora }}
+              </td>
+              <td>
+                <mat-icon>{{ row.before.ativo ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+              </td>
+              <td>
+                {{ row.before.codigo_acesso }}
+              </td>
+            </tr>
+          </ng-container>
+          </tbody>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div fxFlex="47%">
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Estado Após Alterações</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table>
+          <thead>
+          <tr>
+            <th>Sentido</th>
+            <th>Hora</th>
+            <th>Ativo</th>
+            <th>Código de Acesso</th>
+          </tr>
+          </thead>
+          <tbody>
+          <ng-container *ngFor="let row of rows; index as i">
+
+            <tr>
+              <td>
+                {{ row.after.sentido }}
+              </td>
+              <td>
+                {{ row.after.hora }}
+              </td>
+              <td>
+                <mat-icon>{{ row.after.ativo ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+              </td>
+              <td>
+                {{ row.after.codigo_acesso }}
+              </td>
+            </tr>
+
+          </ng-container>
+          </tbody>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+</div>
+<div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="10px" class="mtb-20">
+  <div fxFlex="94%">
+
+    <div class="mat-20">
+      <mat-form-field class="text-full-width">
+        <mat-label>Justificativa Aprovador</mat-label>
+        <textarea required="true" matInput placeholder="Ex. Erro na coleta do registro de acesso..."
+                  [(ngModel)]="pedido.justificativa_aprovador"></textarea>
+      </mat-form-field>
+    </div>
+  </div>
+</div>
+<div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="10px" class="mtb-20">
+  <div fxFlex="94%">
+
+    <button matButton="tonal" (click)="cancel()">Cancelar</button>
+    <button matButton="filled" (click)="aprovar()" class="ml-5">Aprovar</button>
+    <button matButton="outlined" (click)="aprovar()" class="ml-5">Rejeitar</button>
+  </div>
+</div>

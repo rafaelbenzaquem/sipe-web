@@ -1,0 +1,19 @@
+@if (registro.codigo_acesso == 0 && registro.sentido != '-----' && isNullOrBlank(registro.aprovador)) {
+  <div [matTooltip]="mensagemTooltip()"
+       style="display: flex; flex-direction: column; color: red">
+    <span>{{ registro.sentido }}</span>
+    <span>{{ registro.hora }}</span>
+  </div>
+} @else if (registro.codigo_acesso == 0 && registro.sentido != '-----') {
+  <div [matTooltip]="mensagemTooltip()"
+       style="display: flex; flex-direction: column; color: blue">
+    <span>{{ registro.sentido }}</span>
+    <span>{{ registro.hora }}</span>
+  </div>
+} @else {
+  <div style="display: flex; flex-direction: column; ">
+
+    <span>{{ registro.sentido }}</span>
+    <span>{{ registro.hora }}</span>
+  </div>
+}

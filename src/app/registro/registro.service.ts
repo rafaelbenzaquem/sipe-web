@@ -15,26 +15,35 @@ export class RegistroService {
   constructor(private http: HttpClient) {
   }
 
-  cria(registro: Registro, matricula: string, dia: string): Observable<RegistroResponse> {
-    return this.http.post<RegistroResponse>(`${this.API_BASE}/pontos?matricula=${matricula}&dia=${dia}`,
+  cria(registro: Registro, matricula: string, dia: string, idPedidoAlteracao: number): Observable<RegistroResponse> {
+    return this.http.post<RegistroResponse>(`${this.API_BASE}/pontos?matricula=${matricula}&dia=${dia}&id_pedido_alteracao=${idPedidoAlteracao}`,
       [registro.toNovoRequest()]);
   }
 
-  atualiza(registro: Registro, matricula: string, dia: string): Observable<RegistroResponse> {
-    return this.http.put<RegistroResponse>(`${this.API_BASE}/pontos?matricula=${matricula}&dia=${dia}`,
+  atualiza(registro: Registro, matricula: string, dia: string, idPedidoAlteracao: number): Observable<RegistroResponse> {
+    return this.http.put<RegistroResponse>(`${this.API_BASE}/pontos?matricula=${matricula}&dia=${dia}&id_pedido_alteracao=${idPedidoAlteracao}`,
       registro.toAtualizadoRequest());
+  }
+
+
+  aprova(id_registro: number, idPedidoAlteracao: number): Observable<RegistroResponse> {
+    return this.http.put<RegistroResponse>(`${this.API_BASE}/${id_registro}`, null);
   }
 
   busca(id: number): Observable<RegistroResponse> {
     return this.http.get<RegistroResponse>(`${this.API_BASE}/${id}`);
   }
 
-  lista(matricula: string, dia: string): Observable<RegistroListResponse> {
-    return this.http.get<RegistroListResponse>(`${this.API_BASE}/pontos?matricula=${matricula}&dia=${dia}`);
+  listaAtuais(matricula: string, dia: string): Observable<RegistroListResponse> {
+    return this.http.get<RegistroListResponse>(`${this.API_BASE}/pontos?matricula=${matricula}&dia=${dia}&todos=false`);
   }
 
-  apaga(id: number): Observable<RegistroResponse> {
-    return this.http.delete<RegistroResponse>(`${this.API_BASE}/${id}`);
+  listaTodos(matricula: string, dia: string): Observable<RegistroListResponse> {
+    return this.http.get<RegistroListResponse>(`${this.API_BASE}/pontos?matricula=${matricula}&dia=${dia}&todos=true`);
+  }
+
+  apaga(id: number, idPedidoAlteracao: number): Observable<RegistroResponse> {
+    return this.http.delete<RegistroResponse>(`${this.API_BASE}/${id}?id_pedido_alteracao=${idPedidoAlteracao}`);
   }
 
 }

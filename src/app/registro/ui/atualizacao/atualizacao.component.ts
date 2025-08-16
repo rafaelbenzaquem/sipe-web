@@ -14,6 +14,10 @@ import {Ponto} from '../../../ponto/ponto.model';
 import {MatCard, MatCardModule} from '@angular/material/card';
 import {RegistroService} from '../../registro.service';
 import {CheckBoxComponent} from '../../../check-box/check-box.component';
+import {Pedido} from '../../../alteracao/pedido/pedido.model';
+import {PedidoService} from '../../../alteracao/pedido/pedido.service';
+import {MatDividerModule} from '@angular/material/divider';
+import {catchError, switchMap, tap} from 'rxjs/operators';
 
 @Component({
   standalone: true,
@@ -32,29 +36,39 @@ import {CheckBoxComponent} from '../../../check-box/check-box.component';
     FlexLayoutModule,
     ReactiveFormsModule,
     MatCardModule,
-    CheckBoxComponent
+    CheckBoxComponent,
+    MatDividerModule
   ],
   templateUrl: './atualizacao.component.html',
   styleUrls: ['./atualizacao.component.scss']
 })
 export class AtualizacaoComponent {
-  /** Original snapshot of registros for reset */
+
+  diaFormatado = "";
+  pedido: Pedido = new Pedido();
+  justificativa: string = "";
   private originalRegistros: Registro[] = [];
-  /** Working copy of registros being edited */
   registros: Registro[] = [];
   registrosParaApagar: Registro[] = [];
-  /** Filter flags */
   showActive: boolean = true;
-  showInactive: boolean = true;
+  showInactive: boolean = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public ponto: Ponto,
     private dialogRef: MatDialogRef<AtualizacaoComponent>,
-    private registroService: RegistroService
+    private registroService: RegistroService,
+    private pedidoService: PedidoService,
   ) {
-    // snapshot registros and create working copy for editing
-    this.originalRegistros = ponto.registros.map(r => Object.assign(new Registro(), r));
-    this.registros = this.originalRegistros.map(r => Object.assign(new Registro(), r));
+    this.diaFormatado = ponto.dia.replaceAll("/", "");
+
+    let todosRegistros = registroService.listaTodos(ponto.matricula, this.diaFormatado);
+
+    todosRegistros.subscribe(rlr => {
+      let listaRegistros = rlr._embedded.registros.map(rr => Registro.toModel(rr))
+      this.originalRegistros = listaRegistros.map(r => Object.assign(new Registro(), r));
+      this.registros = this.originalRegistros.map(r => Object.assign(new Registro(), r));
+    });
+
   }
 
   moveUp(index: number): void {
@@ -70,21 +84,53 @@ export class AtualizacaoComponent {
   }
 
   remove(index: number): void {
-    console.log("remove index:"+index);
+    console.log("remove index:" + index);
     this.registrosParaApagar.push(this.registros[index]);
     this.registros.splice(index, 1);
   }
 
   save(): void {
+
+    this.pedidoService.obterPorPonto(this.ponto.matricula, this.diaFormatado).pipe(
+      tap(pedidoResponse => {
+        this.pedido = Pedido.toModel(pedidoResponse);
+        this.pedidoService.atualizaPedido(pedidoResponse.id, this.ponto.matricula, this.diaFormatado, this.justificativa);
+        this.fazerPedido(this.pedido);
+      }),
+      // Se encontrar, só retorna o pedido
+      catchError(err => {
+        if (err.status === 404) {
+          // Não encontrado → cria
+          return this.pedidoService.realizarPedido(
+            this.ponto.matricula,
+            this.diaFormatado,
+            this.justificativa
+          ).pipe(
+            tap(pedidoResponse => {
+              this.pedido = Pedido.toModel(pedidoResponse);
+              this.fazerPedido(this.pedido);
+            })
+          );
+        }
+        // Se for outro erro, propaga
+        throw err;
+      })
+    ).subscribe();
+
+    this.dialogRef.close({registros: this.registros});
+  }
+
+  private fazerPedido(pedido: Pedido) {
     this.registros.forEach(registro => {
-      if (registro.id === 0)
-        this.registroService.cria(registro, this.ponto.matricula, this.ponto.dia.replaceAll('/', '')).subscribe(
+      let registroOld = AtualizacaoComponent.encontrarRegistroPorId(this.originalRegistros, registro.id);
+      if (registroOld == undefined)
+        this.registroService.cria(registro, this.ponto.matricula, this.ponto.dia.replaceAll('/', ''), pedido.id).subscribe(
           rr => {
             registro = Registro.toModel(rr)
           }
         )
-      else
-        this.registroService.atualiza(registro, this.ponto.matricula, this.ponto.dia.replaceAll('/', '')).subscribe(
+      else if (registroOld.registroFoiAlterado(registro))
+        this.registroService.atualiza(registro, this.ponto.matricula, this.ponto.dia.replaceAll('/', ''), pedido.id).subscribe(
           rr => {
             registro = Registro.toModel(rr)
           }
@@ -93,24 +139,26 @@ export class AtualizacaoComponent {
 
     this.registros.forEach((registro, index) => {
       if (!registro.ativo) {
-        console.log("save:registros.forEach:index:"+index);
+        console.log("save:registros.forEach:index:" + index);
         this.registros.splice(index, 1);
       }
     })
 
     this.registrosParaApagar.forEach((registro: Registro) => {
       if (registro.id !== 0) {
-        this.registroService.apaga(registro.id).subscribe(
+        this.registroService.apaga(registro.id, pedido.id).subscribe(
           registroApagado => {
             console.log(registroApagado);
           },
         )
       }
     })
-
-
-    this.dialogRef.close({registros: this.registros});
   }
+
+  static encontrarRegistroPorId(registros: Registro[], id: number): Registro | undefined {
+    return registros.find(registro => registro.id === id);
+  }
+
 
   /** Restore working copy to original snapshot, clearing pending deletions */
   reset(): void {
@@ -120,6 +168,16 @@ export class AtualizacaoComponent {
 
   add(): void {
     let registro = new Registro();
+    let ultimoRegistro = this.registros.at(this.registros.length - 1);
+    if (ultimoRegistro) {
+      if (ultimoRegistro.sentido == "Entrada") {
+        registro.sentido = "Saída";
+      } else {
+        registro.sentido = "Entrada";
+      }
+    } else {
+      registro.sentido = "Entrada";
+    }
     this.registros.push(registro);
   }
 

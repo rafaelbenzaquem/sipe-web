@@ -7,7 +7,7 @@ export class Ponto {
   descricao: string = '';
   indice: number = 0;
   total_segundos: number = 0;
-
+  pedidoAlteracaoPendente: boolean = false;
   registros: Registro[] = [];
 
   static toModel(pontoResponse: PontoResponse) {
@@ -17,6 +17,7 @@ export class Ponto {
     ponto.descricao = pontoResponse.descricao;
     ponto.indice = pontoResponse.indice;
     ponto.total_segundos = pontoResponse.total_segundos;
+    ponto.pedidoAlteracaoPendente = pontoResponse.pedido_alteracao_pendente;
     return ponto;
   }
 }
@@ -33,6 +34,7 @@ export interface PontoResponse {
   descricao: string;
   indice: number;
   total_segundos: number;
+  pedido_alteracao_pendente: boolean;
   _links: {
     self: { href: string };
     registros: { href: string };

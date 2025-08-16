@@ -6,6 +6,8 @@ import {Registro} from '../../../registro/registro.model';
 import {MatButton, MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTableModule} from '@angular/material/table';
+import {TimerComponent} from '../../../registro/ui/timer/timer.component'
+import {PedidoService} from '../../../alteracao/pedido/pedido.service';
 
 
 export class PontoTableModel {
@@ -42,9 +44,19 @@ export class PontoTableModel {
 
 }
 
+
 export class RegistroListModel {
   sentido: string = '-----';
   hora: string = '--:--';
+
+  criador: string = 'sem criador';
+  data_criacao: string = '';
+
+  codigo_acesso: number = 0;
+
+  aprovador: string = 'Não aprovado';
+  data_aprovacao: string = 'Não aprovado';
+
   registro: Registro = new Registro();
 
 
@@ -52,9 +64,39 @@ export class RegistroListModel {
     let registroListModel = new RegistroListModel();
     registroListModel.sentido = registro.sentido;
     registroListModel.hora = registro.hora;
+    registroListModel.codigo_acesso = registro.codigo_acesso;
+
+    registroListModel.criador = registro.matricula_criador;
+    registroListModel.data_criacao = RegistroListModel.formatarData(registro.data_criacao);
+
+    registroListModel.aprovador = registro.matricula_aprovador;
+    registroListModel.data_aprovacao = RegistroListModel.formatarData(registro.data_aprovacao);
+
     registroListModel.registro = registro;
     return registroListModel;
   }
+
+  static formatarData(dataStr: string): string {
+    if (dataStr) {
+
+      const data = new Date(dataStr);
+      if (isNaN(data.getTime())) {
+        return 'Não disponível!';
+      }
+
+      const dia = String(data.getDate()).padStart(2, '0');
+      const mes = String(data.getMonth() + 1).padStart(2, '0'); // meses começam do zero
+      const ano = data.getFullYear();
+
+      const horas = String(data.getHours()).padStart(2, '0');
+      const minutos = String(data.getMinutes()).padStart(2, '0');
+      const segundos = String(data.getSeconds()).padStart(2, '0');
+
+      return `${dia}/${mes}/${ano} ${horas}:${minutos}:${segundos}`;
+    }
+    return 'Não disponível!';
+  }
+
 }
 
 @Component({
@@ -65,7 +107,8 @@ export class RegistroListModel {
     MatButton,
     MatButtonModule,
     MatIconModule,
-    MatTableModule
+    MatTableModule,
+    TimerComponent
   ],
   templateUrl: './tabela-pontos.component.html',
   styleUrl: './tabela-pontos.component.scss',
@@ -81,10 +124,18 @@ export class TabelaPontosComponent {
     this._pontos = v || [];
     this.updateTableModel();
   }
+
+  constructor(private pedidoService: PedidoService) {
+  }
+
   get pontos(): Ponto[] {
     return this._pontos;
   }
+
   @Output() editar = new EventEmitter<Ponto>();
+  @Output() aprovar = new EventEmitter<Ponto>();
+
+
   private _tamanhoRegistros = 2;
   /** Número de colunas de registros; reconstrói o modelo da tabela quando alterar */
   @Input()
@@ -92,9 +143,11 @@ export class TabelaPontosComponent {
     this._tamanhoRegistros = v || 0;
     this.updateTableModel();
   }
+
   get tamanhoRegistros(): number {
     return this._tamanhoRegistros;
   }
+
   pontosTableModel: PontoTableModel[] = [];
 
 
@@ -104,11 +157,11 @@ export class TabelaPontosComponent {
   // }
 
 
-  criaPontosTableModel(pontos: Ponto[], maiorLista: number) {
+  criaPontosTableModel(pontos: Ponto[], maiorLista: number): PontoTableModel[] {
     // let maiorLista = this.verificaMaiorListaDeRegistro(pontos);
-    let pontosTableModel: PontoTableModel[] = [];
-    pontosTableModel = pontos.map(PontoTableModel.toPontoTableModel)
-    pontosTableModel.forEach(ponto => {
+    let pontoTableModelList: PontoTableModel[] = [];
+    pontoTableModelList = pontos.map(PontoTableModel.toPontoTableModel)
+    pontoTableModelList.forEach(ponto => {
       if (ponto.registros) {
 
         let elementosFaltantes = maiorLista - ponto.registros.length;
@@ -118,7 +171,7 @@ export class TabelaPontosComponent {
         }
       }
     })
-    return pontosTableModel;
+    return pontoTableModelList;
   }
 
 
@@ -142,8 +195,22 @@ export class TabelaPontosComponent {
   }
 
   getRegistroIndices(): number[] {
-    return Array.from({ length: this.tamanhoRegistros }, (_, i) => i);
+    return Array.from({length: this.tamanhoRegistros}, (_, i) => i);
   }
 
 
+  formataTooltip(registro: RegistroListModel): string {
+
+    if (registro.aprovador) {
+      return `Criado por: ${registro.criador} - ${registro.data_criacao}\n
+      Aprovado por: ${registro.aprovador} - ${registro.data_aprovacao}`;
+    }
+
+
+    return `Criado por: ${registro.criador} - ${registro.data_criacao}`;
+  }
+
+  isNullOrBlank(str: string | null | undefined): boolean {
+    return str == null || str.trim() === '';
+  }
 }

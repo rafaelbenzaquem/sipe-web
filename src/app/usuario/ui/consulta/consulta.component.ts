@@ -14,6 +14,7 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatDialog,} from '@angular/material/dialog';
 import {AtualizacaoUsuarioDialog} from '../dialogs/dialogs.utils';
 import {Router, RouterLink} from '@angular/router';
+import {AuthService} from '../../../auth/auth.service';
 
 @Component({
   selector: 'app-consulta',
@@ -45,6 +46,7 @@ export class ConsultaComponent implements OnInit {
   constructor(
     private usuarioService: UsuarioService,
     private router: Router,
+    private authService: AuthService
   ) {
     this.debouncedBuscaUsuarios = this.debounce(this.buscaUsuarios.bind(this), 1000);
   }
@@ -95,6 +97,24 @@ export class ConsultaComponent implements OnInit {
         func(...args);
       }, delay);
     };
+  }
+
+  get usuario(){
+    return this.authService.getUsuario();
+  }
+
+  /**
+   * Verifica se possui determinada permissão
+   */
+  hasRole(role: string): boolean {
+    return this.authService.hasRole(role);
+  }
+
+  /**
+   * Verifica se possui ao menos uma das permissões
+   */
+  hasAnyRole(roles: string[]): boolean {
+    return this.authService.hasAnyRole(roles);
   }
 }
 

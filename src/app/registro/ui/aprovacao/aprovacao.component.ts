@@ -14,7 +14,6 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatOptionModule} from '@angular/material/core';
 import {MatSelectModule} from '@angular/material/select';
 import {MatInputModule} from '@angular/material/input';
-import {MatDivider} from '@angular/material/divider';
 import {PedidoService} from '../../../alteracao/pedido/pedido.service';
 
 interface AprovacaoRow {
@@ -61,8 +60,7 @@ export class RegistroModel {
     MatFormFieldModule,
     MatOptionModule,
     MatSelectModule,
-    MatInputModule,
-    MatDivider
+    MatInputModule
   ],
   templateUrl: './aprovacao.component.html',
   styleUrls: ['./aprovacao.component.scss']
@@ -124,20 +122,22 @@ export class AprovacaoComponent {
     this.pedidoService.aprovaPedido(this.pedido.id, this.pedido.matricula_ponto,
       this.converterData(this.pedido.dia_ponto), this.pedido.justificativa,
       this.pedido.justificativa_aprovador).subscribe(
-      p => {
-        console.log(p);
-        this.dialogRef.close();
+      pr => {
+        let pedido: Pedido = Pedido.toModel(pr);
+        console.log("AprovacaoComponent::aprovar");
+        this.dialogRef.close({pedido: Pedido});
       }
     );
   }
 
   rejeitar(): void {
     this.pedidoService.aprovaPedido(this.pedido.id, this.pedido.matricula_ponto,
-      this.converterData(this.pedido.dia_ponto) , this.pedido.justificativa,
+      this.converterData(this.pedido.dia_ponto), this.pedido.justificativa,
       this.pedido.justificativa_aprovador).subscribe(
-      p => {
-        console.log(p);
-        this.dialogRef.close();
+      pr => {
+        let pedido: Pedido = Pedido.toModel(pr);
+        console.log("AprovacaoComponent::rejeitar");
+        this.dialogRef.close({pedido: Pedido});
       }
     );
   }

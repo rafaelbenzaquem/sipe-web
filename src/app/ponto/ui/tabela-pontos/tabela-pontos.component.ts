@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {DatePipe, NgForOf} from '@angular/common';
+import {DatePipe, NgForOf, NgIf} from '@angular/common';
 import {Ponto} from '../../ponto.model';
 import {FormsModule} from '@angular/forms';
 import {Registro} from '../../../registro/registro.model';
@@ -8,6 +8,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatTableModule} from '@angular/material/table';
 import {TimerComponent} from '../../../registro/ui/timer/timer.component'
 import {PedidoService} from '../../../alteracao/pedido/pedido.service';
+import {AuthService} from '../../../auth/auth.service';
 
 
 export class PontoTableModel {
@@ -108,7 +109,8 @@ export class RegistroListModel {
     MatButtonModule,
     MatIconModule,
     MatTableModule,
-    TimerComponent
+    TimerComponent,
+    NgIf
   ],
   templateUrl: './tabela-pontos.component.html',
   styleUrl: './tabela-pontos.component.scss',
@@ -125,7 +127,8 @@ export class TabelaPontosComponent {
     this.updateTableModel();
   }
 
-  constructor(private pedidoService: PedidoService) {
+  constructor(private pedidoService: PedidoService,
+              private authService: AuthService) {
   }
 
   get pontos(): Ponto[] {
@@ -212,5 +215,19 @@ export class TabelaPontosComponent {
 
   isNullOrBlank(str: string | null | undefined): boolean {
     return str == null || str.trim() === '';
+  }
+
+  /**
+   * Verifica se possui determinada permissão
+   */
+  hasRole(role: string): boolean {
+    return this.authService.hasRole(role);
+  }
+
+  /**
+   * Verifica se possui ao menos uma das permissões
+   */
+  hasAnyRole(roles: string[]): boolean {
+    return this.authService.hasAnyRole(roles);
   }
 }

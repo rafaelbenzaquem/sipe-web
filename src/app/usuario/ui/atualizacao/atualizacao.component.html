@@ -51,7 +51,7 @@
                        [formControl]="cracha"
                        name="cracha"
                        placeholder="Ex: 0000000000020999"
-                       pattern="[0-9]{16}"
+                       pattern="[0-9]{4,16}"
                        maxlength="16"
                        required
                        (blur)="updateCrachaErrorMessage()"

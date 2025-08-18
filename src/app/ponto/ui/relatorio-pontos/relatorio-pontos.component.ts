@@ -74,7 +74,8 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
     private relatorioService: RelatorioService,
     private pedidoService: PedidoService,
     private dialog: MatDialog
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -83,7 +84,7 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
     });
   }
 
-   definePeriodo(): void {
+  definePeriodo(): void {
     this.inicioSelecionado = this.periodo.value.inicio;
     this.fimSelecionado = this.periodo.value.fim;
     this.foiBuscado = false;
@@ -125,7 +126,7 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
 
     let pontosUsuarioObservable =
       isUpdate ? this.pontoService.atualizaPontosUsuario(matricula, inicio, fim).toPromise()
-      : this.pontoService.getPontosUsuario(matricula, inicio, fim).toPromise();
+        : this.pontoService.getPontosUsuario(matricula, inicio, fim).toPromise();
     let pontos: Ponto[] = [];
 
     try {
@@ -209,7 +210,6 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
 
     dialogRef.afterClosed().subscribe(async (result: { registros?: Registro[] }) => {
       console.log("RelatorioPontosComponent:openAtualizacao:afterClosed", result);
-      // if registros were updated, refresh pontos (and table) to update totals and data
       if (result?.registros) {
         await this.atualizaPontos();
       }
@@ -222,18 +222,19 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
     this.pedidoService.obterPorPonto(ponto.matricula, ponto.dia.replaceAll('/', ''))
       .subscribe(pr => {
         console.log("pedido: " + JSON.stringify(pr));
-         let pedido = Pedido.toModel(pr);
+        let pedido = Pedido.toModel(pr);
         const dialogRef = this.dialog.open(AprovacaoComponent, {
           data: pedido,
           width: '850px'
         });
 
-        dialogRef.afterClosed().subscribe(async (result: { registros?: Registro[] }) => {
-          console.log("RelatorioPontosComponent:openAtualizacao:afterClosed", result);
-          // if registros were updated, refresh pontos (and table) to update totals and data
-          if (result?.registros) {
+        dialogRef.afterClosed().subscribe(async (result: { pedido: Pedido }) => {
+          console.log("RelatorioPontosComponent:openAprovacao:afterClosed", result);
+
+          if (result.pedido.status != pedido.status) {
             await this.atualizaPontos();
           }
+
         });
       });
   }

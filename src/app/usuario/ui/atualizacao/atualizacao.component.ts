@@ -143,7 +143,7 @@ export class AtualizacaoComponent {
     if (this.cracha.hasError('required')) {
       this.errorCrachaMessage.set('Campo \'Crachá Ponto\' obrigatório!');
     } else if (this.cracha.hasError('pattern')) {
-      this.errorCrachaMessage.set('Campo \'Crachá Ponto\' deverá ter 16 caracteres numéricos.');
+      this.errorCrachaMessage.set('Campo \'Crachá Ponto\' deverá ter entre 4 e 16 dígitos.');
     } else {
       this.errorCrachaMessage.set('');
     }

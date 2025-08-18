@@ -18,6 +18,10 @@ export class UsuarioService {
     return this.http.get<UsuarioResponse>(`${this.API_BASE}/${id}`);
   }
 
+  getUsuarioPorMatricula(matricula: string): Observable<UsuarioResponse> {
+    return this.http.get<UsuarioResponse>(`${this.API_BASE}/${matricula}`);
+  }
+
   getTodosUsuarios(): Observable<UsuarioListResponse> {
     return this.http.get<UsuarioListResponse>(this.API_BASE);
   }

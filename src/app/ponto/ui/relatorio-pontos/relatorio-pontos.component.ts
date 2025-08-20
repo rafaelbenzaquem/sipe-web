@@ -22,6 +22,7 @@ import {RelatorioService} from './relatorio.service';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {Pedido} from '../../../alteracao/pedido/pedido.model';
 import {PedidoService} from '../../../alteracao/pedido/pedido.service';
+import {MatIconModule} from '@angular/material/icon';
 
 @Component({
   selector: 'app-relatorio-pontos',
@@ -39,7 +40,8 @@ import {PedidoService} from '../../../alteracao/pedido/pedido.service';
     MatDatepickerModule,
     FormsModule,
     TabelaPontosComponent,
-    MatProgressBar
+    MatProgressBar,
+    MatIconModule
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './relatorio-pontos.component.html',

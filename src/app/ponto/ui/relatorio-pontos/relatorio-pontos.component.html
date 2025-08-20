@@ -23,14 +23,17 @@
               <mat-date-range-picker #rangePicker>
                 <mat-date-range-picker-actions>
                   <button matButton="filled"
-                          matDateRangePickerCancel>
-                    Cancelar
-                  </button>
-                  <button matButton="filled"
                           (click)="definePeriodo()"
                           matDateRangePickerApply>
+                    <mat-icon fontIcon="check_small"/>
                     Definir
                   </button>
+                  <button matButton="tonal"
+                          matDateRangePickerCancel>
+                    <mat-icon fontIcon="close"/>
+                    Cancelar
+                  </button>
+
                 </mat-date-range-picker-actions>
               </mat-date-range-picker>
             </mat-form-field>

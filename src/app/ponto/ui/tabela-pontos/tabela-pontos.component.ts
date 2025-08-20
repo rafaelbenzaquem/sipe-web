@@ -109,8 +109,7 @@ export class RegistroListModel {
     MatButtonModule,
     MatIconModule,
     MatTableModule,
-    TimerComponent,
-    NgIf
+    TimerComponent
   ],
   templateUrl: './tabela-pontos.component.html',
   styleUrl: './tabela-pontos.component.scss',
@@ -120,6 +119,14 @@ export class TabelaPontosComponent {
 
 
   private _pontos: Ponto[] = [];
+  private _tamanhoRegistros = 2;
+  private _horario: number = 7;
+  pontosTableModel: PontoTableModel[] = [];
+
+  constructor(private pedidoService: PedidoService,
+              private authService: AuthService) {
+  }
+
   /** Pontos de entrada; reconstrói o modelo da tabela quando alterar */
   @Input()
   set pontos(v: Ponto[]) {
@@ -127,19 +134,10 @@ export class TabelaPontosComponent {
     this.updateTableModel();
   }
 
-  constructor(private pedidoService: PedidoService,
-              private authService: AuthService) {
-  }
-
   get pontos(): Ponto[] {
     return this._pontos;
   }
 
-  @Output() editar = new EventEmitter<Ponto>();
-  @Output() aprovar = new EventEmitter<Ponto>();
-
-
-  private _tamanhoRegistros = 2;
   /** Número de colunas de registros; reconstrói o modelo da tabela quando alterar */
   @Input()
   set tamanhoRegistros(v: number) {
@@ -151,7 +149,26 @@ export class TabelaPontosComponent {
     return this._tamanhoRegistros;
   }
 
-  pontosTableModel: PontoTableModel[] = [];
+  @Input()
+  set horario(v: number) {
+    this._horario = v || 8;
+  }
+
+  get horario(): number {
+    return this._horario;
+  }
+
+
+
+
+  @Output() editar = new EventEmitter<Ponto>();
+  @Output() aprovar = new EventEmitter<Ponto>();
+
+
+
+
+
+
 
 
   // /** Reconstrói o modelo de exibição a partir dos inputs atuais */

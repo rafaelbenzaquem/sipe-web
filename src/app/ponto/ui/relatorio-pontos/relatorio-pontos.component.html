@@ -65,6 +65,7 @@
               <app-tabela-pontos
                 [pontos]="pontos"
                 [tamanhoRegistros]="tamanhoMaximo"
+                [horario]="usuario.hora_diaria||7"
                 (editar)="openAtualizacao($event)"
                 (aprovar)="openAprovacao($event)">
               </app-tabela-pontos>

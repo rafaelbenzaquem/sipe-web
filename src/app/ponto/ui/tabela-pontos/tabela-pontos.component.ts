@@ -9,6 +9,7 @@ import {MatTableModule} from '@angular/material/table';
 import {TimerComponent} from '../../../registro/ui/timer/timer.component'
 import {PedidoService} from '../../../alteracao/pedido/pedido.service';
 import {AuthService} from '../../../auth/auth.service';
+import {Usuario} from '../../../usuario/usuario.model';
 
 
 export class PontoTableModel {
@@ -17,15 +18,19 @@ export class PontoTableModel {
   descricao: string = '';
   total: string = '00:00:00';
   registros: RegistroListModel[] = [];
+  temCreditoDeHoras: boolean = false;
   ponto: Ponto = new Ponto();
+  usuario: Usuario = new Usuario();
 
-  static toPontoTableModel(ponto: Ponto): PontoTableModel {
+  static toPontoTableModel(ponto: Ponto, usuario: Usuario = new Usuario() || undefined): PontoTableModel {
     let pontoTableModel = new PontoTableModel();
     pontoTableModel.dia = ponto.dia;
     pontoTableModel.descricao = ponto.descricao;
     pontoTableModel.total = PontoTableModel.formatarSegundosEmHoras(ponto.total_segundos);
     pontoTableModel.registros = ponto.registros.map(RegistroListModel.toRegistroListModel);
+    pontoTableModel.temCreditoDeHoras = PontoTableModel.temCreditoDeHoras(ponto.total_segundos, usuario.hora_diaria || 7);
     pontoTableModel.ponto = ponto;
+    pontoTableModel.usuario = usuario;
     return pontoTableModel;
   }
 
@@ -41,6 +46,18 @@ export class PontoTableModel {
     const segundosFormatados = String(segundos).padStart(2, '0');
 
     return `${horasFormatadas}:${minutosFormatados}:${segundosFormatados}`;
+  }
+
+  private static temCreditoDeHoras(totalSegundosTrabalhados: number, horasDiarias: number): boolean {
+
+    console.log("Total de Segundos: " + totalSegundosTrabalhados);
+
+    let horasDiariasEmSegundos = horasDiarias * 3600;
+
+    console.log("Carga horária em segundos: " + horasDiariasEmSegundos);
+
+
+    return totalSegundosTrabalhados >= horasDiariasEmSegundos;
   }
 
 }
@@ -119,12 +136,24 @@ export class TabelaPontosComponent {
 
 
   private _pontos: Ponto[] = [];
+  private _usuarioPonto: Usuario = new Usuario();
   private _tamanhoRegistros = 2;
   private _horario: number = 7;
   pontosTableModel: PontoTableModel[] = [];
 
   constructor(private pedidoService: PedidoService,
               private authService: AuthService) {
+  }
+
+
+  @Input()
+  set usuarios(v: Usuario) {
+    this._usuarioPonto = v ;
+    this.updateTableModel();
+  }
+
+  get usuarios(): Usuario {
+    return this._usuarioPonto;
   }
 
   /** Pontos de entrada; reconstrói o modelo da tabela quando alterar */
@@ -159,16 +188,8 @@ export class TabelaPontosComponent {
   }
 
 
-
-
   @Output() editar = new EventEmitter<Ponto>();
   @Output() aprovar = new EventEmitter<Ponto>();
-
-
-
-
-
-
 
 
   // /** Reconstrói o modelo de exibição a partir dos inputs atuais */
@@ -177,10 +198,10 @@ export class TabelaPontosComponent {
   // }
 
 
-  criaPontosTableModel(pontos: Ponto[], maiorLista: number): PontoTableModel[] {
+  criaPontosTableModel(pontos: Ponto[], maiorLista: number, usuario: Usuario = new Usuario() || undefined): PontoTableModel[] {
     // let maiorLista = this.verificaMaiorListaDeRegistro(pontos);
     let pontoTableModelList: PontoTableModel[] = [];
-    pontoTableModelList = pontos.map(PontoTableModel.toPontoTableModel)
+    pontoTableModelList = pontos.map(p => PontoTableModel.toPontoTableModel(p, usuario))
     pontoTableModelList.forEach(ponto => {
       if (ponto.registros) {
 

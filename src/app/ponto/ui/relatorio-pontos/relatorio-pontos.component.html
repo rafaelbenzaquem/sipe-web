@@ -67,7 +67,8 @@
                 [tamanhoRegistros]="tamanhoMaximo"
                 [horario]="usuario.hora_diaria||7"
                 (editar)="openAtualizacao($event)"
-                (aprovar)="openAprovacao($event)">
+                (aprovar)="openAprovacao($event)"
+              (controle)="openControle($event)">
               </app-tabela-pontos>
             }
           </div>

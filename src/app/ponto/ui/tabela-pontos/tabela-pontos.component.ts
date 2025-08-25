@@ -167,6 +167,8 @@ export class TabelaPontosComponent {
     return this._pontos;
   }
 
+
+
   /** Número de colunas de registros; reconstrói o modelo da tabela quando alterar */
   @Input()
   set tamanhoRegistros(v: number) {
@@ -190,6 +192,8 @@ export class TabelaPontosComponent {
 
   @Output() editar = new EventEmitter<Ponto>();
   @Output() aprovar = new EventEmitter<Ponto>();
+
+  @Output() controle = new EventEmitter<Ponto>();
 
 
   // /** Reconstrói o modelo de exibição a partir dos inputs atuais */

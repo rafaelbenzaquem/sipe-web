@@ -18,11 +18,12 @@ import {AtualizacaoComponent} from '../../../registro/ui/atualizacao/atualizacao
 import {TabelaPontosComponent} from '../tabela-pontos/tabela-pontos.component';
 import {Ponto} from '../../ponto.model';
 import {AprovacaoComponent} from '../../../registro/ui/aprovacao/aprovacao.component';
-import {RelatorioService} from './relatorio.service';
+import {RelatorioService} from '../../relatorio.service';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {Pedido} from '../../../alteracao/pedido/pedido.model';
 import {PedidoService} from '../../../alteracao/pedido/pedido.service';
 import {MatIconModule} from '@angular/material/icon';
+import {ControleAprovacaoComponent} from '../../../registro/ui/controle-aprovacao/controle-aprovacao.component';
 
 @Component({
   selector: 'app-relatorio-pontos',
@@ -236,6 +237,29 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
           if (result.pedido.status != pedido.status) {
             await this.atualizaPontos();
           }
+
+        });
+      });
+  }
+
+  /** Abre diálogo de controle de pedido alteração de registros  */
+  openControle(ponto: Ponto): void {
+
+    this.pedidoService.obterPorPonto(ponto.matricula, ponto.dia.replaceAll('/', ''))
+      .subscribe(pr => {
+        console.log("pedido: " + JSON.stringify(pr));
+        let pedido = Pedido.toModel(pr);
+        const dialogRef = this.dialog.open(ControleAprovacaoComponent, {
+          data: pedido,
+          width: '850px'
+        });
+
+        dialogRef.afterClosed().subscribe(async (result: { pedido: Pedido }) => {
+          console.log("RelatorioPontosComponent:openControle:afterClosed", result);
+
+          // if (result.pedido.status != pedido.status) {
+          //   await this.atualizaPontos();
+          // }
 
         });
       });

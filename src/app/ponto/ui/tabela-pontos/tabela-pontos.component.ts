@@ -10,6 +10,7 @@ import {TimerComponent} from '../../../registro/ui/timer/timer.component'
 import {PedidoService} from '../../../alteracao/pedido/pedido.service';
 import {AuthService} from '../../../auth/auth.service';
 import {Usuario} from '../../../usuario/usuario.model';
+import {Pedido} from '../../../alteracao/pedido/pedido.model';
 
 
 export class PontoTableModel {
@@ -21,8 +22,9 @@ export class PontoTableModel {
   temCreditoDeHoras: boolean = false;
   ponto: Ponto = new Ponto();
   usuario: Usuario = new Usuario();
+  pedido: Pedido = new Pedido();
 
-  static toPontoTableModel(ponto: Ponto, usuario: Usuario = new Usuario() || undefined): PontoTableModel {
+  static toPontoTableModel(ponto: Ponto, usuario: Usuario = new Usuario() || undefined, pedido: Pedido = new Pedido() || undefined): PontoTableModel {
     let pontoTableModel = new PontoTableModel();
     pontoTableModel.dia = ponto.dia;
     pontoTableModel.descricao = ponto.descricao;
@@ -31,6 +33,7 @@ export class PontoTableModel {
     pontoTableModel.temCreditoDeHoras = PontoTableModel.temCreditoDeHoras(ponto.total_segundos, usuario.hora_diaria || 7);
     pontoTableModel.ponto = ponto;
     pontoTableModel.usuario = usuario;
+    pontoTableModel.pedido = pedido;
     return pontoTableModel;
   }
 
@@ -148,7 +151,7 @@ export class TabelaPontosComponent {
 
   @Input()
   set usuarios(v: Usuario) {
-    this._usuarioPonto = v ;
+    this._usuarioPonto = v;
     this.updateTableModel();
   }
 
@@ -166,6 +169,7 @@ export class TabelaPontosComponent {
   get pontos(): Ponto[] {
     return this._pontos;
   }
+
 
   /** Número de colunas de registros; reconstrói o modelo da tabela quando alterar */
   @Input()
@@ -190,6 +194,8 @@ export class TabelaPontosComponent {
 
   @Output() editar = new EventEmitter<Ponto>();
   @Output() aprovar = new EventEmitter<Ponto>();
+
+  @Output() controle = new EventEmitter<Ponto>();
 
 
   // /** Reconstrói o modelo de exibição a partir dos inputs atuais */

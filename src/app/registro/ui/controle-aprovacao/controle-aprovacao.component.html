@@ -1,3 +1,18 @@
+<div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="10px" class="mtb-20">
+  <div fxFlex="94%">
+
+    <div class="mat-20">
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <mat-card-title>Pedido {{ pedido.status }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          Justificativa Aprovador: {{ pedido.justificativa_aprovador }}
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>
 <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="10px" class="mt-5">
   <div fxFlex="47%">
     <mat-card appearance="outlined">
@@ -78,18 +93,7 @@
   </div>
 
 </div>
-<div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="10px" class="mtb-20">
-  <div fxFlex="94%">
 
-    <div class="mat-20">
-      <mat-form-field class="text-full-width">
-        <mat-label>Justificativa Aprovador</mat-label>
-        <textarea required="true" matInput placeholder="Ex. Erro na coleta do registro de acesso..."
-                  [(ngModel)]="pedido.justificativa_aprovador"></textarea>
-      </mat-form-field>
-    </div>
-  </div>
-</div>
 <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="10px" class="mtb-20">
   <div fxFlex="94%">
 

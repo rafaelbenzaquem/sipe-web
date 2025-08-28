@@ -69,7 +69,15 @@ export class ConsultaComponent implements OnInit {
 
   buscaUsuarios(page: number, size: number, nome: string = "") {
     this.usuarioService.getUsuarios(page, size, nome).subscribe(response => {
-      this.usuarios = response._embedded.usuarios.map(Usuario.toModel);
+      this.usuarios = response._embedded.usuarios.map(Usuario.toModel).sort(
+        (a, b) => {
+          if (!a.nome && !b.nome) return 0;
+          if (!a.nome) return 1;
+          if (!b.nome) return -1;
+          return a.nome.localeCompare(b.nome, undefined, {sensitivity: "base"});
+        }
+      );
+
       this.length = response.page.totalElements;
     });
     this.isLoading = false;
@@ -99,7 +107,7 @@ export class ConsultaComponent implements OnInit {
     };
   }
 
-  get usuario(){
+  get usuario() {
     return this.authService.getUsuario();
   }
 

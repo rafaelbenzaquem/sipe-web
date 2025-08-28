@@ -61,6 +61,7 @@ export class AppComponent {
     private dialog: MatDialog
   ) {
     this.oauthService.events.subscribe((e) => {
+      console.log("AppComponent:oauthService.events: "+e.type);
       if (e.type === 'token_expires') {
         const dialogRef = this.dialog.open(SessionExpiredDialog, { disableClose: true });
         dialogRef.afterClosed().subscribe(() => {

@@ -244,7 +244,7 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
 
   /** Abre diálogo de controle de pedido alteração de registros  */
   openControle(ponto: Ponto): void {
-
+    console.log("RelatorioPontosComponent:openControle");
     this.pedidoService.obterPorPonto(ponto.matricula, ponto.dia.replaceAll('/', ''))
       .subscribe(pr => {
         console.log("pedido: " + JSON.stringify(pr));

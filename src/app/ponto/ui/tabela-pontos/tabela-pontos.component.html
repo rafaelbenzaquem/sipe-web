@@ -54,7 +54,7 @@
         </button>
       }
 
-      @if (pontoTableModel.ponto.pedidoAlteracaoAtualAvaliado) {
+      @if (pontoTableModel.ponto.pedidoAlteracaoAtualAvaliado || pontoTableModel.ponto.pedidoAlteracaoPendente) {
         <button matButton="elevated" (click)="controle.emit(pontoTableModel.ponto)">
           <mat-icon>visibility</mat-icon>
           Status

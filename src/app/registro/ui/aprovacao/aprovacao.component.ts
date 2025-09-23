@@ -131,7 +131,7 @@ export class AprovacaoComponent {
   }
 
   rejeitar(): void {
-    this.pedidoService.aprovaPedido(this.pedido.id, this.pedido.matricula_ponto,
+    this.pedidoService.rejeitaPedido(this.pedido.id, this.pedido.matricula_ponto,
       this.converterData(this.pedido.dia_ponto), this.pedido.justificativa,
       this.pedido.justificativa_aprovador).subscribe(
       pr => {

@@ -83,6 +83,13 @@
                 <mat-icon fontIcon="menu"></mat-icon>
                 Relatório
               </a>
+              <a mat-stroked-button color="accent" *ngIf="hasAnyRole(['GRP_SIPE_ADMIN','GRP_SIPE_DIRETOR','GRP_SIPE_USERS'])
+              && (mapPendencias(usuario) | async)"
+                 [routerLink]="['/pontos/relatorio/pendente']"
+                 [state]="{'usuario': usuario}">
+                <mat-icon>visibility</mat-icon>
+                Pendentes
+              </a>
             </td>
           </ng-container>
 

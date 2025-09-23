@@ -19,7 +19,6 @@ import {TabelaPontosComponent} from '../tabela-pontos/tabela-pontos.component';
 import {Ponto} from '../../ponto.model';
 import {AprovacaoComponent} from '../../../registro/ui/aprovacao/aprovacao.component';
 import {RelatorioService} from '../../relatorio.service';
-import {MatProgressBar} from '@angular/material/progress-bar';
 import {Pedido} from '../../../alteracao/pedido/pedido.model';
 import {PedidoService} from '../../../alteracao/pedido/pedido.service';
 import {MatIconModule} from '@angular/material/icon';
@@ -41,14 +40,13 @@ import {ControleAprovacaoComponent} from '../../../registro/ui/controle-aprovaca
     MatDatepickerModule,
     FormsModule,
     TabelaPontosComponent,
-    MatProgressBar,
     MatIconModule
   ],
   providers: [provideNativeDateAdapter()],
-  templateUrl: './relatorio-pontos.component.html',
-  styleUrl: './relatorio-pontos.component.scss'
+  templateUrl: './relatorio-pontos-pendentes.component.html',
+  styleUrl: './relatorio-pontos-pendentes.component.scss'
 })
-export class RelatorioPontosComponent implements OnInit, OnChanges {
+export class RelatorioPontosPendentesComponent implements OnInit, OnChanges {
 
 
   readonly periodo = new FormGroup({
@@ -63,8 +61,6 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
   tamanhoMaximo = 0;
 
   foiBuscado = false;
-
-  isLoading = false;
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log("Entra em OnChanges...");
@@ -83,53 +79,45 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       this.usuario = window.history.state.usuario;
-      console.log(this.usuario);
+      console.log("ngOnInit():"+this.usuario);
+      this.definePeriodo();
     });
   }
 
+
+
   definePeriodo(): void {
-    this.inicioSelecionado = this.periodo.value.inicio;
-    this.fimSelecionado = this.periodo.value.fim;
+    console.log("definePeriodo()");
+    const hoje = new Date();
+    const primeiroDiaMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+
+    this.inicioSelecionado = primeiroDiaMes;
+    this.fimSelecionado = hoje;
     this.foiBuscado = false;
-    this.atualizaPontos()
+    this.buscaPontos();
   }
 
   public async buscaPontos() {
-    this.isLoading = true;
     console.log("Exibir Pontos...");
-    if (this.usuario.matricula && this.periodo.value.inicio && this.periodo.value.fim) {
-      this.pontos = await this.funcPontos(this.usuario.matricula, this.periodo.value.inicio, this.periodo.value.fim, false);
+    if (this.usuario.matricula && this.inicioSelecionado && this.fimSelecionado) {
+      this.pontos = await this.funcPontos(this.usuario.matricula, this.inicioSelecionado, this.fimSelecionado, false);
       this.tamanhoMaximo = this.verificaMaiorListaDeRegistro(this.pontos);
     } else {
       this.pontos = []; // Garante que this.pontos seja um array mesmo se a condição falhar
     }
     console.log("Exibir Pontos... Pontos length " + this.pontos.length);
-    this.isLoading = false;
   }
 
-  public async atualizaPontos() {
-    this.isLoading = true;
-    console.log("Exibir Pontos...");
-    if (this.usuario.matricula && this.periodo.value.inicio && this.periodo.value.fim) {
-      this.pontos = await this.funcPontos(this.usuario.matricula, this.periodo.value.inicio, this.periodo.value.fim, true);
-      this.tamanhoMaximo = this.verificaMaiorListaDeRegistro(this.pontos);
-    } else {
-      this.buscaPontos(); // Garante que this.pontos seja um array mesmo se a condição falhar
-    }
-    console.log("Exibir Pontos... Pontos length " + this.pontos.length);
-    this.isLoading = false;
-  }
 
   async funcPontos(matricula: string, inicioSelecionado: Date, fimSelecionado: Date, isUpdate: boolean): Promise<Ponto[]> {
     console.log('buscarPontos');
-    let inicio = RelatorioPontosComponent.formataDataDeEntrada(inicioSelecionado);
-    let fim = RelatorioPontosComponent.formataDataDeEntrada(fimSelecionado);
+    let inicio = RelatorioPontosPendentesComponent.formataDataDeEntrada(inicioSelecionado);
+    let fim = RelatorioPontosPendentesComponent.formataDataDeEntrada(fimSelecionado);
     console.log('inicio: ' + inicio);
     console.log('fim: ' + fim);
 
     let pontosUsuarioObservable =
-      isUpdate ? this.pontoService.atualizaPontosUsuario(matricula, inicio, fim).toPromise()
-        : this.pontoService.getPontosUsuario(matricula, inicio, fim).toPromise();
+        this.pontoService.getPontosUsuario(matricula, inicio, fim, true).toPromise();
     let pontos: Ponto[] = [];
 
     try {
@@ -160,26 +148,14 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
     let dataFim = this.fimSelecionado;
     if (this.pontos)
       if (dataInicio && dataFim && this.pontos.length !== 0)
-        return 'Pontos de ' + RelatorioPontosComponent.formataDataDeSaida(dataInicio) + " até " +
-          RelatorioPontosComponent.formataDataDeSaida(dataFim);
+        return 'Pontos pendentes de aprovação no período de ' + RelatorioPontosPendentesComponent.formataDataDeSaida(dataInicio) + " até " +
+          RelatorioPontosPendentesComponent.formataDataDeSaida(dataFim);
       else if (dataInicio && dataFim && this.pontos.length === 0)
-        return 'Não existe pontos no período de ' + RelatorioPontosComponent.formataDataDeSaida(dataInicio) + " até " +
-          RelatorioPontosComponent.formataDataDeSaida(dataFim);
+        return 'Não existe pendencias no período de ' + RelatorioPontosPendentesComponent.formataDataDeSaida(dataInicio) + " até " +
+          RelatorioPontosPendentesComponent.formataDataDeSaida(dataFim);
     return '';
   }
 
-  async baixarRelatorio() {
-    this.isLoading = true;
-    try {
-      if (this.usuario.matricula && this.periodo.value.inicio && this.periodo.value.fim)
-        await this.relatorioService.downloadRelatorio(this.usuario.matricula, this.periodo.value.inicio, this.periodo.value.fim);
-      console.log('Download do relatório iniciado com sucesso.');
-    } catch (error) {
-      console.error('Falha ao iniciar o download do relatório:', error);
-      // Lógica para lidar com o erro (exibir mensagem ao usuário, etc.)
-    }
-    this.isLoading = false;
-  }
 
   private static formataDataDeSaida(date: Date) {
 
@@ -214,7 +190,7 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
     dialogRef.afterClosed().subscribe(async (result: { registros?: Registro[] }) => {
       console.log("RelatorioPontosPendentesComponent:openAtualizacao:afterClosed", result);
       if (result?.registros) {
-        await this.atualizaPontos();
+        await this.buscaPontos();
       }
     });
   }
@@ -235,7 +211,7 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
           console.log("RelatorioPontosPendentesComponent:openAprovacao:afterClosed", result);
 
           if (result.pedido.status != pedido.status) {
-            await this.atualizaPontos();
+            await this.buscaPontos();
           }
 
         });

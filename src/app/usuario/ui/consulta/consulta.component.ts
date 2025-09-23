@@ -15,6 +15,8 @@ import {MatDialog,} from '@angular/material/dialog';
 import {AtualizacaoUsuarioDialog} from '../dialogs/dialogs.utils';
 import {Router, RouterLink} from '@angular/router';
 import {AuthService} from '../../../auth/auth.service';
+import {PontoService} from '../../../ponto/ponto.service';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-consulta',
@@ -45,6 +47,7 @@ export class ConsultaComponent implements OnInit {
 
   constructor(
     private usuarioService: UsuarioService,
+    private pontoService: PontoService,
     private router: Router,
     private authService: AuthService
   ) {
@@ -57,11 +60,22 @@ export class ConsultaComponent implements OnInit {
   pageSizeOptions = [5, 10, 25];
 
 
+
   ngOnInit(): void {
     console.log("Consultado lista de usuários");
     this.buscaUsuarios(0, 5);
   }
 
+
+  pendenciasMap: Map<string, Observable<boolean>> = new Map();
+
+  mapPendencias(usuario: Usuario): Observable<boolean> {
+    let matricula = usuario.matricula || "";
+    if (!this.pendenciasMap.has(matricula)) {
+      this.pendenciasMap.set(matricula, this.temPendencias(usuario));
+    }
+    return this.pendenciasMap.get(matricula)!;
+  }
 
   handlePageEvent(e: PageEvent) {
     this.buscaUsuarios(e.pageIndex, e.pageSize);
@@ -123,6 +137,11 @@ export class ConsultaComponent implements OnInit {
    */
   hasAnyRole(roles: string[]): boolean {
     return this.authService.hasAnyRole(roles);
+  }
+
+  temPendencias(usuario: Usuario): Observable<boolean> {
+    const matricula = usuario.matricula || "";
+    return this.pontoService.existePontoComPedidoAlteracaoPendente(matricula, "01092025", "22092025");
   }
 }
 

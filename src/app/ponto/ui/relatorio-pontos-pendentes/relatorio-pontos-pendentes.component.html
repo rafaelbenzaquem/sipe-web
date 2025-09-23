@@ -1,0 +1,33 @@
+<div fxLayout="row" fxLayoutAlign="center">
+  <div fxLayout="column" fxFlex="100%">
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>
+          Usuário: {{ usuario.nome }} , matrícula: {{ usuario.matricula }}
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="mat-20">
+        <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="16px">
+          <div fxLayout="column">
+          </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="16px">
+          <div fxLayout="column" fxFlex="100%" class="mt-20">
+
+            {{ exibirPeriodo() }} <br/>
+            @if (pontos.length > 0) {
+              <app-tabela-pontos
+                [pontos]="pontos"
+                [tamanhoRegistros]="tamanhoMaximo"
+                [horario]="usuario.hora_diaria||7"
+                (editar)="openAtualizacao($event)"
+                (aprovar)="openAprovacao($event)"
+                (controle)="openControle($event)">
+              </app-tabela-pontos>
+            }
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

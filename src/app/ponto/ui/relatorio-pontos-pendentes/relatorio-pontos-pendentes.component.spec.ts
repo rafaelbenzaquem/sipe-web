@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RelatorioPontosComponent } from './relatorio-pontos.component';
+import { RelatorioPontosPendentesComponent } from './relatorio-pontos-pendentes.component';
 
 describe('RelatorioPontosPendentesComponent', () => {
-  let component: RelatorioPontosComponent;
-  let fixture: ComponentFixture<RelatorioPontosComponent>;
+  let component: RelatorioPontosPendentesComponent;
+  let fixture: ComponentFixture<RelatorioPontosPendentesComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RelatorioPontosComponent]
+      imports: [RelatorioPontosPendentesComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(RelatorioPontosComponent);
+    fixture = TestBed.createComponent(RelatorioPontosPendentesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

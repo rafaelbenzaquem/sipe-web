@@ -18,8 +18,12 @@ export class PontoService {
     return this.http.get<PontoResponse>(`${this.API_BASE}/${matricula}/${dia}`);
   }
 
-  getPontosUsuario(matricula: string, inicio: string, fim: string): Observable<PontoListResponse> {
-    return this.http.get<PontoListResponse>(`${this.API_BASE}?matricula=${matricula}&inicio=${inicio}&fim=${fim}`);
+  getPontosUsuario(matricula: string, inicio: string, fim: string, pendente: boolean = false): Observable<PontoListResponse> {
+    return this.http.get<PontoListResponse>(`${this.API_BASE}?matricula=${matricula}&inicio=${inicio}&fim=${fim}&pendente=${pendente}`);
+  }
+
+  existePontoComPedidoAlteracaoPendente(matricula: string, inicio: string, fim: string): Observable<boolean> {
+    return this.http.get<boolean>(`${this.API_BASE}/pendente?matricula=${matricula}&inicio=${inicio}&fim=${fim}`);
   }
 
   atualizaPontosUsuario(matricula: string, inicio: string, fim: string): Observable<PontoListResponse> {

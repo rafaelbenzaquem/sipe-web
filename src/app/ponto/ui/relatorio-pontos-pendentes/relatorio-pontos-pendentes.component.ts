@@ -89,13 +89,25 @@ export class RelatorioPontosPendentesComponent implements OnInit, OnChanges {
   definePeriodo(): void {
     console.log("definePeriodo()");
     const hoje = new Date();
-    const primeiroDiaMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
 
-    this.inicioSelecionado = primeiroDiaMes;
+    let inicioSelecionado: Date;
+
+    if (hoje.getDate() > 10) {
+      // Primeiro dia do mês atual
+      inicioSelecionado = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+    } else {
+      // Primeiro dia do mês anterior
+      const mesAnterior = hoje.getMonth() === 0 ? 11 : hoje.getMonth() - 1;
+      const anoAnterior = hoje.getMonth() === 0 ? hoje.getFullYear() - 1 : hoje.getFullYear();
+      inicioSelecionado = new Date(anoAnterior, mesAnterior, 1);
+    }
+
+    this.inicioSelecionado = inicioSelecionado;
     this.fimSelecionado = hoje;
     this.foiBuscado = false;
     this.buscaPontos();
   }
+
 
   public async buscaPontos() {
     console.log("Exibir Pontos...");

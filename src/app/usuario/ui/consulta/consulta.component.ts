@@ -13,7 +13,7 @@ import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatDialog,} from '@angular/material/dialog';
 import {AtualizacaoUsuarioDialog} from '../dialogs/dialogs.utils';
-import {Router, RouterLink} from '@angular/router';
+import {RouterLink} from '@angular/router';
 import {AuthService} from '../../../auth/auth.service';
 import {PontoService} from '../../../ponto/ponto.service';
 import {Observable} from 'rxjs';
@@ -43,12 +43,11 @@ export class ConsultaComponent implements OnInit {
   usuarios: Usuario[] = [];
   colunasTable: string[] = ["id", "nome", "matricula", "cracha", "hora_diaria", "acoes"]
   readonly dialog = inject(MatDialog);
-  private debouncedBuscaUsuarios: (page: number, size: number, nome: string) => void;
+  private debouncedBuscaUsuarios: (page: number, size: number, nome: string, matricula: string, cracha: string) => void;
 
   constructor(
     private usuarioService: UsuarioService,
     private pontoService: PontoService,
-    private router: Router,
     private authService: AuthService
   ) {
     this.debouncedBuscaUsuarios = this.debounce(this.buscaUsuarios.bind(this), 1000);
@@ -58,7 +57,6 @@ export class ConsultaComponent implements OnInit {
   pageSize = 0;
   pageIndex = 0;
   pageSizeOptions = [5, 10, 25];
-
 
 
   ngOnInit(): void {
@@ -81,17 +79,9 @@ export class ConsultaComponent implements OnInit {
     this.buscaUsuarios(e.pageIndex, e.pageSize);
   }
 
-  buscaUsuarios(page: number, size: number, nome: string = "") {
-    this.usuarioService.getUsuarios(page, size, nome).subscribe(response => {
-      this.usuarios = response._embedded.usuarios.map(Usuario.toModel).sort(
-        (a, b) => {
-          if (!a.nome && !b.nome) return 0;
-          if (!a.nome) return 1;
-          if (!b.nome) return -1;
-          return a.nome.localeCompare(b.nome, undefined, {sensitivity: "base"});
-        }
-      );
-
+  buscaUsuarios(page: number, size: number, nome: string = "", matricula: string = "", cracha: string = "") {
+    this.usuarioService.paginar(page, size, nome, matricula, cracha).subscribe(response => {
+      this.usuarios = response._embedded.usuarios.map(Usuario.toModel);
       this.length = response.page.totalElements;
     });
     this.isLoading = false;
@@ -99,7 +89,7 @@ export class ConsultaComponent implements OnInit {
 
   onInput(event: Event) {
     this.isLoading = true;
-    this.debouncedBuscaUsuarios(0, 5, this.nomeBusca);
+    this.debouncedBuscaUsuarios(0, 5, this.nomeBusca, this.nomeBusca, this.nomeBusca);
   }
 
   preparaEditar(usuario: Usuario) {
@@ -141,7 +131,39 @@ export class ConsultaComponent implements OnInit {
 
   temPendencias(usuario: Usuario): Observable<boolean> {
     const matricula = usuario.matricula || "";
-    return this.pontoService.existePontoComPedidoAlteracaoPendente(matricula, "01092025", "22092025");
+    const dataInicio = this.getDataInicial(); // Primeiro dia do mês atual
+    const dataFim = this.getDataAtual(); // Data atual
+    return this.pontoService.existePontoComPedidoAlteracaoPendente(matricula, dataInicio, dataFim);
   }
+
+  private getDataInicial(): string {
+    const hoje = new Date();
+
+    let inicioSelecionado: Date;
+
+    if (hoje.getDate() > 10) {
+      // Primeiro dia do mês atual
+      inicioSelecionado = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+    } else {
+      // Primeiro dia do mês anterior
+      const mesAnterior = hoje.getMonth() === 0 ? 11 : hoje.getMonth() - 1;
+      const anoAnterior = hoje.getMonth() === 0 ? hoje.getFullYear() - 1 : hoje.getFullYear();
+      inicioSelecionado = new Date(anoAnterior, mesAnterior, 1);
+    }
+
+    return this.formatDate(inicioSelecionado);
+  }
+
+  private getDataAtual(): string {
+    return this.formatDate(new Date());
+  }
+
+  private formatDate(date: Date): string {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}${month}${year}`;
+  }
+
 }
 

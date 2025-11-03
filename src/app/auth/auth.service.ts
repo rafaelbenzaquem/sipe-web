@@ -26,7 +26,7 @@ export class AuthService {
    */
   login(perfil: Perfil): Observable<Usuario> {
     this.perfilSubject.next(perfil);
-    return this.usuarioService.getUsuarioPorMatricula(perfil.login).pipe(
+    return this.usuarioService.buscarPorMatricula(perfil.login).pipe(
       map(response => {
         const usuario = Usuario.toModel(response);
         this.usuarioSubject.next(usuario);

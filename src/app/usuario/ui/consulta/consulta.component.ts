@@ -41,7 +41,8 @@ export class ConsultaComponent implements OnInit {
   isLoading = false;
   nomeBusca: string = '';
   usuarios: Usuario[] = [];
-  colunasTable: string[] = ["id", "nome", "matricula", "cracha", "hora_diaria", "acoes"]
+  usuariosFull: Usuario[] = [];
+  colunasTable: string[] = ["nome", "matricula", "cracha", "hora_diaria", "acoes"]
   readonly dialog = inject(MatDialog);
   private debouncedBuscaUsuarios: (page: number, size: number, nome: string, matricula: string, cracha: string) => void;
 
@@ -54,14 +55,14 @@ export class ConsultaComponent implements OnInit {
   }
 
   length = 0;
-  pageSize = 0;
+  pageSize = 25;
   pageIndex = 0;
-  pageSizeOptions = [5, 10, 25];
+  pageSizeOptions = [25, 50, 100];
 
 
   ngOnInit(): void {
     console.log("Consultado lista de usuários");
-    this.buscaUsuarios(0, 5);
+    this.buscaUsuarios(0, this.pageSize);
   }
 
 
@@ -76,20 +77,34 @@ export class ConsultaComponent implements OnInit {
   }
 
   handlePageEvent(e: PageEvent) {
-    this.buscaUsuarios(e.pageIndex, e.pageSize);
+    this.pageIndex = e.pageIndex;
+    this.pageSize = e.pageSize;
+    this.usuarios = this.sliceUsuarios();
   }
 
   buscaUsuarios(page: number, size: number, nome: string = "", matricula: string = "", cracha: string = "") {
-    this.usuarioService.paginar(page, size, nome, matricula, cracha).subscribe(response => {
-      this.usuarios = response._embedded.usuarios.map(Usuario.toModel);
-      this.length = response.page.totalElements;
+    this.isLoading = true;
+    this.usuarioService.listar(nome, matricula, cracha).subscribe(response => {
+      this.usuariosFull = response._embedded.usuarios.map(Usuario.toModel);
+      this.length = this.usuariosFull.length;
+      this.pageIndex = page;
+      this.pageSize = size;
+      this.usuarios = this.sliceUsuarios();
+      this.isLoading = false;
+    }, _ => {
+      this.isLoading = false;
     });
-    this.isLoading = false;
+  }
+
+  private sliceUsuarios(): Usuario[] {
+    const start = this.pageIndex * this.pageSize;
+    const end = start + this.pageSize;
+    return this.usuariosFull.slice(start, end);
   }
 
   onInput(event: Event) {
     this.isLoading = true;
-    this.debouncedBuscaUsuarios(0, 5, this.nomeBusca, this.nomeBusca, this.nomeBusca);
+    this.debouncedBuscaUsuarios(0, this.pageSize, this.nomeBusca, this.nomeBusca, this.nomeBusca);
   }
 
   preparaEditar(usuario: Usuario) {

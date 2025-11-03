@@ -23,7 +23,12 @@ export class UsuarioService {
   }
 
   listar(nome = '', matricula = '', cracha =''): Observable<UsuarioListResponse> {
-    let uri = `${this.API_BASE}${(nome === undefined || nome === '') ? `` : `&nome=${nome}`}${(matricula === undefined || matricula === '') ? `` : `&matricula=${matricula}`}${(cracha === undefined || cracha === '') ? `` : `&cracha=${cracha}`}`;
+    const params: string[] = [];
+    if (nome !== undefined && nome !== '') params.push(`nome=${encodeURIComponent(nome)}`);
+    if (matricula !== undefined && matricula !== '') params.push(`matricula=${encodeURIComponent(matricula)}`);
+    if (cracha !== undefined && cracha !== '') params.push(`cracha=${encodeURIComponent(cracha)}`);
+    const query = params.length ? `?${params.join('&')}` : '';
+    const uri = `${this.API_BASE}${query}`;
     console.log("Listar: "+uri);
     return this.http.get<UsuarioListResponse>(uri);
   }

@@ -8,6 +8,26 @@
         <div fxLayout="row">
           <div fxLayout="column" fxFlex="100%">
             <mat-form-field class="full-width">
+              <mat-label>State</mat-label>
+              <input matInput
+                     aria-label="State"
+                     [matAutocomplete]="auto"
+                     [formControl]="stateCtrl">
+              <mat-autocomplete #auto="matAutocomplete">
+                @for (lotacao of filteredStates | async; track lotacao) {
+                  <mat-option [value]="lotacao.sigla">
+                    <img alt="" class="example-option-img" [src]="lotacao.id" height="25">
+                    <span>{{lotacao.sigla}}</span> |
+                    <small>{{lotacao.descricao}}</small>
+                  </mat-option>
+                }
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+        </div>
+        <div fxLayout="row">
+          <div fxLayout="column" fxFlex="100%">
+            <mat-form-field class="full-width">
               <mat-label>Nome:</mat-label>
               <input name="nomeBusca"
                      [(ngModel)]="nomeBusca"

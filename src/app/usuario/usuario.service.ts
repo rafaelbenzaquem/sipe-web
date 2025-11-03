@@ -22,11 +22,12 @@ export class UsuarioService {
     return this.http.get<UsuarioResponse>(`${this.API_BASE}/${matricula}`);
   }
 
-  listar(nome = '', matricula = '', cracha =''): Observable<UsuarioListResponse> {
+  listar(nome = '', matricula = '', cracha ='',id_lotacao = env.SIPE_LOTACAO_PAI): Observable<UsuarioListResponse> {
     const params: string[] = [];
     if (nome !== undefined && nome !== '') params.push(`nome=${encodeURIComponent(nome)}`);
     if (matricula !== undefined && matricula !== '') params.push(`matricula=${encodeURIComponent(matricula)}`);
     if (cracha !== undefined && cracha !== '') params.push(`cracha=${encodeURIComponent(cracha)}`);
+    if (id_lotacao !== undefined) params.push(`id_lotacao=${encodeURIComponent(id_lotacao)}`);
     const query = params.length ? `?${params.join('&')}` : '';
     const uri = `${this.API_BASE}${query}`;
     console.log("Listar: "+uri);

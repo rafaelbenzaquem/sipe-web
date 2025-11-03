@@ -1,10 +1,10 @@
 import {Component, inject, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
+import {AsyncPipe, CommonModule} from '@angular/common';
 import {MatInputModule} from '@angular/material/input'
 import {MatCardModule} from '@angular/material/card'
 import {FlexLayoutModule} from '@angular/flex-layout'
 import {MatIconModule} from '@angular/material/icon'
-import {FormsModule} from '@angular/forms'
+import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms'
 import {MatTableModule} from '@angular/material/table'
 import {MatButtonModule} from '@angular/material/button';
 import {Usuario} from '../../usuario.model';
@@ -17,6 +17,16 @@ import {RouterLink} from '@angular/router';
 import {AuthService} from '../../../auth/auth.service';
 import {PontoService} from '../../../ponto/ponto.service';
 import {Observable} from 'rxjs';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {map, startWith} from 'rxjs/operators';
+
+export interface Lotacao {
+  id: number;
+  sigla: string;
+  descricao: string;
+}
 
 @Component({
   selector: 'app-consulta',
@@ -31,18 +41,42 @@ import {Observable} from 'rxjs';
     CommonModule,
     MatPaginatorModule,
     MatProgressBarModule,
-    RouterLink
+    RouterLink,
+    MatFormFieldModule,
+    MatInputModule,
+    MatAutocompleteModule,
+    ReactiveFormsModule,
+    MatSlideToggleModule,
+    AsyncPipe
   ],
   templateUrl: './consulta.component.html',
   styleUrl: './consulta.component.scss'
 })
 export class ConsultaComponent implements OnInit {
-
+  stateCtrl = new FormControl('');
+  filteredStates: Observable<Lotacao[]>;
   isLoading = false;
   nomeBusca: string = '';
   usuarios: Usuario[] = [];
   usuariosFull: Usuario[] = [];
   colunasTable: string[] = ["nome", "matricula", "cracha", "hora_diaria", "acoes"]
+  lotacoes: Lotacao[] = [
+    { id: 15, sigla: 'SJRR', descricao: 'SECAO JUDICIARIA DE RORAIMA' },
+    { id: 112, sigla: '1ª VARA', descricao: '1ª VARA DA SJRR' },
+    { id: 124, sigla: '2ª VARA', descricao: '2ª VARA DA SJRR' },
+    { id: 136, sigla: '3ª VARA', descricao: '3ª VARA (JEF) DA SJRR' },
+    { id: 215, sigla: '4ª VARA', descricao: '4ª VARA DA SJRR' },
+    { id: 70, sigla: 'DIREF', descricao: 'DIRETORIA DO FORO' },
+    { id: 77, sigla: 'SECAD', descricao: 'SECRETARIA ADMINISTRATIVA' },
+    { id: 226, sigla: 'CEJUC', descricao: 'CENTRO JUDICIÁRIO DE CONCILIAÇÃO' },
+    { id: 245, sigla: 'ASJUR', descricao: 'ASSESSORIA JURÍDICA E LEGISLAÇÃO DE PESSOAL' },
+    { id: 246, sigla: 'SEAUD', descricao: 'SEÇÃO DE AUDITORIA INTERNA' },
+    { id: 224, sigla: 'NUCJU', descricao: 'NÚCLEO JUDICIÁRIO' },
+    { id: 227, sigla: 'NUCAD', descricao: 'NÚCLEO DE ADMINISTRAÇÃO' },
+    { id: 253, sigla: 'NUCAF', descricao: 'NÚCLEO DE ADMINISTRAÇÃO ORÇAMENTÁRIA, FINANCEIRA E PATRIMONIAL' },
+    { id: 263, sigla: 'NUTEC', descricao: 'NÚCLEO DE TECNOLOGIA DA INFORMAÇÃO' }
+  ];
+
   readonly dialog = inject(MatDialog);
   private debouncedBuscaUsuarios: (page: number, size: number, nome: string, matricula: string, cracha: string) => void;
 
@@ -51,6 +85,9 @@ export class ConsultaComponent implements OnInit {
     private pontoService: PontoService,
     private authService: AuthService
   ) {
+    this.filteredStates = this.stateCtrl.valueChanges.pipe(
+      startWith(''),
+      map(lotacao => (lotacao ? this._filterStates(lotacao) : this.lotacoes.slice())), );
     this.debouncedBuscaUsuarios = this.debounce(this.buscaUsuarios.bind(this), 1000);
   }
 
@@ -178,6 +215,12 @@ export class ConsultaComponent implements OnInit {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     return `${day}${month}${year}`;
+  }
+
+  private _filterStates(value: string): Lotacao[] {
+    const filterValue = value.toLowerCase();
+
+    return this.lotacoes.filter(lotacao => lotacao.sigla.toLowerCase().includes(filterValue));
   }
 
 }

@@ -14,35 +14,32 @@ export class UsuarioService {
   constructor(private http: HttpClient) {
   }
 
-  getUsuarioPorId(id: number): Observable<UsuarioResponse> {
+  buscarPorId(id: number): Observable<UsuarioResponse> {
     return this.http.get<UsuarioResponse>(`${this.API_BASE}/${id}`);
   }
 
-  getUsuarioPorMatricula(matricula: string): Observable<UsuarioResponse> {
+  buscarPorMatricula(matricula: string): Observable<UsuarioResponse> {
     return this.http.get<UsuarioResponse>(`${this.API_BASE}/${matricula}`);
   }
 
-  getTodosUsuarios(): Observable<UsuarioListResponse> {
-    return this.http.get<UsuarioListResponse>(this.API_BASE);
-  }
-
-  // getUsuarios(page = 0, size = 5): Observable<UsuarioListResponse> {
-  //   return this.http.get<UsuarioListResponse>(`${this.API_BASE}?page=${page}&size=${size}`);
-  // }
-
-
-  getUsuarios(page = 0, size = 5, nome = '', matricula = ''): Observable<UsuarioListResponse> {
-    let uri = `${this.API_BASE}?page=${page}&size=${size}
-    ${(nome === undefined || nome === '') ? '' : `&nome=${nome}`}
-    ${(matricula === undefined || matricula === '') ? '' : `&matricula=${matricula}`}`;
+  listar(nome = '', matricula = '', cracha =''): Observable<UsuarioListResponse> {
+    let uri = `${this.API_BASE}${(nome === undefined || nome === '') ? `` : `&nome=${nome}`}${(matricula === undefined || matricula === '') ? `` : `&matricula=${matricula}`}${(cracha === undefined || cracha === '') ? `` : `&cracha=${cracha}`}`;
+    console.log("Listar: "+uri);
     return this.http.get<UsuarioListResponse>(uri);
   }
 
-  criarUsuario(usuario: UsuarioCreateRequest): Observable<UsuarioResponse> {
+
+  paginar(page = 0, size = 5, nome = '', matricula = '', cracha =''): Observable<UsuarioListResponse> {
+    let uri = `${this.API_BASE}/pag?page=${page}&size=${size}${(nome === undefined || nome === '') ? `` : `&nome=${nome}`}${(matricula === undefined || matricula === '') ? `` : `&matricula=${matricula}`}${(cracha === undefined || cracha === '') ? `` : `&cracha=${cracha}`}`;
+    console.log("Paginar: "+uri);
+    return this.http.get<UsuarioListResponse>(uri);
+  }
+
+  criar(usuario: UsuarioCreateRequest): Observable<UsuarioResponse> {
     return this.http.post<UsuarioResponse>(this.API_BASE, usuario);
   }
 
-  atualizaUsuario(usuario: UsuarioUpdateRequest): Observable<UsuarioResponse> {
+  atualizar(usuario: UsuarioUpdateRequest): Observable<UsuarioResponse> {
     return this.http.put<UsuarioResponse>(`${this.API_BASE}/${usuario.id}`, usuario);
   }
 

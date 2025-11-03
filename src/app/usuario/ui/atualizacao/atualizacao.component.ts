@@ -166,7 +166,7 @@ export class AtualizacaoComponent {
     this.usuario.hora_diaria = this.hora_diaria.value;
 
     console.log("Atualizando o usuário: " + this.usuario);
-    const obs = this.usuarioService.atualizaUsuario(this.usuario.toUpdateRequest());
+    const obs = this.usuarioService.atualizar(this.usuario.toUpdateRequest());
     obs.subscribe({
         next: success => {
           this.usuario = Usuario.toModel(success);

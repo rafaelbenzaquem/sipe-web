@@ -133,7 +133,7 @@ export class CadastroComponent {
     this.usuario.hora_diaria = this.hora_diaria.value;
 
     console.log("Salvando o usuário: " + this.usuario);
-    const obs = this.usuarioService.criarUsuario(this.usuario.toCreateRequest());
+    const obs = this.usuarioService.criar(this.usuario.toCreateRequest());
     obs.subscribe({
         next: success => {
           this.usuario.id = success.id;

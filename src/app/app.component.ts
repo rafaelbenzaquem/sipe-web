@@ -20,6 +20,7 @@ import {MatChipsModule} from '@angular/material/chips';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatBadgeModule} from '@angular/material/badge';
+import {VersionService} from './core/version.service';
 
 @Component({
   standalone: true,
@@ -54,12 +55,16 @@ export class AppComponent {
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
 
   URL_BASE = env.SIPE_API_URL;
+  appVersion = '';
+
   constructor(
     private authService: AuthService,
     private router: Router,
     private oauthService: OAuthService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private versionService: VersionService
   ) {
+    // Subscribe to OAuth token events
     this.oauthService.events.subscribe((e) => {
       console.log("AppComponent:oauthService.events: "+e.type);
       if (e.type === 'token_expires') {
@@ -68,6 +73,12 @@ export class AppComponent {
           this.authService.logout();
         });
       }
+    });
+
+    // Load application version from public/version.json
+    this.versionService.getVersion().subscribe({
+      next: (info) => this.appVersion = info.version,
+      error: () => this.appVersion = ''
     });
   }
 

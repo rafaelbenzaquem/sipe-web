@@ -172,7 +172,7 @@ export class RelatorioPontosComponent implements OnInit, OnChanges {
     this.isLoading = true;
     try {
       if (this.usuario.matricula && this.periodo.value.inicio && this.periodo.value.fim)
-        await this.relatorioService.downloadRelatorio(this.usuario.matricula, this.periodo.value.inicio, this.periodo.value.fim);
+        await this.relatorioService.downloadRelatorioUsuario(this.usuario.matricula, this.periodo.value.inicio, this.periodo.value.fim);
       console.log('Download do relatório iniciado com sucesso.');
     } catch (error) {
       console.error('Falha ao iniciar o download do relatório:', error);

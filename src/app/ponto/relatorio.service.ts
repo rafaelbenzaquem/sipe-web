@@ -13,7 +13,7 @@ export class RelatorioService {
   constructor(private http: HttpClient) {
   }
 
-  async downloadRelatorio(matricula: string, inicio: Date, fim: Date): Promise<void> {
+  async downloadRelatorioUsuario(matricula: string, inicio: Date, fim: Date): Promise<void> {
     const inicioFormatado = this.formatarData(inicio);
     const fimFormatado = this.formatarData(fim);
     const url = `${this.baseUrl}/${matricula.toUpperCase()}?inicio=${inicioFormatado}&fim=${fimFormatado}`;

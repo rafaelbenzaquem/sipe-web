@@ -55,6 +55,7 @@ export interface Lotacao {
 export class ConsultaComponent implements OnInit {
   lotacaoCtrl = new FormControl('');
   lotacoesFiltradas: Observable<Lotacao[]>;
+  lotacaoSelecionada?: Lotacao;
   carregandoSelecao = false;
   carregandoBusca = false;
   nomeBusca: string = '';
@@ -161,11 +162,9 @@ export class ConsultaComponent implements OnInit {
 
   onSubmit() {
     this.carregandoSelecao = true;
-    console.log("teste " + this.lotacaoCtrl.getRawValue())
     let sigla = this.lotacaoCtrl.getRawValue() || '';
-    const resultado = this.buscarLotacaoPorAtributo(this.lotacoes, 'sigla', sigla);
-    console.log(resultado);
-    this.selecionaUsuarios(resultado?.id || 15);
+    this.lotacaoSelecionada = this.buscarLotacaoPorAtributo(this.lotacoes, 'sigla', sigla);
+    this.selecionaUsuarios(this.lotacaoSelecionada?.id || 15);
   }
 
   onInput(event: Event) {

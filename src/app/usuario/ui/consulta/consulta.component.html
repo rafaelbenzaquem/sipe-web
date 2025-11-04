@@ -6,29 +6,32 @@
       </mat-card-header>
       <mat-card-content class="mt-20">
         <div fxLayout="row">
-          <div fxLayout="column" fxFlex="80%">
+          <div fxLayout="column" fxFlex="100%">
             <mat-form-field class="full-width">
               <mat-label>Setor</mat-label>
               <input matInput
                      aria-label="Lotação"
                      [matAutocomplete]="auto"
                      [formControl]="lotacaoCtrl">
-              <mat-autocomplete #auto="matAutocomplete">
+              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSubmit()">
                 @for (lotacao of lotacoesFiltradas | async; track lotacao) {
                   <mat-option [value]="lotacao.sigla">
-                    <span>{{lotacao.sigla}}</span> |
-                    <small>{{lotacao.descricao}}</small>
+                    <span>{{ lotacao.sigla }}</span> |
+                    <small>{{ lotacao.descricao }}</small>
                   </mat-option>
                 }
               </mat-autocomplete>
             </mat-form-field>
-
           </div>
-          <div fxLayout="column" fxFlex="20%">
+        </div>
+        <div fxLayout="row">
+          <div fxLayout="column" fxFlex="100%">
             <button matButton="filled"
-                    (click)="onSubmit()"  [disabled]="lotacaoCtrl.getRawValue()==''">
-              <mat-icon fontIcon="update"/>
-              Atualizar
+                    (click)="onSubmit()" [disabled]="lotacaoSelecionada==undefined">
+              <mat-icon fontIcon="assignment"/>
+              Emitir Relatório Setorial @if(lotacaoSelecionada){
+              {{ lotacaoSelecionada.sigla }}
+            }
             </button>
           </div>
         </div>
@@ -83,7 +86,12 @@
   <div fxLayout="column" fxFlex="80%">
     <mat-card appearance="outlined">
       <mat-card-header>
-        <mat-card-title>Tabela de Usuários</mat-card-title>
+        <mat-card-title>
+          Tabela de Servidores
+          @if(lotacaoSelecionada){
+            {{ lotacaoSelecionada.sigla }}
+          }
+        </mat-card-title>
       </mat-card-header>
       <mat-card-content>
 
@@ -113,7 +121,7 @@
             <th mat-header-cell *matHeaderCellDef></th>
             <td mat-cell *matCellDef="let usuario">
               <button matButton="text" *ngIf="hasAnyRole(['GRP_SIPE_ADMIN','GRP_SIPE_RH'])"
-                      type="button" (click)="preparaEditar(usuario)" >
+                      type="button" (click)="preparaEditar(usuario)">
                 <mat-icon fontIcon="edit"></mat-icon>
                 Editar
               </button>

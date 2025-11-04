@@ -53,28 +53,29 @@ export interface Lotacao {
   styleUrl: './consulta.component.scss'
 })
 export class ConsultaComponent implements OnInit {
-  stateCtrl = new FormControl('');
-  filteredStates: Observable<Lotacao[]>;
-  isLoading = false;
+  lotacaoCtrl = new FormControl('');
+  lotacoesFiltradas: Observable<Lotacao[]>;
+  carregandoSelecao = false;
+  carregandoBusca = false;
   nomeBusca: string = '';
   usuarios: Usuario[] = [];
   usuariosFull: Usuario[] = [];
   colunasTable: string[] = ["nome", "matricula", "cracha", "hora_diaria", "acoes"]
   lotacoes: Lotacao[] = [
-    { id: 15, sigla: 'SJRR', descricao: 'SECAO JUDICIARIA DE RORAIMA' },
-    { id: 112, sigla: '1ª VARA', descricao: '1ª VARA DA SJRR' },
-    { id: 124, sigla: '2ª VARA', descricao: '2ª VARA DA SJRR' },
-    { id: 136, sigla: '3ª VARA', descricao: '3ª VARA (JEF) DA SJRR' },
-    { id: 215, sigla: '4ª VARA', descricao: '4ª VARA DA SJRR' },
-    { id: 70, sigla: 'DIREF', descricao: 'DIRETORIA DO FORO' },
-    { id: 77, sigla: 'SECAD', descricao: 'SECRETARIA ADMINISTRATIVA' },
-    { id: 226, sigla: 'CEJUC', descricao: 'CENTRO JUDICIÁRIO DE CONCILIAÇÃO' },
-    { id: 245, sigla: 'ASJUR', descricao: 'ASSESSORIA JURÍDICA E LEGISLAÇÃO DE PESSOAL' },
-    { id: 246, sigla: 'SEAUD', descricao: 'SEÇÃO DE AUDITORIA INTERNA' },
-    { id: 224, sigla: 'NUCJU', descricao: 'NÚCLEO JUDICIÁRIO' },
-    { id: 227, sigla: 'NUCAD', descricao: 'NÚCLEO DE ADMINISTRAÇÃO' },
-    { id: 253, sigla: 'NUCAF', descricao: 'NÚCLEO DE ADMINISTRAÇÃO ORÇAMENTÁRIA, FINANCEIRA E PATRIMONIAL' },
-    { id: 263, sigla: 'NUTEC', descricao: 'NÚCLEO DE TECNOLOGIA DA INFORMAÇÃO' }
+    {id: 15, sigla: 'SJRR', descricao: 'SECAO JUDICIARIA DE RORAIMA'},
+    {id: 112, sigla: '1ª VARA', descricao: '1ª VARA DA SJRR'},
+    {id: 124, sigla: '2ª VARA', descricao: '2ª VARA DA SJRR'},
+    {id: 136, sigla: '3ª VARA', descricao: '3ª VARA (JEF) DA SJRR'},
+    {id: 215, sigla: '4ª VARA', descricao: '4ª VARA DA SJRR'},
+    {id: 70, sigla: 'DIREF', descricao: 'DIRETORIA DO FORO'},
+    {id: 77, sigla: 'SECAD', descricao: 'SECRETARIA ADMINISTRATIVA'},
+    {id: 226, sigla: 'CEJUC', descricao: 'CENTRO JUDICIÁRIO DE CONCILIAÇÃO'},
+    {id: 245, sigla: 'ASJUR', descricao: 'ASSESSORIA JURÍDICA E LEGISLAÇÃO DE PESSOAL'},
+    {id: 246, sigla: 'SEAUD', descricao: 'SEÇÃO DE AUDITORIA INTERNA'},
+    {id: 224, sigla: 'NUCJU', descricao: 'NÚCLEO JUDICIÁRIO'},
+    {id: 227, sigla: 'NUCAD', descricao: 'NÚCLEO DE ADMINISTRAÇÃO'},
+    {id: 253, sigla: 'NUCAF', descricao: 'NÚCLEO DE ADMINISTRAÇÃO ORÇAMENTÁRIA, FINANCEIRA E PATRIMONIAL'},
+    {id: 263, sigla: 'NUTEC', descricao: 'NÚCLEO DE TECNOLOGIA DA INFORMAÇÃO'}
   ];
 
   readonly dialog = inject(MatDialog);
@@ -85,9 +86,9 @@ export class ConsultaComponent implements OnInit {
     private pontoService: PontoService,
     private authService: AuthService
   ) {
-    this.filteredStates = this.stateCtrl.valueChanges.pipe(
+    this.lotacoesFiltradas = this.lotacaoCtrl.valueChanges.pipe(
       startWith(''),
-      map(lotacao => (lotacao ? this._filterStates(lotacao) : this.lotacoes.slice())), );
+      map(lotacao => lotacao ? this._filtroLotacoes(lotacao) : this.lotacoes.slice()),);
     this.debouncedBuscaUsuarios = this.debounce(this.buscaUsuarios.bind(this), 1000);
   }
 
@@ -120,16 +121,27 @@ export class ConsultaComponent implements OnInit {
   }
 
   buscaUsuarios(page: number, size: number, nome: string = "", matricula: string = "", cracha: string = "") {
-    this.isLoading = true;
+    this.carregandoBusca = true;
     this.usuarioService.listar(nome, matricula, cracha).subscribe(response => {
       this.usuariosFull = response._embedded.usuarios.map(Usuario.toModel);
       this.length = this.usuariosFull.length;
       this.pageIndex = page;
       this.pageSize = size;
       this.usuarios = this.sliceUsuarios();
-      this.isLoading = false;
+      this.carregandoBusca = false;
     }, _ => {
-      this.isLoading = false;
+      this.carregandoBusca = false;
+    });
+  }
+
+  selecionaUsuarios(id_lotacao: number = 15) {
+    this.usuarioService.listar('', '', '', id_lotacao).subscribe(response => {
+      this.usuariosFull = response._embedded.usuarios.map(Usuario.toModel);
+      this.length = this.usuariosFull.length;
+      this.usuarios = this.sliceUsuarios();
+      this.carregandoSelecao = false;
+    }, _ => {
+      this.carregandoSelecao = false;
     });
   }
 
@@ -139,8 +151,25 @@ export class ConsultaComponent implements OnInit {
     return this.usuariosFull.slice(start, end);
   }
 
+  buscarLotacaoPorAtributo<T extends keyof Lotacao>(
+    lotacoes: Lotacao[],
+    atributo: T,
+    valor: Lotacao[T]
+  ): Lotacao | undefined {
+    return lotacoes.find(lotacao => lotacao[atributo] === valor);
+  }
+
+  onSubmit() {
+    this.carregandoSelecao = true;
+    console.log("teste " + this.lotacaoCtrl.getRawValue())
+    let sigla = this.lotacaoCtrl.getRawValue() || '';
+    const resultado = this.buscarLotacaoPorAtributo(this.lotacoes, 'sigla', sigla);
+    console.log(resultado);
+    this.selecionaUsuarios(resultado?.id || 15);
+  }
+
   onInput(event: Event) {
-    this.isLoading = true;
+    this.carregandoBusca = true;
     this.debouncedBuscaUsuarios(0, this.pageSize, this.nomeBusca, this.nomeBusca, this.nomeBusca);
   }
 
@@ -217,10 +246,9 @@ export class ConsultaComponent implements OnInit {
     return `${day}${month}${year}`;
   }
 
-  private _filterStates(value: string): Lotacao[] {
-    const filterValue = value.toLowerCase();
-
-    return this.lotacoes.filter(lotacao => lotacao.sigla.toLowerCase().includes(filterValue));
+  private _filtroLotacoes(value: string): Lotacao[] {
+    const valorFiltrado = value.toLowerCase();
+    return this.lotacoes.filter(lotacao => lotacao.sigla.toLowerCase().includes(valorFiltrado));
   }
 
 }

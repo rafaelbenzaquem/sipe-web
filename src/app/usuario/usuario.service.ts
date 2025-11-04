@@ -22,7 +22,7 @@ export class UsuarioService {
     return this.http.get<UsuarioResponse>(`${this.API_BASE}/${matricula}`);
   }
 
-  listar(nome = '', matricula = '', cracha ='',id_lotacao = env.SIPE_LOTACAO_PAI): Observable<UsuarioListResponse> {
+  listar(nome = '', matricula = '', cracha ='',id_lotacao: number= env.SIPE_LOTACAO_PAI): Observable<UsuarioListResponse> {
     const params: string[] = [];
     if (nome !== undefined && nome !== '') params.push(`nome=${encodeURIComponent(nome)}`);
     if (matricula !== undefined && matricula !== '') params.push(`matricula=${encodeURIComponent(matricula)}`);

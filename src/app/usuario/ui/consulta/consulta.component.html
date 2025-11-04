@@ -2,29 +2,56 @@
   <div fxLayout="column" fxFlex="80%">
     <mat-card appearance="outlined">
       <mat-card-header>
-        <mat-card-title>Consulta</mat-card-title>
+        <mat-card-title>Busca Setorial</mat-card-title>
       </mat-card-header>
       <mat-card-content class="mt-20">
         <div fxLayout="row">
-          <div fxLayout="column" fxFlex="100%">
+          <div fxLayout="column" fxFlex="80%">
             <mat-form-field class="full-width">
-              <mat-label>State</mat-label>
+              <mat-label>Setor</mat-label>
               <input matInput
-                     aria-label="State"
+                     aria-label="Lotação"
                      [matAutocomplete]="auto"
-                     [formControl]="stateCtrl">
+                     [formControl]="lotacaoCtrl">
               <mat-autocomplete #auto="matAutocomplete">
-                @for (lotacao of filteredStates | async; track lotacao) {
+                @for (lotacao of lotacoesFiltradas | async; track lotacao) {
                   <mat-option [value]="lotacao.sigla">
-                    <img alt="" class="example-option-img" [src]="lotacao.id" height="25">
                     <span>{{lotacao.sigla}}</span> |
                     <small>{{lotacao.descricao}}</small>
                   </mat-option>
                 }
               </mat-autocomplete>
             </mat-form-field>
+
+          </div>
+          <div fxLayout="column" fxFlex="20%">
+            <button matButton="filled"
+                    (click)="onSubmit()"  [disabled]="lotacaoCtrl.getRawValue()==''">
+              <mat-icon fontIcon="update"/>
+              Atualizar
+            </button>
           </div>
         </div>
+        <div fxLayout="row">
+          <div fxLayout="column" fxFlex="100%">
+            <mat-progress-bar
+              *ngIf="carregandoSelecao"
+              mode="indeterminate"
+              color="primary">
+            </mat-progress-bar>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+<div fxLayout="row" fxLayoutAlign="center" class="mt-20">
+  <div fxLayout="column" fxFlex="80%">
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Consulta</mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="mt-20">
         <div fxLayout="row">
           <div fxLayout="column" fxFlex="100%">
             <mat-form-field class="full-width">
@@ -41,7 +68,7 @@
         <div fxLayout="row">
           <div fxLayout="column" fxFlex="100%">
             <mat-progress-bar
-              *ngIf="isLoading"
+              *ngIf="carregandoBusca"
               mode="indeterminate"
               color="primary">
             </mat-progress-bar>

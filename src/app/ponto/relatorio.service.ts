@@ -45,6 +45,32 @@ export class RelatorioService {
     }
   }
 
+
+  async downloadRelatorioLotacao(id_lotacao: number, inicio: Date, fim: Date): Promise<void> {
+    const inicioFormatado = this.formatarData(inicio);
+    const fimFormatado = this.formatarData(fim);
+    const url = `${this.baseUrl}/lotacao/${id_lotacao}?inicio=${inicioFormatado}&fim=${fimFormatado}`;
+
+    try {
+      const response: HttpResponse<Blob> = await firstValueFrom(
+        this.http.get(url, {
+          observe: 'response',
+          responseType: 'blob',
+        })
+      );
+
+      const blob = response.body!;
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = (contentDisposition || id_lotacao) + '.pdf';
+      filename = filename.replace("attachment; ","")
+      this.saveBlob(blob, filename);
+
+    } catch (error) {
+      console.error('Ocorreu um erro durante o download:', error);
+      throw error;
+    }
+  }
+
   private formatarData(date: Date): string {
     const dia = ('0' + date.getDate()).slice(-2);
     const mes = ('0' + (date.getMonth() + 1)).slice(-2);

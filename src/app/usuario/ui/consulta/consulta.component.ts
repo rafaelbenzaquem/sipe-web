@@ -21,6 +21,7 @@ import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {map, startWith} from 'rxjs/operators';
+import {RelatorioService} from '../../../ponto/relatorio.service';
 
 export interface Lotacao {
   id: number;
@@ -85,7 +86,8 @@ export class ConsultaComponent implements OnInit {
   constructor(
     private usuarioService: UsuarioService,
     private pontoService: PontoService,
-    private authService: AuthService
+    private authService: AuthService,
+    private relatorioService: RelatorioService,
   ) {
     this.lotacoesFiltradas = this.lotacaoCtrl.valueChanges.pipe(
       startWith(''),
@@ -160,12 +162,26 @@ export class ConsultaComponent implements OnInit {
     return lotacoes.find(lotacao => lotacao[atributo] === valor);
   }
 
-  onSubmit() {
+  onSelect() {
     this.carregandoSelecao = true;
     let sigla = this.lotacaoCtrl.getRawValue() || '';
     this.lotacaoSelecionada = this.buscarLotacaoPorAtributo(this.lotacoes, 'sigla', sigla);
     this.selecionaUsuarios(this.lotacaoSelecionada?.id || 15);
   }
+
+  async baixarRelatorio() {
+    this.carregandoSelecao = true;
+    try {
+      if (this.lotacaoSelecionada)
+        await this.relatorioService.downloadRelatorioLotacao(this.lotacaoSelecionada.id, this.getDataInicial(), new Date());
+      console.log('Download do relatório iniciado com sucesso.');
+    } catch (error) {
+      console.error('Falha ao iniciar o download do relatório:', error);
+      // Lógica para lidar com o erro (exibir mensagem ao usuário, etc.)
+    }
+    this.carregandoSelecao = false;
+  }
+
 
   onInput(event: Event) {
     this.carregandoBusca = true;
@@ -211,12 +227,12 @@ export class ConsultaComponent implements OnInit {
 
   temPendencias(usuario: Usuario): Observable<boolean> {
     const matricula = usuario.matricula || "";
-    const dataInicio = this.getDataInicial(); // Primeiro dia do mês atual
+    const dataInicio = this.formatDate(this.getDataInicial()); // Primeiro dia do mês atual
     const dataFim = this.getDataAtual(); // Data atual
     return this.pontoService.existePontoComPedidoAlteracaoPendente(matricula, dataInicio, dataFim);
   }
 
-  private getDataInicial(): string {
+  private getDataInicial(): Date {
     const hoje = new Date();
 
     let inicioSelecionado: Date;
@@ -231,7 +247,7 @@ export class ConsultaComponent implements OnInit {
       inicioSelecionado = new Date(anoAnterior, mesAnterior, 1);
     }
 
-    return this.formatDate(inicioSelecionado);
+    return inicioSelecionado;
   }
 
   private getDataAtual(): string {

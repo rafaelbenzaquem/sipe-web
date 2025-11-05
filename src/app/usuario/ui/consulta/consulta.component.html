@@ -13,7 +13,7 @@
                      aria-label="Lotação"
                      [matAutocomplete]="auto"
                      [formControl]="lotacaoCtrl">
-              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSubmit()">
+              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSelect()">
                 @for (lotacao of lotacoesFiltradas | async; track lotacao) {
                   <mat-option [value]="lotacao.sigla">
                     <span>{{ lotacao.sigla }}</span> |
@@ -27,7 +27,7 @@
         <div fxLayout="row">
           <div fxLayout="column" fxFlex="100%">
             <button matButton="filled"
-                    (click)="onSubmit()" [disabled]="lotacaoSelecionada==undefined">
+                    (click)="baixarRelatorio()" [disabled]="lotacaoSelecionada==undefined">
               <mat-icon fontIcon="assignment"/>
               Emitir Relatório Setorial @if(lotacaoSelecionada){
               {{ lotacaoSelecionada.sigla }}

@@ -46,6 +46,31 @@ export class RelatorioService {
   }
 
 
+  async downloadRelatorioLotacaoPorDiretor(matricula_diretor: string, inicio: Date, fim: Date): Promise<void> {
+    const inicioFormatado = this.formatarData(inicio);
+    const fimFormatado = this.formatarData(fim);
+    const url = `${this.baseUrl}/lotacao/usuario/${matricula_diretor}?inicio=${inicioFormatado}&fim=${fimFormatado}`;
+
+    try {
+      const response: HttpResponse<Blob> = await firstValueFrom(
+        this.http.get(url, {
+          observe: 'response',
+          responseType: 'blob',
+        })
+      );
+
+      const blob = response.body!;
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = (contentDisposition || matricula_diretor) + '.pdf';
+      filename = filename.replace("attachment; ","")
+      this.saveBlob(blob, filename);
+
+    } catch (error) {
+      console.error('Ocorreu um erro durante o download:', error);
+      throw error;
+    }
+  }
+
   async downloadRelatorioLotacao(id_lotacao: number, inicio: Date, fim: Date): Promise<void> {
     const inicioFormatado = this.formatarData(inicio);
     const fimFormatado = this.formatarData(fim);

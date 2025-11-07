@@ -170,16 +170,31 @@ export class ConsultaComponent implements OnInit {
   }
 
   async baixarRelatorio() {
-    this.carregandoSelecao = true;
-    try {
-      if (this.lotacaoSelecionada)
-        await this.relatorioService.downloadRelatorioLotacao(this.lotacaoSelecionada.id, this.getDataInicial(), new Date());
-      console.log('Download do relatório iniciado com sucesso.');
-    } catch (error) {
-      console.error('Falha ao iniciar o download do relatório:', error);
-      // Lógica para lidar com o erro (exibir mensagem ao usuário, etc.)
+    if (this.hasAnyRole(['GRP_SIPE_ADMIN', 'GRP_SIPE_RH'])) {
+      this.carregandoSelecao = true;
+      try {
+        if (this.lotacaoSelecionada) {
+          await this.relatorioService.downloadRelatorioLotacao(this.lotacaoSelecionada.id, this.getDataInicial(), new Date());
+          console.log('Download do relatório iniciado com sucesso.');
+        }
+      } catch (error) {
+        console.error('Falha ao iniciar o download do relatório:', error);
+        // Lógica para lidar com o erro (exibir mensagem ao usuário, etc.)
+      }
+      this.carregandoSelecao = false;
+    } else if (this.hasAnyRole(['GRP_SIPE_DIRETOR'])) {
+      this.carregandoSelecao = true;
+      try {
+        if (this.usuario && this.usuario.matricula) {
+          await this.relatorioService.downloadRelatorioLotacaoPorDiretor(this.usuario.matricula, this.getDataInicial(), new Date());
+          console.log('Download do relatório iniciado com sucesso.');
+        }
+      } catch (error) {
+        console.error('Falha ao iniciar o download do relatório:', error);
+        // Lógica para lidar com o erro (exibir mensagem ao usuário, etc.)
+      }
+      this.carregandoSelecao = false;
     }
-    this.carregandoSelecao = false;
   }
 
 

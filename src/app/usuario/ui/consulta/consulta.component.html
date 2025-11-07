@@ -1,5 +1,6 @@
 <div fxLayout="row" fxLayoutAlign="center">
   <div fxLayout="column" fxFlex="80%">
+    @if(hasAnyRole(['GRP_SIPE_ADMIN','GRP_SIPE_RH'])){
     <mat-card appearance="outlined">
       <mat-card-header>
         <mat-card-title>Busca Setorial</mat-card-title>
@@ -27,9 +28,9 @@
         <div fxLayout="row">
           <div fxLayout="column" fxFlex="100%">
             <button matButton="filled"
-                    (click)="baixarRelatorio()" [disabled]="lotacaoSelecionada==undefined">
+                    (click)="baixarRelatorio()" [disabled]="lotacaoSelecionada==undefined||lotacaoSelecionada.id==15">
               <mat-icon fontIcon="assignment"/>
-              Emitir Relatório Setorial @if(lotacaoSelecionada){
+              Emitir Relatório Setorial @if (lotacaoSelecionada) {
               {{ lotacaoSelecionada.sigla }}
             }
             </button>
@@ -46,9 +47,43 @@
         </div>
       </mat-card-content>
     </mat-card>
+    }
   </div>
 </div>
-<div fxLayout="row" fxLayoutAlign="center" class="mt-20">
+<div fxLayout="row" fxLayoutAlign="center">
+  <div fxLayout="column" fxFlex="80%">
+    @if(hasAnyRole(['GRP_SIPE_DIRETOR'])){
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <mat-card-title>Busca Setorial</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="mt-20">
+          <div fxLayout="row">
+            <div fxLayout="column" fxFlex="100%">
+              <button matButton="filled"
+                      (click)="baixarRelatorio()" [disabled]="lotacaoSelecionada==undefined||lotacaoSelecionada.id==15">
+                <mat-icon fontIcon="assignment"/>
+                Emitir Relatório Setorial @if (lotacaoSelecionada) {
+                {{ lotacaoSelecionada.sigla }}
+              }
+              </button>
+            </div>
+          </div>
+          <div fxLayout="row">
+            <div fxLayout="column" fxFlex="100%">
+              <mat-progress-bar
+                *ngIf="carregandoSelecao"
+                mode="indeterminate"
+                color="primary">
+              </mat-progress-bar>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+</div>
+<div fxLayout="row" fxLayoutAlign="center" >
   <div fxLayout="column" fxFlex="80%">
     <mat-card appearance="outlined">
       <mat-card-header>
@@ -81,14 +116,13 @@
     </mat-card>
   </div>
 </div>
-
-<div fxLayout="row" fxLayoutAlign="center" class="mt-20">
+<div fxLayout="row" fxLayoutAlign="center">
   <div fxLayout="column" fxFlex="80%">
     <mat-card appearance="outlined">
       <mat-card-header>
         <mat-card-title>
           Tabela de Servidores
-          @if(lotacaoSelecionada){
+          @if (lotacaoSelecionada) {
             {{ lotacaoSelecionada.sigla }}
           }
         </mat-card-title>

@@ -174,7 +174,7 @@ export class ConsultaComponent implements OnInit {
       this.carregandoSelecao = true;
       try {
         if (this.lotacaoSelecionada) {
-          await this.relatorioService.downloadRelatorioLotacao(this.lotacaoSelecionada.id, this.getDataInicial(), new Date());
+          await this.relatorioService.downloadRelatorioLotacao(this.lotacaoSelecionada.id, this.getDataInicial(), this.getDataFinal());
           console.log('Download do relatório iniciado com sucesso.');
         }
       } catch (error) {
@@ -186,7 +186,7 @@ export class ConsultaComponent implements OnInit {
       this.carregandoSelecao = true;
       try {
         if (this.usuario && this.usuario.matricula) {
-          await this.relatorioService.downloadRelatorioLotacaoPorDiretor(this.usuario.matricula, this.getDataInicial(), new Date());
+          await this.relatorioService.downloadRelatorioLotacaoPorDiretor(this.usuario.matricula, this.getDataInicial(), this.getDataFinal());
           console.log('Download do relatório iniciado com sucesso.');
         }
       } catch (error) {
@@ -243,7 +243,7 @@ export class ConsultaComponent implements OnInit {
   temPendencias(usuario: Usuario): Observable<boolean> {
     const matricula = usuario.matricula || "";
     const dataInicio = this.formatDate(this.getDataInicial()); // Primeiro dia do mês atual
-    const dataFim = this.getDataAtual(); // Data atual
+    const dataFim = this.formatDate(this.getDataFinal()); // Data atual
     return this.pontoService.existePontoComPedidoAlteracaoPendente(matricula, dataInicio, dataFim);
   }
 
@@ -263,6 +263,17 @@ export class ConsultaComponent implements OnInit {
     }
 
     return inicioSelecionado;
+  }
+
+  private getDataFinal(): Date {
+    const hoje = new Date();
+    let fimSelecionado = hoje;
+    if (hoje.getDate() <= 10) {
+      fimSelecionado = new Date(hoje.getFullYear(), hoje.getMonth(), 0);
+      console.log("Data final selecionada:" + fimSelecionado);
+    }
+
+    return fimSelecionado;
   }
 
   private getDataAtual(): string {

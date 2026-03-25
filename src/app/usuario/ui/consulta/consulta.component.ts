@@ -71,10 +71,6 @@ export class ConsultaComponent implements OnInit {
     {id: 215, sigla: '4ª VARA', descricao: '4ª VARA DA SJRR'},
     {id: 70, sigla: 'DIREF', descricao: 'DIRETORIA DO FORO'},
     {id: 77, sigla: 'SECAD', descricao: 'SECRETARIA ADMINISTRATIVA'},
-    {id: 226, sigla: 'CEJUC', descricao: 'CENTRO JUDICIÁRIO DE CONCILIAÇÃO'},
-    {id: 245, sigla: 'ASJUR', descricao: 'ASSESSORIA JURÍDICA E LEGISLAÇÃO DE PESSOAL'},
-    {id: 246, sigla: 'SEAUD', descricao: 'SEÇÃO DE AUDITORIA INTERNA'},
-    {id: 224, sigla: 'NUCJU', descricao: 'NÚCLEO JUDICIÁRIO'},
     {id: 227, sigla: 'NUCAD', descricao: 'NÚCLEO DE ADMINISTRAÇÃO'},
     {id: 253, sigla: 'NUCAF', descricao: 'NÚCLEO DE ADMINISTRAÇÃO ORÇAMENTÁRIA, FINANCEIRA E PATRIMONIAL'},
     {id: 263, sigla: 'NUTEC', descricao: 'NÚCLEO DE TECNOLOGIA DA INFORMAÇÃO'}

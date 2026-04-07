@@ -1,0 +1,111 @@
+.dashboard-tabela {
+  padding: 24px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  gap: 16px;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.card-icon {
+  color: #3f51b5;
+}
+
+/* Tabela */
+
+.table-container {
+  overflow-x: auto;
+  margin-top: 8px;
+}
+
+.ponto-table {
+  width: 100%;
+  min-width: 700px;
+}
+
+.hora-cell {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.restantes-cell {
+  color: #f44336;
+}
+
+.progresso-cell {
+  min-width: 160px;
+}
+
+.progresso-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  mat-progress-bar {
+    flex: 1;
+    border-radius: 4px;
+  }
+}
+
+.progresso-valor {
+  font-size: 0.8rem;
+  color: rgba(0, 0, 0, 0.54);
+  min-width: 36px;
+  text-align: right;
+}
+
+.sem-ponto-label {
+  color: rgba(0, 0, 0, 0.38);
+}
+
+/* Status badge */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: default;
+}
+
+.status-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.status-presente {
+  color: #4caf50;
+}
+
+.status-ausente {
+  color: rgba(0, 0, 0, 0.38);
+}
+
+/* Estado vazio */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 0;
+  color: rgba(0, 0, 0, 0.38);
+
+  .empty-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}

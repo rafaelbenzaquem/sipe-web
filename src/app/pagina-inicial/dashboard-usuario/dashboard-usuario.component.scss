@@ -1,0 +1,210 @@
+.dashboard-usuario {
+  padding: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  gap: 16px;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.dashboard-header {
+  margin-bottom: 24px;
+
+  h2 {
+    margin: 0 0 4px;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.87);
+  }
+
+  .data-hoje {
+    margin: 0;
+    font-size: 0.9rem;
+    color: rgba(0, 0, 0, 0.54);
+    text-transform: capitalize;
+  }
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.ponto-card,
+.eventos-card,
+.empty-card {
+  width: 100%;
+}
+
+.card-icon {
+  color: #3f51b5;
+}
+
+/* Horários */
+
+.horarios-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 16px;
+  padding: 12px 0;
+}
+
+.divider-vertical {
+  height: 56px;
+}
+
+.horario-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.icon-entrada {
+  color: #4caf50;
+}
+
+.icon-saida {
+  color: #f44336;
+}
+
+.horario-label {
+  font-size: 0.75rem;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.horario-value {
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Horas */
+
+.horas-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.horas-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.horas-label {
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.horas-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.horas-value.trabalhadas {
+  color: #3f51b5;
+}
+
+.horas-value.restantes {
+  color: #f44336;
+}
+
+.progress-bar {
+  margin-top: 8px;
+  border-radius: 4px;
+}
+
+.progresso-label {
+  font-size: 0.75rem;
+  color: rgba(0, 0, 0, 0.54);
+  text-align: right;
+}
+
+/* Eventos */
+
+.eventos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 0;
+}
+
+.evento-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.03);
+  border-left: 3px solid transparent;
+
+  &.entrada {
+    border-left-color: #4caf50;
+
+    mat-icon {
+      color: #4caf50;
+    }
+  }
+
+  &.saida {
+    border-left-color: #f44336;
+
+    mat-icon {
+      color: #f44336;
+    }
+  }
+}
+
+.evento-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.evento-hora {
+  font-size: 1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.evento-sentido {
+  font-size: 0.8rem;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+/* Estado vazio */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 0;
+  color: rgba(0, 0, 0, 0.38);
+
+  .empty-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}

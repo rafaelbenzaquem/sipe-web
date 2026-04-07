@@ -12,7 +12,16 @@
     <span class="after-version-space"></span>
     <div fxLayout="row" fxLayoutAlign="center">
       <div fxLayout="column" fxFlex="100%">
-
+        <mat-divider></mat-divider>
+        <a class="drawer-link"
+           routerLink="/">
+          <mat-icon>home</mat-icon>
+          Página Inicial
+        </a>
+      </div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="center">
+      <div fxLayout="column" fxFlex="100%">
         <mat-divider></mat-divider>
         <a class="drawer-link" *ngIf="hasAnyRole(['GRP_SIPE_ADMIN','GRP_SIPE_DIRETOR','GRP_SIPE_RH'])"
            routerLink="/usuarios/consulta">

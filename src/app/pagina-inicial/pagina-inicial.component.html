@@ -1,12 +1,31 @@
-<div class="login-container">
-  <mat-card appearance="outlined" *ngIf="!isLoggedIn()">
+<!-- Tela de login (não autenticado) -->
+<div class="login-container" *ngIf="!(perfil$ | async)">
+  <mat-card appearance="outlined" class="login-card">
     <mat-card-header>
-      <mat-card-title>Login</mat-card-title>
+      <mat-card-title>SIPE</mat-card-title>
+      <mat-card-subtitle>Sistema Integrado de Ponto Eletrônico</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
+      <p class="login-info">Faça login para acessar o sistema.</p>
     </mat-card-content>
-    <mat-card-actions>
-      <button matButton="filled"  (click)="login()">Entrar</button>
+    <mat-card-actions align="end">
+      <button mat-flat-button color="primary" (click)="login()">Entrar</button>
     </mat-card-actions>
   </mat-card>
 </div>
+
+<!-- Carregando dados do usuário após autenticação -->
+<div class="login-container" *ngIf="(perfil$ | async) && !(usuario$ | async)">
+  <mat-spinner diameter="48"></mat-spinner>
+</div>
+
+<!-- Dashboard (autenticado e dados carregados) -->
+<ng-container *ngIf="usuario$ | async">
+
+  <!-- Usuário comum: dashboard individual -->
+  <app-dashboard-usuario *ngIf="isUsuarioComum"></app-dashboard-usuario>
+
+  <!-- Diretor, Admin ou RH: tabela de usuários -->
+  <app-dashboard-tabela *ngIf="isDashboardTabela"></app-dashboard-tabela>
+
+</ng-container>

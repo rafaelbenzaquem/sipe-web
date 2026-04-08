@@ -97,3 +97,9 @@ body {
   margin-top: 20px;
   width: 100%;
 }
+
+/* Menu de notificações: permite largura maior que o padrão do mat-menu */
+.notificacoes-menu .mat-mdc-menu-content {
+  min-width: 320px;
+  max-width: 380px;
+}

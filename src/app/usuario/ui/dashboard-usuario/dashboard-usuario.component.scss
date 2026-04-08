@@ -197,6 +197,63 @@
   color: #4caf50;
 }
 
+/* Em intervalo */
+
+.ponto-card.em-intervalo {
+  border-color: #ff9800;
+}
+
+.horas-value.pausado {
+  color: #ff9800;
+}
+
+/* Alertas de diagnóstico */
+
+.alerta-card {
+  margin-bottom: 16px;
+}
+
+.alerta-catraca {
+  border-color: #f44336;
+}
+
+.alerta-intervalo {
+  border-color: #ff9800;
+}
+
+.alerta-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.alerta-icon {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.alerta-catraca .alerta-icon {
+  color: #f44336;
+}
+
+.alerta-intervalo .alerta-icon {
+  color: #ff9800;
+}
+
+.alerta-titulo {
+  margin: 0 0 4px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.alerta-subtitulo {
+  margin: 0;
+  font-size: 0.82rem;
+  color: rgba(0, 0, 0, 0.54);
+}
+
 /* Estado ausente */
 
 .ausente-card {

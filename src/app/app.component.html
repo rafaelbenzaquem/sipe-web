@@ -24,6 +24,16 @@
       <div fxLayout="column" fxFlex="100%">
         <mat-divider></mat-divider>
         <a class="drawer-link" *ngIf="hasAnyRole(['GRP_SIPE_ADMIN','GRP_SIPE_DIRETOR','GRP_SIPE_RH'])"
+           routerLink="/usuarios/frequencia">
+          <mat-icon>browse_gallery</mat-icon>
+          Frequência do dia
+        </a>
+      </div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="center">
+      <div fxLayout="column" fxFlex="100%">
+        <mat-divider></mat-divider>
+        <a class="drawer-link" *ngIf="hasAnyRole(['GRP_SIPE_ADMIN','GRP_SIPE_DIRETOR','GRP_SIPE_RH'])"
            routerLink="/usuarios/consulta">
           <mat-icon>search</mat-icon>
           Busca de Usuários
@@ -47,15 +57,6 @@
            [state]="{'usuario': usuario}">
           <mat-icon>assignment</mat-icon>
           Relatório Pessoal de Ponto
-        </a>
-      </div>
-    </div>
-    <div fxLayout="row" fxLayoutAlign="center">
-      <div fxLayout="column" fxFlex="100%">
-        <mat-divider></mat-divider>
-        <a class="drawer-link" *ngIf="hasRole('GRP_SIPE_ADMIN')" routerLink="/">
-          <mat-icon>settings</mat-icon>
-          Configuração
         </a>
       </div>
     </div>
@@ -94,23 +95,40 @@
           <span>Bem-vindo, {{ usuario?.nome }}</span>
         </div>
         <div class="header-block">
-          <a [matMenuTriggerFor]="menu">
-            <mat-icon matBadge="15">notifications_active</mat-icon>
+          <a [matMenuTriggerFor]="menuNotificacoes">
+            <mat-icon
+              [matBadge]="totalNaoLidas"
+              [matBadgeHidden]="totalNaoLidas === 0"
+              matBadgeColor="warn"
+              matBadgeSize="small">
+              {{ totalNaoLidas > 0 ? 'notifications_active' : 'notifications' }}
+            </mat-icon>
           </a>
         </div>
-        <mat-menu #menu="matMenu">
-          <button mat-menu-item>
-            <mat-icon>dialpad</mat-icon>
-            <span>Redial</span>
-          </button>
-          <button mat-menu-item disabled>
-            <mat-icon>voicemail</mat-icon>
-            <span>Check voice mail</span>
-          </button>
-          <button mat-menu-item>
-            <mat-icon>notifications_off</mat-icon>
-            <span>Disable alerts</span>
-          </button>
+
+        <mat-menu #menuNotificacoes="matMenu" class="notificacoes-menu">
+          @if (notificacoes.length === 0) {
+            <button mat-menu-item disabled>
+              <mat-icon>notifications_none</mat-icon>
+              <span class="notif-vazia">Nenhuma notificação</span>
+            </button>
+          }
+          @for (notif of notificacoes; track notif.id) {
+            <a mat-menu-item
+               [routerLink]="notif.routerLink"
+               [state]="notif.routerState"
+               (click)="marcarComoLida(notif.id)"
+               class="notif-item">
+              <mat-icon [class.notif-icon-pendente]="notif.tipo === 'PENDENTE'"
+                        [class.notif-icon-avaliado]="notif.tipo === 'AVALIADO'">
+                {{ notif.icone }}
+              </mat-icon>
+              <div class="notif-content">
+                <span class="notif-titulo">{{ notif.titulo }}</span>
+                <span class="notif-mensagem">{{ notif.mensagem }}</span>
+              </div>
+            </a>
+          }
         </mat-menu>
 
         <button mat-icon-button color="accent" (click)="logout()" title="Logout">

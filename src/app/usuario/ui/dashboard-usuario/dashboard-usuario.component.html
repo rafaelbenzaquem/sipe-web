@@ -14,6 +14,7 @@
       <p class="data-hoje">{{ hojeExibicao }}</p>
     </div>
 
+    <!-- Estado: sem registros hoje -->
     @if (estaAusente) {
       <mat-card appearance="outlined" class="ausente-card">
         <mat-card-content>
@@ -27,6 +28,36 @@
     }
 
     @if (!estaAusente) {
+
+      <!-- Alerta: falha de catraca (saída sem entrada antecedente) -->
+      @if (falhaCarraca) {
+        <mat-card appearance="outlined" class="alerta-card alerta-catraca">
+          <mat-card-content>
+            <div class="alerta-row">
+              <mat-icon class="alerta-icon">warning</mat-icon>
+              <div>
+                <p class="alerta-titulo">Entrada não registrada</p>
+                <p class="alerta-subtitulo">Foi detectada uma saída sem registro de entrada antecedente. Verifique a catraca ou solicite uma entrada manual.</p>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <!-- Indicador de intervalo -->
+      @if (emIntervalo && !falhaCarraca) {
+        <mat-card appearance="outlined" class="alerta-card alerta-intervalo">
+          <mat-card-content>
+            <div class="alerta-row">
+              <mat-icon class="alerta-icon">free_breakfast</mat-icon>
+              <div>
+                <p class="alerta-titulo">Em intervalo</p>
+                <p class="alerta-subtitulo">Você saiu às {{ ultimaSaida }}. O cronômetro está pausado até o próximo registro de entrada.</p>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
 
       <div class="cards-grid">
 
@@ -55,12 +86,20 @@
         </mat-card>
 
         <!-- Card Cronômetro -->
-        <mat-card appearance="outlined" class="ponto-card" [class.concluida]="jornadaConcluida">
+        <mat-card appearance="outlined" class="ponto-card"
+                  [class.concluida]="jornadaConcluida"
+                  [class.em-intervalo]="emIntervalo && !falhaCarraca">
           <mat-card-header>
             <mat-icon mat-card-avatar class="card-icon">
-              {{ jornadaConcluida ? 'task_alt' : 'timer' }}
+              @if (jornadaConcluida) { task_alt }
+              @else if (emIntervalo && !falhaCarraca) { pause_circle }
+              @else { timer }
             </mat-icon>
-            <mat-card-title>{{ jornadaConcluida ? 'Jornada Concluída' : 'Tempo Restante' }}</mat-card-title>
+            <mat-card-title>
+              @if (jornadaConcluida) { Jornada Concluída }
+              @else if (emIntervalo && !falhaCarraca) { Cronômetro Pausado }
+              @else { Tempo Restante }
+            </mat-card-title>
             <mat-card-subtitle>Carga diária: {{ usuario?.hora_diaria }}h</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
@@ -70,11 +109,17 @@
                 <span class="horas-value trabalhadas">{{ horasTrabalhadas }}</span>
               </div>
               <div class="horas-row">
-                <span class="horas-label">{{ jornadaConcluida ? 'Carga cumprida' : 'Restante' }}</span>
+                <span class="horas-label">
+                  @if (jornadaConcluida) { Carga cumprida }
+                  @else if (emIntervalo && !falhaCarraca) { Pausado (em intervalo) }
+                  @else { Restante }
+                </span>
                 <span class="horas-value"
-                      [class.restantes]="!jornadaConcluida"
+                      [class.restantes]="!jornadaConcluida && !emIntervalo"
+                      [class.pausado]="emIntervalo && !falhaCarraca"
                       [class.concluida-valor]="jornadaConcluida">
-                  {{ jornadaConcluida ? '00:00:00' : cronometroExibicao }}
+                  @if (jornadaConcluida) { 00:00:00 }
+                  @else { {{ cronometroExibicao }} }
                 </span>
               </div>
               <mat-progress-bar

@@ -9,10 +9,17 @@ import {PaginaInicialComponent} from './pagina-inicial/pagina-inicial.component'
 import {
   RelatorioPontosPendentesComponent
 } from './ponto/ui/relatorio-pontos-pendentes/relatorio-pontos-pendentes.component';
+import {FrequenciaComponent} from './usuario/ui/frequencia/frequencia.component';
 
 
 export const routes: Routes = [
   {path: '', component: PaginaInicialComponent},
+  {
+    path: 'usuarios/frequencia',
+    component: FrequenciaComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: {roles: ['GRP_SIPE_ADMIN', 'GRP_SIPE_DIRETOR', 'GRP_SIPE_RH']}
+  },
   {
     path: 'usuarios/consulta',
     component: UsuarioConsultaComponent,
@@ -38,5 +45,5 @@ export const routes: Routes = [
     data: {roles: ['GRP_SIPE_ADMIN', 'GRP_SIPE_DIRETOR', 'GRP_SIPE_USERS']}
   },
   {path: 'unauthorized', component: UnauthorizedComponent},
-  {path: '**', redirectTo: ''}
+  {path: '**', redirectTo: '/'}
 ];

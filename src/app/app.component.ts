@@ -1,6 +1,6 @@
-import {Component, inject, signal} from '@angular/core';
+import {Component, DestroyRef, inject, signal} from '@angular/core';
 import {IMAGE_CONFIG, NgIf, NgOptimizedImage} from '@angular/common';
-import {Router, RouterLink, RouterOutlet} from '@angular/router';
+import {NavigationEnd, Router, RouterLink, RouterOutlet} from '@angular/router';
 import {AuthService} from './auth/auth.service';
 import {MatDialog, MatDialogModule} from '@angular/material/dialog';
 import {OAuthService} from 'angular-oauth2-oidc';
@@ -12,7 +12,7 @@ import {MatTableModule} from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {provideMomentDateAdapter} from '@angular/material-moment-adapter';
 import {MAT_DATE_LOCALE} from '@angular/material/core';
-import 'moment/locale/pt-br'
+import 'moment/locale/pt-br';
 import {FlexModule} from '@angular/flex-layout';
 import {environment as env} from '../environments/environment';
 import {MatMenuModule} from '@angular/material/menu';
@@ -21,6 +21,10 @@ import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatBadgeModule} from '@angular/material/badge';
 import {VersionService} from './core/version.service';
+import {NotificacaoService} from './notificacao/notificacao.service';
+import {Notificacao} from './notificacao/notificacao.model';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {filter} from 'rxjs/operators';
 
 @Component({
   standalone: true,
@@ -33,7 +37,6 @@ import {VersionService} from './core/version.service';
     FlexModule, MatMenuModule,
     MatChipsModule, MatSidenavModule,
     MatDividerModule, MatBadgeModule,
-    MatMenuModule,
     MatDialogModule
   ],
   providers: [
@@ -41,9 +44,7 @@ import {VersionService} from './core/version.service';
     provideMomentDateAdapter(),
     {
       provide: IMAGE_CONFIG,
-      useValue: {
-        placeholderResolution: 40
-      }
+      useValue: {placeholderResolution: 40}
     },
   ],
   templateUrl: './app.component.html',
@@ -53,72 +54,88 @@ export class AppComponent {
   title = 'SIPE';
   logoPath = 'assets/logoImagem.png';
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
+  private readonly destroyRef = inject(DestroyRef);
 
   URL_BASE = env.SIPE_API_URL;
   appVersion = '';
+
+  /** Lista de notificações não lidas, sincronizada com o serviço. */
+  notificacoes: Notificacao[] = [];
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private oauthService: OAuthService,
     private dialog: MatDialog,
-    private versionService: VersionService
+    private versionService: VersionService,
+    private notificacaoService: NotificacaoService
   ) {
-    // Subscribe to OAuth token events
+    // Exibe dialog quando o token OAuth estiver prestes a expirar
     this.oauthService.events.subscribe((e) => {
-      console.log("AppComponent:oauthService.events: "+e.type);
       if (e.type === 'token_expires') {
-        const dialogRef = this.dialog.open(SessionExpiredDialog, { disableClose: true });
-        dialogRef.afterClosed().subscribe(() => {
-          this.authService.logout();
-        });
+        const dialogRef = this.dialog.open(SessionExpiredDialog, {disableClose: true});
+        dialogRef.afterClosed().subscribe(() => this.authService.logout());
       }
     });
 
-    // Load application version from public/version.json
+    // Versão da aplicação
     this.versionService.getVersion().subscribe({
       next: (info) => this.appVersion = info.version,
       error: () => this.appVersion = ''
     });
+
+    // Carrega notificações assim que o usuário autentica
+    this.authService.usuario$.pipe(
+      filter(u => u !== null),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => {
+      this.notificacaoService.carregarNotificacoes(true);
+    });
+
+    // Recarrega notificações a cada navegação (respeitando o cache de 5 min)
+    this.router.events.pipe(
+      filter(e => e instanceof NavigationEnd),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => {
+      this.notificacaoService.carregarNotificacoes();
+    });
+
+    // Sincroniza a lista local com o observable do serviço
+    this.notificacaoService.notificacoes$.pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(notifs => {
+      this.notificacoes = notifs;
+    });
   }
 
-  /**
-   * Verifica se o usuário está logado
-   */
+  get totalNaoLidas(): number {
+    return this.notificacoes.length;
+  }
+
+  marcarComoLida(id: string): void {
+    this.notificacaoService.marcarComoLida(id);
+  }
+
   isLoggedIn(): boolean {
     return this.authService.isLoggedIn();
   }
 
-  /**
-   * Retorna o perfil do usuário logado
-   */
   get perfil() {
     return this.authService.getPerfil();
   }
 
-  get usuario(){
+  get usuario() {
     return this.authService.getUsuario();
   }
 
-  /**
-   * Verifica se possui determinada permissão
-   */
   hasRole(role: string): boolean {
     return this.authService.hasRole(role);
   }
 
-  /**
-   * Verifica se possui ao menos uma das permissões
-   */
   hasAnyRole(roles: string[]): boolean {
     return this.authService.hasAnyRole(roles);
   }
 
-  /**
-   * Inicia logout federado:
-   * - Limpa estado local e redireciona ao Identity Provider para encerrar sessão
-   * - Após logout no provedor, o usuário retorna à aplicação em postLogoutRedirectUri
-   */
   logout(): void {
     this.authService.logout();
   }

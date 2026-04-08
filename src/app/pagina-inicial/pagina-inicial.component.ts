@@ -7,8 +7,7 @@ import {OAuthService} from 'angular-oauth2-oidc';
 import {authCodeFlowConfig} from '../auth/auth.code.flow.config';
 import {AuthService} from '../auth/auth.service';
 import {Perfil} from './perfil.model';
-import {DashboardUsuarioComponent} from './dashboard-usuario/dashboard-usuario.component';
-import {DashboardTabelaComponent} from './dashboard-tabela/dashboard-tabela.component';
+import {DashboardUsuarioComponent} from '../usuario/ui/dashboard-usuario/dashboard-usuario.component';
 
 @Component({
   standalone: true,
@@ -19,8 +18,7 @@ import {DashboardTabelaComponent} from './dashboard-tabela/dashboard-tabela.comp
     MatCardModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    DashboardUsuarioComponent,
-    DashboardTabelaComponent
+    DashboardUsuarioComponent
   ],
   templateUrl: './pagina-inicial.component.html',
   styleUrl: './pagina-inicial.component.scss'

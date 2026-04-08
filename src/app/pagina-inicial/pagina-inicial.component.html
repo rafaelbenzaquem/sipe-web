@@ -23,9 +23,7 @@
 <ng-container *ngIf="usuario$ | async">
 
   <!-- Usuário comum: dashboard individual -->
-  <app-dashboard-usuario *ngIf="isUsuarioComum"></app-dashboard-usuario>
+  <app-dashboard-usuario ></app-dashboard-usuario>
 
-  <!-- Diretor, Admin ou RH: tabela de usuários -->
-  <app-dashboard-tabela *ngIf="isDashboardTabela"></app-dashboard-tabela>
 
 </ng-container>

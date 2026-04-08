@@ -22,12 +22,7 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {map, startWith} from 'rxjs/operators';
 import {RelatorioService} from '../../../ponto/relatorio.service';
-
-export interface Lotacao {
-  id: number;
-  sigla: string;
-  descricao: string;
-}
+import {Lotacao, LOTACOES} from '../../../shared/lotacao.data';
 
 @Component({
   selector: 'app-consulta',
@@ -63,18 +58,7 @@ export class ConsultaComponent implements OnInit {
   usuarios: Usuario[] = [];
   usuariosFull: Usuario[] = [];
   colunasTable: string[] = ["nome", "matricula", "cracha", "hora_diaria", "acoes"]
-  lotacoes: Lotacao[] = [
-    {id: 15, sigla: 'SJRR', descricao: 'SECAO JUDICIARIA DE RORAIMA'},
-    {id: 112, sigla: '1ª VARA', descricao: '1ª VARA DA SJRR'},
-    {id: 124, sigla: '2ª VARA', descricao: '2ª VARA DA SJRR'},
-    {id: 136, sigla: '3ª VARA', descricao: '3ª VARA (JEF) DA SJRR'},
-    {id: 215, sigla: '4ª VARA', descricao: '4ª VARA DA SJRR'},
-    {id: 77, sigla: 'SECAD', descricao: 'SECRETARIA ADMINISTRATIVA'},
-    {id: 224, sigla: 'NUCJU', descricao: 'NÚCLEO JUDICIÁRIO'},
-    {id: 227, sigla: 'NUCAD', descricao: 'NÚCLEO DE ADMINISTRAÇÃO'},
-    {id: 253, sigla: 'NUCAF', descricao: 'NÚCLEO DE ADMINISTRAÇÃO ORÇAMENTÁRIA, FINANCEIRA E PATRIMONIAL'},
-    {id: 263, sigla: 'NUTEC', descricao: 'NÚCLEO DE TECNOLOGIA DA INFORMAÇÃO'}
-  ];
+  lotacoes: Lotacao[] = LOTACOES;
 
   readonly dialog = inject(MatDialog);
   private debouncedBuscaUsuarios: (page: number, size: number, nome: string, matricula: string, cracha: string) => void;

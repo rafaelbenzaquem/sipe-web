@@ -187,6 +187,49 @@
   color: rgba(0, 0, 0, 0.54);
 }
 
+/* Jornada concluída */
+
+.ponto-card.concluida {
+  border-color: #4caf50;
+}
+
+.horas-value.concluida-valor {
+  color: #4caf50;
+}
+
+/* Estado ausente */
+
+.ausente-card {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.ausente-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0;
+  color: rgba(0, 0, 0, 0.38);
+
+  .ausente-icon {
+    font-size: 56px;
+    width: 56px;
+    height: 56px;
+    margin-bottom: 12px;
+  }
+
+  .ausente-titulo {
+    margin: 0 0 4px;
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+
+  .ausente-subtitulo {
+    margin: 0;
+    font-size: 0.85rem;
+  }
+}
+
 /* Estado vazio */
 
 .empty-state {

@@ -30,7 +30,7 @@
     @if (!estaAusente) {
 
       <!-- Alerta: falha de catraca (saída sem entrada antecedente) -->
-      @if (falhaCarraca) {
+      @if (falhaCatraca) {
         <mat-card appearance="outlined" class="alerta-card alerta-catraca">
           <mat-card-content>
             <div class="alerta-row">
@@ -45,7 +45,7 @@
       }
 
       <!-- Indicador de intervalo -->
-      @if (emIntervalo && !falhaCarraca) {
+      @if (emIntervalo && !falhaCatraca) {
         <mat-card appearance="outlined" class="alerta-card alerta-intervalo">
           <mat-card-content>
             <div class="alerta-row">
@@ -88,16 +88,16 @@
         <!-- Card Cronômetro -->
         <mat-card appearance="outlined" class="ponto-card"
                   [class.concluida]="jornadaConcluida"
-                  [class.em-intervalo]="emIntervalo && !falhaCarraca">
+                  [class.em-intervalo]="emIntervalo && !falhaCatraca">
           <mat-card-header>
             <mat-icon mat-card-avatar class="card-icon">
               @if (jornadaConcluida) { task_alt }
-              @else if (emIntervalo && !falhaCarraca) { pause_circle }
+              @else if (emIntervalo && !falhaCatraca) { pause_circle }
               @else { timer }
             </mat-icon>
             <mat-card-title>
               @if (jornadaConcluida) { Jornada Concluída }
-              @else if (emIntervalo && !falhaCarraca) { Cronômetro Pausado }
+              @else if (emIntervalo && !falhaCatraca) { Cronômetro Pausado }
               @else { Tempo Restante }
             </mat-card-title>
             <mat-card-subtitle>Carga diária: {{ usuario?.hora_diaria }}h</mat-card-subtitle>
@@ -106,17 +106,17 @@
             <div class="horas-container">
               <div class="horas-row">
                 <span class="horas-label">Trabalhadas</span>
-                <span class="horas-value trabalhadas">{{ horasTrabalhadas }}</span>
+                <span class="horas-value trabalhadas">{{ horasTrabalhadasString }}</span>
               </div>
               <div class="horas-row">
                 <span class="horas-label">
                   @if (jornadaConcluida) { Carga cumprida }
-                  @else if (emIntervalo && !falhaCarraca) { Pausado (em intervalo) }
+                  @else if (emIntervalo && !falhaCatraca) { Pausado (em intervalo) }
                   @else { Restante }
                 </span>
                 <span class="horas-value"
                       [class.restantes]="!jornadaConcluida && !emIntervalo"
-                      [class.pausado]="emIntervalo && !falhaCarraca"
+                      [class.pausado]="emIntervalo && !falhaCatraca"
                       [class.concluida-valor]="jornadaConcluida">
                   @if (jornadaConcluida) { 00:00:00 }
                   @else { {{ cronometroExibicao }} }

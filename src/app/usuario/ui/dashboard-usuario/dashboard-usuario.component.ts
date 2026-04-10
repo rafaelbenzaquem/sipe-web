@@ -47,7 +47,8 @@ export class DashboardUsuarioComponent implements OnInit {
     private pontoService: PontoService,
     private registroService: RegistroService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.usuario = this.authService.getUsuario();
@@ -81,7 +82,7 @@ export class DashboardUsuarioComponent implements OnInit {
         }
         this.carregando = false;
 
-        if (!this.estaAusente && !this.falhaCarraca) {
+        if (!this.estaAusente && !this.falhaCatraca) {
           this.iniciarCronometro();
         }
 
@@ -94,6 +95,15 @@ export class DashboardUsuarioComponent implements OnInit {
     });
   }
 
+  timeString(seconds: number): string {
+    return (new Date(seconds * 1000)).toLocaleTimeString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  }
+
+
   // ── Estado de presença ──────────────────────────────────────────────────────
 
   get estaAusente(): boolean {
@@ -104,7 +114,7 @@ export class DashboardUsuarioComponent implements OnInit {
    * Primeiro registro do dia é uma Saída — a catraca registrou saída sem entrada
    * antecedente (falha de equipamento ou entrada manual necessária).
    */
-  get falhaCarraca(): boolean {
+  get falhaCatraca(): boolean {
     const sorted = this.registrosOrdenados;
     return sorted.length > 0 && sorted[0].sentido === 'Saída';
   }
@@ -141,17 +151,50 @@ export class DashboardUsuarioComponent implements OnInit {
     return saidas.length > 0 ? saidas[saidas.length - 1].hora : '---';
   }
 
-  get horasTrabalhadas(): string {
-    return this.ponto ? this.formatarSegundos(this.ponto.total_segundos) : '00:00:00';
+  get ultimaEntrada(): string {
+    const entradas = this.registrosOrdenados.filter(r => r.sentido === 'Entrada');
+    return entradas.length > 0 ? entradas[entradas.length - 1].hora : '---';
+  }
+
+  get horasTrabalhadasString(): string {
+    return this.formatarSegundos(this.horasTrabalhadasSegundos);
+  }
+
+  get ultimaEntradaSegundos(): number {
+    const ultimaEntradaStr = this.ultimaEntrada;
+    const ultimaEntradaMs = this.horaParaMs(ultimaEntradaStr);
+    return ultimaEntradaMs ? Math.floor(ultimaEntradaMs / 1000) : 0;
+  }
+
+  get primeiraEntradaSegundos(): number {
+    const primeiraEntradaStr = this.primeiraEntrada;
+    const primeiraEntradaMs = this.horaParaMs(primeiraEntradaStr);
+    return primeiraEntradaMs ? Math.floor(primeiraEntradaMs / 1000) : 0;
+  }
+
+  get horasTrabalhadasSegundos(): number {
+    const primeiraEntradaSec = this.primeiraEntradaSegundos;
+    const ultimaEntradaSec = this.ultimaEntradaSegundos;
+    const horarioAtual = this.horarioAtualEmSegundos;
+
+    return this.ponto ?
+      this.ponto.total_segundos ? ((horarioAtual - ultimaEntradaSec) + this.ponto.total_segundos) : horarioAtual - primeiraEntradaSec : 0;
+  }
+
+  get horarioAtualEmSegundos(): number {
+    return Math.floor(Date.now() / 1000);
   }
 
   get cronometroExibicao(): string {
-    return this.formatarSegundos(this.segundosRestantes);
+    const horasTrabalhadasSegundos = this.horasTrabalhadasSegundos;
+    const horasDiariasSegundos = this.usuario?.hora_diaria ? this.usuario?.hora_diaria * 60 * 60 : 8 * 60 * 60;
+
+    return this.formatarSegundos(horasDiariasSegundos-horasTrabalhadasSegundos);
   }
 
   get progresso(): number {
     if (!this.usuario?.hora_diaria || !this.ponto) return 0;
-    return Math.min(100, Math.round((this.ponto.total_segundos / (this.usuario.hora_diaria * 3600)) * 100));
+    return Math.min(100, Math.round((this.horasTrabalhadasSegundos / (this.usuario.hora_diaria * 3600)) * 100));
   }
 
   get corProgresso(): 'primary' | 'accent' | 'warn' {
@@ -168,6 +211,13 @@ export class DashboardUsuarioComponent implements OnInit {
     const h = Math.floor(segundos / 3600);
     const m = Math.floor((segundos % 3600) / 60);
     const s = segundos % 60;
+    return `${('0' + h).slice(-2)}:${('0' + m).slice(-2)}:${('0' + s).slice(-2)}`;
+  }
+
+  formatarHoras(horas: number): string {
+    const h = horas % 24;
+    const m = 0;
+    const s = 0;
     return `${('0' + h).slice(-2)}:${('0' + m).slice(-2)}:${('0' + s).slice(-2)}`;
   }
 
@@ -213,7 +263,10 @@ export class DashboardUsuarioComponent implements OnInit {
     while (i < regs.length) {
       if (regs[i].sentido === 'Entrada') {
         const entradaMs = this.horaParaMs(regs[i].hora);
-        if (entradaMs === null) { i++; continue; }
+        if (entradaMs === null) {
+          i++;
+          continue;
+        }
 
         if (i + 1 < regs.length && regs[i + 1].sentido === 'Saída') {
           // Par Entrada→Saída: período trabalhado delimitado
@@ -252,7 +305,7 @@ export class DashboardUsuarioComponent implements OnInit {
   }
 
   /** Suporta formatos "HH:MM" e "HHMM". */
-  private parseHora(hora: string): {h: number; m: number} | null {
+  private parseHora(hora: string): { h: number; m: number } | null {
     if (!hora || hora === '---') return null;
     if (hora.includes(':')) {
       const [h, m] = hora.split(':').map(Number);

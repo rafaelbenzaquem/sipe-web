@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, DestroyRef, inject, OnInit} from '@angular/core';
 import {AsyncPipe} from '@angular/common';
 import {MatTableModule} from '@angular/material/table';
 import {MatCardModule} from '@angular/material/card';
@@ -11,7 +11,7 @@ import {MatInputModule} from '@angular/material/input';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {FlexLayoutModule} from '@angular/flex-layout';
-import {Observable, forkJoin, of} from 'rxjs';
+import {forkJoin, interval, Observable, of} from 'rxjs';
 import {catchError, map, startWith, switchMap} from 'rxjs/operators';
 import {AuthService} from '../../../auth/auth.service';
 import {UsuarioService} from '../../usuario.service';
@@ -21,6 +21,7 @@ import {Ponto} from '../../../ponto/ponto.model';
 import {Registro} from '../../../registro/registro.model';
 import {Lotacao, LOTACOES} from '../../../shared/lotacao.data';
 import {RegistroService} from '../../../registro/registro.service';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 export type StatusJornada = 'em_expediente' | 'em_intervalo' | 'falha_catraca';
 
@@ -46,6 +47,7 @@ export interface LinhaTabela {
     MatAutocompleteModule,
     ReactiveFormsModule,
     FlexLayoutModule
+
   ],
   templateUrl: './dashboard-tabela.component.html',
   styleUrl: './dashboard-tabela.component.scss'
@@ -59,6 +61,7 @@ export class DashboardTabelaComponent implements OnInit {
   /* Filtro de lotação (apenas Admin/RH) */
   readonly lotacaoCtrl = new FormControl('');
   readonly lotacoes: Lotacao[] = LOTACOES;
+  private readonly destroyRef = inject(DestroyRef);
   lotacoesFiltradas: Observable<Lotacao[]>;
   lotacaoSelecionada?: Lotacao;
   carregandoFiltro = false;
@@ -67,16 +70,19 @@ export class DashboardTabelaComponent implements OnInit {
     private authService: AuthService,
     private usuarioService: UsuarioService,
     private registroService: RegistroService,
-    private pontoService: PontoService
+    private pontoService: PontoService,
+    private cdr: ChangeDetectorRef
   ) {
     this.lotacoesFiltradas = this.lotacaoCtrl.valueChanges.pipe(
       startWith(''),
       map(v => v ? this.filtrarLotacoes(v) : this.lotacoes.slice())
     );
+    this.cdr.markForCheck();
   }
 
   ngOnInit(): void {
     this.carregarDados();
+    this.iniciarCronometro();
   }
 
   get titulo(): string {
@@ -104,19 +110,34 @@ export class DashboardTabelaComponent implements OnInit {
     this.carregarDados(this.lotacaoSelecionada?.id);
   }
 
-  horasTrabalhadas(linha: LinhaTabela): string {
-    return linha.ponto ? this.formatarSegundos(linha.ponto.total_segundos) : '---';
+  horasTrabalhadasString(linha: LinhaTabela): string {
+    return this.formatarSegundos(this.horasTrabalhadasSegundos(linha));
+  }
+
+
+  horasTrabalhadasSegundos(linha: LinhaTabela): number {
+    const inicioStr = this.primeiraEntradaLinha(linha);
+    const inicioMs = this.horaParaMs(inicioStr);
+    const inicio = inicioMs ? Math.floor(inicioMs / 1000) : 0;
+    const horarioAtual: number = this.horarioAtualEmSegundos;
+    return linha.ponto ?
+      linha.ponto.total_segundos ? ((horarioAtual - inicio) - linha.ponto.total_segundos) : horarioAtual - inicio : 0;
+
+  }
+
+  get horarioAtualEmSegundos(): number {
+    return Math.floor(Date.now() / 1000);
   }
 
   horasRestantes(linha: LinhaTabela): string {
-    if (!linha.usuario.hora_diaria || !linha.ponto) return '---';
-    const restantes = (linha.usuario.hora_diaria * 3600) - linha.ponto.total_segundos;
-    return restantes > 0 ? this.formatarSegundos(restantes) : '00:00:00';
+    if (!linha.usuario.hora_diaria || !linha.ponto) return '00:00:00';
+    const restantes = Math.abs((linha.usuario.hora_diaria * 3600) - this.horasTrabalhadasSegundos(linha));
+    return restantes >= 0 ? this.formatarSegundos(restantes) : '00:00:00';
   }
 
   progresso(linha: LinhaTabela): number {
     if (!linha.usuario.hora_diaria || !linha.ponto) return 0;
-    return Math.min(100, Math.round((linha.ponto.total_segundos / (linha.usuario.hora_diaria * 3600)) * 100));
+    return Math.min(100, Math.round((this.horasTrabalhadasSegundos(linha) / (linha.usuario.hora_diaria * 3600)) * 100));
   }
 
   corProgresso(linha: LinhaTabela): 'primary' | 'accent' | 'warn' {
@@ -187,11 +208,11 @@ export class DashboardTabelaComponent implements OnInit {
               usuarios.map((u, i) =>
                 pontos[i] !== null
                   ? this.registroService.listaTodos(u.matricula!, hoje).pipe(
-                      map(r => (r._embedded?.registros ?? [])
-                        .map(rr => Registro.toModel(rr))
-                        .filter(rr => rr.ativo)),
-                      catchError(() => of([] as Registro[]))
-                    )
+                    map(r => (r._embedded?.registros ?? [])
+                      .map(rr => Registro.toModel(rr))
+                      .filter(rr => rr.ativo)),
+                    catchError(() => of([] as Registro[]))
+                  )
                   : of([] as Registro[])
               )
             ).pipe(map(registrosLista => ({pontos, registrosLista})))
@@ -214,6 +235,41 @@ export class DashboardTabelaComponent implements OnInit {
         this.carregando = false;
       }
     });
+  }
+
+
+  private iniciarCronometro(): void {
+    interval(1000).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => {
+      this.cdr.markForCheck();
+    });
+  }
+
+
+  /** Converte "HH:MM" ou "HHMM" para timestamp (ms) do dia de hoje. */
+  private horaParaMs(hora: string): number | null {
+    const parsed = this.parseHora(hora);
+    if (!parsed) return null;
+    const d = new Date();
+    d.setHours(parsed.h, parsed.m, 0, 0);
+    return d.getTime();
+  }
+
+
+  /** Suporta formatos "HH:MM" e "HHMM". */
+  private parseHora(hora: string): { h: number; m: number } | null {
+    if (!hora || hora === '---') return null;
+    if (hora.includes(':')) {
+      const [h, m] = hora.split(':').map(Number);
+      return isNaN(h) || isNaN(m) ? null : {h, m};
+    }
+    if (hora.length >= 4) {
+      const h = parseInt(hora.substring(0, 2), 10);
+      const m = parseInt(hora.substring(2, 4), 10);
+      return isNaN(h) || isNaN(m) ? null : {h, m};
+    }
+    return null;
   }
 
   private filtrarLotacoes(value: string): Lotacao[] {

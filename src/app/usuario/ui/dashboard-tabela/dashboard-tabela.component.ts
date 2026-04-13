@@ -114,15 +114,33 @@ export class DashboardTabelaComponent implements OnInit {
     return this.formatarSegundos(this.horasTrabalhadasSegundos(linha));
   }
 
+  primeiraEntradaSegundos(linha: LinhaTabela): number {
+    const primeiraEntradaStr = this.primeiraEntradaLinha(linha);
+    const primeiraEntradaMs = this.horaParaMs(primeiraEntradaStr);
+    return primeiraEntradaMs ? Math.floor(primeiraEntradaMs / 1000) : 0;
+  }
+
+  ultimaEntradaSegundos(linha: LinhaTabela): number {
+    const ultimaEntradaStr = this.ultimaEntradaLinha(linha);
+    const ultimaEntradaMs = this.horaParaMs(ultimaEntradaStr);
+    return ultimaEntradaMs ? Math.floor(ultimaEntradaMs / 1000) : 0;
+  }
+
+
+  ultimaSaidaSegundos(linha: LinhaTabela): number {
+    const ultimaSaidaStr = this.ultimaSaidaLinha(linha);
+    const ultimaSaidaMs = this.horaParaMs(ultimaSaidaStr);
+    return ultimaSaidaMs ? Math.floor(ultimaSaidaMs / 1000) : 0;
+  }
 
   horasTrabalhadasSegundos(linha: LinhaTabela): number {
-    const inicioStr = this.primeiraEntradaLinha(linha);
-    const inicioMs = this.horaParaMs(inicioStr);
-    const inicio = inicioMs ? Math.floor(inicioMs / 1000) : 0;
-    const horarioAtual: number = this.horarioAtualEmSegundos;
+    const primeiraEntradaSec = this.primeiraEntradaSegundos(linha);
+    const ultimaEntradaSec = this.ultimaEntradaSegundos(linha);
+    const ultimaSaidaSec = this.ultimaSaidaSegundos(linha);
+    const horarioAtual = this.horarioAtualEmSegundos;
+    const horarioFinal = ultimaSaidaSec == null ? horarioAtual : ultimaSaidaSec > ultimaEntradaSec ? ultimaSaidaSec : horarioAtual;
     return linha.ponto ?
-      linha.ponto.total_segundos ? ((horarioAtual - inicio) - linha.ponto.total_segundos) : horarioAtual - inicio : 0;
-
+      linha.ponto.total_segundos ? ((horarioFinal - ultimaEntradaSec) + linha.ponto.total_segundos) : horarioAtual - primeiraEntradaSec : 0;
   }
 
   get horarioAtualEmSegundos(): number {
@@ -162,10 +180,25 @@ export class DashboardTabelaComponent implements OnInit {
   }
 
   /** Hora do primeiro registro de Entrada do dia. */
+
+  registrosOrdenados(linha: LinhaTabela) {
+    return [...linha.registros].sort((a, b) => a.hora.localeCompare(b.hora));
+  }
+
   primeiraEntradaLinha(linha: LinhaTabela): string {
-    const sorted = [...linha.registros].sort((a, b) => a.hora.localeCompare(b.hora));
+    const sorted = this.registrosOrdenados(linha);
     const entrada = sorted.find(r => r.sentido === 'Entrada');
     return entrada ? entrada.hora : '---';
+  }
+
+  ultimaSaidaLinha(linha: LinhaTabela): string {
+    const saidas = this.registrosOrdenados(linha).filter(r => r.sentido === 'Saída');
+    return saidas.length > 0 ? saidas[saidas.length - 1].hora : '---';
+  }
+
+  ultimaEntradaLinha(linha: LinhaTabela): string {
+    const saidas = this.registrosOrdenados(linha).filter(r => r.sentido === 'Entrada');
+    return saidas.length > 0 ? saidas[saidas.length - 1].hora : '---';
   }
 
   /**

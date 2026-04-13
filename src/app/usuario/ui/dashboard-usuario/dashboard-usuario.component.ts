@@ -176,7 +176,9 @@ export class DashboardUsuarioComponent implements OnInit {
     const primeiraEntradaSec = this.primeiraEntradaSegundos;
     const ultimaEntradaSec = this.ultimaEntradaSegundos;
     const horarioAtual = this.horarioAtualEmSegundos;
-
+    console.log("Primeira entrada:"+this.formatarSegundos(primeiraEntradaSec));
+    console.log("Ultima entrada:"+this.formatarSegundos(ultimaEntradaSec));
+    console.log("Horário atual:"+this.formatarSegundos(horarioAtual));
     return this.ponto ?
       this.ponto.total_segundos ? ((horarioAtual - ultimaEntradaSec) + this.ponto.total_segundos) : horarioAtual - primeiraEntradaSec : 0;
   }
@@ -187,7 +189,7 @@ export class DashboardUsuarioComponent implements OnInit {
 
   get cronometroExibicao(): string {
     const horasTrabalhadasSegundos = this.horasTrabalhadasSegundos;
-    const horasDiariasSegundos = this.usuario?.hora_diaria ? this.usuario?.hora_diaria * 60 * 60 : 8 * 60 * 60;
+    const horasDiariasSegundos = this.usuario?.hora_diaria ? this.usuario?.hora_diaria * 60 * 60 : 7 * 60 * 60;
 
     return this.formatarSegundos(horasDiariasSegundos-horasTrabalhadasSegundos);
   }
@@ -204,7 +206,7 @@ export class DashboardUsuarioComponent implements OnInit {
   }
 
   get jornadaConcluida(): boolean {
-    return this.segundosRestantes === 0 && !this.estaAusente && !this.carregando;
+    return this.segundosRestantes <= 0 && !this.estaAusente && !this.carregando;
   }
 
   formatarSegundos(segundos: number): string {

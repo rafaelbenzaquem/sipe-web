@@ -23,7 +23,7 @@ import {Lotacao, LOTACOES} from '../../../shared/lotacao.data';
 import {RegistroService} from '../../../registro/registro.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
-export type StatusJornada = 'em_expediente' | 'em_intervalo' | 'falha_catraca';
+export type StatusJornada = 'em_expediente' | 'em_intervalo' | 'falha_catraca' | 'jornada_concluida';
 
 export interface LinhaTabela {
   usuario: Usuario;
@@ -56,7 +56,7 @@ export class DashboardTabelaComponent implements OnInit {
 
   linhas: LinhaTabela[] = [];
   carregando = true;
-  readonly colunas = ['nome', 'matricula', 'entradaInicial', 'horasTrabalhadas', 'horasRestantes', 'progresso', 'status'];
+  readonly colunas = ['nome', 'matricula', 'entradaInicial', 'saidaFinal', 'horasTrabalhadas', 'horasRestantes', 'progresso', 'status'];
 
   /* Filtro de lotação (apenas Admin/RH) */
   readonly lotacaoCtrl = new FormControl('');
@@ -116,36 +116,64 @@ export class DashboardTabelaComponent implements OnInit {
 
   primeiraEntradaSegundos(linha: LinhaTabela): number {
     const primeiraEntradaStr = this.primeiraEntradaLinha(linha);
-    const primeiraEntradaMs = this.horaParaMs(primeiraEntradaStr);
-    return primeiraEntradaMs ? Math.floor(primeiraEntradaMs / 1000) : 0;
+    return this.timeToSeconds(primeiraEntradaStr);
+  }
+
+  primeiraSaidaSegundos(linha: LinhaTabela): number {
+    const primeiraSaidaStr = this.primeiraSaidaLinha(linha);
+    return this.timeToSeconds(primeiraSaidaStr);
   }
 
   ultimaEntradaSegundos(linha: LinhaTabela): number {
     const ultimaEntradaStr = this.ultimaEntradaLinha(linha);
-    const ultimaEntradaMs = this.horaParaMs(ultimaEntradaStr);
-    return ultimaEntradaMs ? Math.floor(ultimaEntradaMs / 1000) : 0;
+    return this.timeToSeconds(ultimaEntradaStr);
   }
 
 
   ultimaSaidaSegundos(linha: LinhaTabela): number {
     const ultimaSaidaStr = this.ultimaSaidaLinha(linha);
-    const ultimaSaidaMs = this.horaParaMs(ultimaSaidaStr);
-    return ultimaSaidaMs ? Math.floor(ultimaSaidaMs / 1000) : 0;
+    return this.timeToSeconds(ultimaSaidaStr);
   }
 
   horasTrabalhadasSegundos(linha: LinhaTabela): number {
     const primeiraEntradaSec = this.primeiraEntradaSegundos(linha);
+    const primeiraSaidaSec = this.primeiraSaidaLinha(linha);
     const ultimaEntradaSec = this.ultimaEntradaSegundos(linha);
     const ultimaSaidaSec = this.ultimaSaidaSegundos(linha);
     const horarioAtual = this.horarioAtualEmSegundos;
-    const horarioFinal = ultimaSaidaSec == null ? horarioAtual : ultimaSaidaSec > ultimaEntradaSec ? ultimaSaidaSec : horarioAtual;
-    return linha.ponto ?
-      linha.ponto.total_segundos ? ((horarioFinal - ultimaEntradaSec) + linha.ponto.total_segundos) : horarioAtual - primeiraEntradaSec : 0;
+    const horarioFinal = ultimaSaidaSec === 0 ? horarioAtual : ultimaSaidaSec > ultimaEntradaSec ? ultimaSaidaSec : horarioAtual;
+    const dif = (horarioFinal - ultimaEntradaSec) - (linha.ponto ? linha.ponto.total_segundos : 0);
+    const horasTrabalhadasSegundos = linha.ponto ? (
+      linha.ponto.total_segundos ? (Math.abs(dif) < 5 ? linha.ponto.total_segundos :
+          (
+            (horarioFinal - ultimaEntradaSec) + linha.ponto.total_segundos
+          )
+      ) : horarioAtual - primeiraEntradaSec) : 0;
+
+    if (linha && linha.usuario && linha.usuario.nome == 'JOÃO CARLOS COELHO FILHO') {
+      console.log(linha.usuario.nome);
+      console.log(this.formatarSegundos(horarioAtual) + " horarioAtual:" + horarioAtual);
+      console.log(this.formatarSegundos(primeiraEntradaSec) + " primeiraEntradaSegundos:" + primeiraEntradaSec);
+      console.log(this.formatarSegundos(ultimaEntradaSec) + " ultimaEntradaSegundos:" + ultimaEntradaSec);
+      console.log(this.formatarSegundos(ultimaSaidaSec) + " ultimaSaidaSegundos:" + ultimaSaidaSec);
+      console.log(this.formatarSegundos(horarioFinal) + " horarioFinalSegundos:" + horarioFinal);
+      console.log(this.formatarSegundos(horasTrabalhadasSegundos) + " horasTrabalhadasSegundos:" + horasTrabalhadasSegundos);
+
+
+    }
+    return horasTrabalhadasSegundos;
   }
 
   get horarioAtualEmSegundos(): number {
-    return Math.floor(Date.now() / 1000);
+    const horaAtual = new Date();
+    return horaAtual.getHours() * 60 * 60 + horaAtual.getMinutes() * 60 + horaAtual.getSeconds();
   }
+
+  horaExtra(linha: LinhaTabela): boolean {
+    const jornada = linha.usuario ? linha.usuario.hora_diaria ? linha.usuario.hora_diaria : 7 : 0;
+    return this.horasTrabalhadasSegundos(linha) > jornada * 60 * 60;
+  }
+
 
   horasRestantes(linha: LinhaTabela): string {
     if (!linha.usuario.hora_diaria || !linha.ponto) return '00:00:00';
@@ -173,9 +201,29 @@ export class DashboardTabelaComponent implements OnInit {
    */
   statusJornada(linha: LinhaTabela): StatusJornada {
     const regs = [...linha.registros].sort((a, b) => a.hora.localeCompare(b.hora));
-    if (regs.length === 0) return 'em_expediente';
-    if (regs[0].sentido === 'Saída') return 'falha_catraca';
-    if (regs[regs.length - 1].sentido === 'Saída') return 'em_intervalo';
+    if (regs.length === 0) {
+      return 'em_expediente';
+    }
+    if (regs[0].sentido === 'Saída') {
+      return 'falha_catraca';
+    }
+    if (regs[regs.length - 1].sentido === 'Saída') {
+      const tempoTrabalhado = this.horasTrabalhadasSegundos(linha);
+      const jornada = linha.usuario.hora_diaria ? linha.usuario.hora_diaria : 7;
+      const percentualTrabalhado = (tempoTrabalhado * 100) / (jornada * 60 * 60);
+
+      if (linha && linha.usuario && linha.usuario.nome == 'ANA LUCIA DE OLIVEIRA') {
+        console.log(linha.usuario.nome);
+        console.log("Tempo trabalhado: " + tempoTrabalhado);
+        console.log("Jornada: " + (jornada * 60 * 60));
+        console.log("Percenteual trabalhado:" + percentualTrabalhado);
+      }
+      if (percentualTrabalhado >= 96) {
+        return 'jornada_concluida';
+      }
+
+      return 'em_intervalo';
+    }
     return 'em_expediente';
   }
 
@@ -191,6 +239,12 @@ export class DashboardTabelaComponent implements OnInit {
     return entrada ? entrada.hora : '---';
   }
 
+  primeiraSaidaLinha(linha: LinhaTabela): string {
+    const sorted = this.registrosOrdenados(linha);
+    const entrada = sorted.find(r => r.sentido === 'Saída');
+    return entrada ? entrada.hora : '---';
+  }
+
   ultimaSaidaLinha(linha: LinhaTabela): string {
     const saidas = this.registrosOrdenados(linha).filter(r => r.sentido === 'Saída');
     return saidas.length > 0 ? saidas[saidas.length - 1].hora : '---';
@@ -200,6 +254,23 @@ export class DashboardTabelaComponent implements OnInit {
     const saidas = this.registrosOrdenados(linha).filter(r => r.sentido === 'Entrada');
     return saidas.length > 0 ? saidas[saidas.length - 1].hora : '---';
   }
+
+  timeToSeconds(time: string): number {
+    if (time.length != 8) {
+      return 0;
+    }
+    const parts = time.split(':');
+    if (parts.length !== 3) throw new Error('Formato inválido. Use HH:mm:ss');
+
+    const [hours, minutes, seconds] = parts.map(Number);
+
+    if ([hours, minutes, seconds].some(isNaN)) {
+      throw new Error('Todos os valores devem ser numéricos');
+    }
+
+    return hours * 3600 + minutes * 60 + seconds;
+  }
+
 
   /**
    * Carrega usuários e seus pontos + registros de hoje em paralelo.

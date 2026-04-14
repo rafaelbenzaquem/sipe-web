@@ -45,8 +45,12 @@
   font-weight: 500;
 }
 
-.restantes-cell {
+.restantes-dec-cell {
   color: #f44336;
+}
+
+.restantes-cre-cell {
+  color: #0f8ee3;
 }
 
 .progresso-cell {
@@ -94,6 +98,10 @@
 
 .status-presente {
   color: #4caf50;
+}
+
+.status-concluido {
+  color: #0f8ee3;
 }
 
 .status-ausente {

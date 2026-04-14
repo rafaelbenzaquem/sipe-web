@@ -89,6 +89,13 @@
                   {{ primeiraEntradaLinha(linha) }}
                 </td>
               </ng-container>
+              <!-- Utilma saída -->
+              <ng-container matColumnDef="saidaFinal">
+                <th mat-header-cell *matHeaderCellDef>Última Saída</th>
+                <td mat-cell *matCellDef="let linha" class="hora-cell entrada-cell">
+                  {{ ultimaSaidaLinha(linha) }}
+                </td>
+              </ng-container>
 
               <!-- Horas Trabalhadas -->
               <ng-container matColumnDef="horasTrabalhadas">
@@ -99,10 +106,11 @@
               </ng-container>
 
               <!-- Horas Restantes -->
+
               <ng-container matColumnDef="horasRestantes">
                 <th mat-header-cell *matHeaderCellDef>Restantes</th>
-                <td mat-cell *matCellDef="let linha" class="hora-cell restantes-cell">
-                  {{ horasRestantes(linha) }}
+                <td mat-cell *matCellDef="let linha" class="hora-cell {{horaExtra(linha)?'restantes-cre-cell':'restantes-dec-cell'}}">
+                  {{ horasRestantes(linha)}}
                 </td>
               </ng-container>
 
@@ -135,15 +143,20 @@
                         Presente
                       </span>
                     }
-
                     @case ('em_intervalo') {
                       <span class="status-badge status-intervalo"
                             matTooltip="Saiu — pode estar em intervalo">
                         <mat-icon class="status-icon">pause_circle</mat-icon>
-                        Em intervalo
+                        Pausa
                       </span>
                     }
-
+                    @case ('jornada_concluida') {
+                      <span class="status-badge status-concluido"
+                            matTooltip="Saiu — jornada de trabalho concluída.">
+                        <mat-icon class="status-icon">done_all</mat-icon>
+                        Concluída
+                      </span>
+                    }
                     @case ('falha_catraca') {
                       <span class="status-badge status-falha"
                             matTooltip="Saída registrada sem entrada antecedente">

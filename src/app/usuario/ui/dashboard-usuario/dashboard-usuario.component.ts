@@ -14,6 +14,7 @@ import {RegistroService} from '../../../registro/registro.service';
 import {Usuario} from '../../usuario.model';
 import {Ponto} from '../../../ponto/ponto.model';
 import {Registro} from '../../../registro/registro.model';
+import {LinhaTabela} from '../dashboard-tabela/dashboard-tabela.component';
 
 @Component({
   standalone: true,
@@ -162,36 +163,59 @@ export class DashboardUsuarioComponent implements OnInit {
 
   get ultimaEntradaSegundos(): number {
     const ultimaEntradaStr = this.ultimaEntrada;
-    const ultimaEntradaMs = this.horaParaMs(ultimaEntradaStr);
-    return ultimaEntradaMs ? Math.floor(ultimaEntradaMs / 1000) : 0;
+    return this.timeToSeconds(ultimaEntradaStr);
   }
 
   get primeiraEntradaSegundos(): number {
     const primeiraEntradaStr = this.primeiraEntrada;
-    const primeiraEntradaMs = this.horaParaMs(primeiraEntradaStr);
-    return primeiraEntradaMs ? Math.floor(primeiraEntradaMs / 1000) : 0;
+    return this.timeToSeconds(primeiraEntradaStr);
+  }
+
+  get ultimaSaidaSegundos(): number {
+    const ultimaSaidaStr = this.ultimaSaida;
+    return this.timeToSeconds(ultimaSaidaStr);
   }
 
   get horasTrabalhadasSegundos(): number {
     const primeiraEntradaSec = this.primeiraEntradaSegundos;
     const ultimaEntradaSec = this.ultimaEntradaSegundos;
+    const ultimaSaidaSec = this.ultimaSaidaSegundos;
     const horarioAtual = this.horarioAtualEmSegundos;
-    console.log("Primeira entrada:"+this.formatarSegundos(primeiraEntradaSec));
-    console.log("Ultima entrada:"+this.formatarSegundos(ultimaEntradaSec));
-    console.log("Horário atual:"+this.formatarSegundos(horarioAtual));
-    return this.ponto ?
-      this.ponto.total_segundos ? ((horarioAtual - ultimaEntradaSec) + this.ponto.total_segundos) : horarioAtual - primeiraEntradaSec : 0;
+    const horarioFinal = ultimaSaidaSec === 0 ? horarioAtual : (ultimaSaidaSec > ultimaEntradaSec ? ultimaSaidaSec : horarioAtual);
+
+    return this.ponto ? (
+      ultimaSaidaSec > ultimaEntradaSec ? this.ponto.total_segundos :
+        (
+          (horarioFinal - ultimaEntradaSec) + this.ponto.total_segundos
+        )
+    ) : 0;
+  }
+
+  timeToSeconds(time: string): number {
+    if (time.length != 8) {
+      return 0;
+    }
+    const parts = time.split(':');
+    if (parts.length !== 3) throw new Error('Formato inválido. Use HH:mm:ss');
+
+    const [hours, minutes, seconds] = parts.map(Number);
+
+    if ([hours, minutes, seconds].some(isNaN)) {
+      throw new Error('Todos os valores devem ser numéricos');
+    }
+
+    return hours * 3600 + minutes * 60 + seconds;
   }
 
   get horarioAtualEmSegundos(): number {
-    return Math.floor(Date.now() / 1000);
+    const horaAtual = new Date();
+    return horaAtual.getHours() * 60 * 60 + horaAtual.getMinutes() * 60 + horaAtual.getSeconds();
   }
 
   get cronometroExibicao(): string {
     const horasTrabalhadasSegundos = this.horasTrabalhadasSegundos;
     const horasDiariasSegundos = this.usuario?.hora_diaria ? this.usuario?.hora_diaria * 60 * 60 : 7 * 60 * 60;
-
-    return this.formatarSegundos(horasDiariasSegundos-horasTrabalhadasSegundos);
+    return this.formatarSegundos(Math.abs(horasDiariasSegundos - horasTrabalhadasSegundos));
   }
 
   get progresso(): number {
@@ -206,7 +230,8 @@ export class DashboardUsuarioComponent implements OnInit {
   }
 
   get jornadaConcluida(): boolean {
-    return this.segundosRestantes <= 0 && !this.estaAusente && !this.carregando;
+    const jornada = this.usuario?.hora_diaria ? this.usuario.hora_diaria * 60 * 60 : 7 * 60 * 60;
+    return this.horasTrabalhadasSegundos > jornada && !this.estaAusente && !this.carregando;
   }
 
   formatarSegundos(segundos: number): string {

@@ -141,26 +141,26 @@ export class DashboardTabelaComponent implements OnInit {
     const ultimaEntradaSec = this.ultimaEntradaSegundos(linha);
     const ultimaSaidaSec = this.ultimaSaidaSegundos(linha);
     const horarioAtual = this.horarioAtualEmSegundos;
-    const horarioFinal = ultimaSaidaSec === 0 ? horarioAtual : ultimaSaidaSec > ultimaEntradaSec ? ultimaSaidaSec : horarioAtual;
-    const dif = (horarioFinal - ultimaEntradaSec) - (linha.ponto ? linha.ponto.total_segundos : 0);
+    const horarioFinal = ultimaSaidaSec === 0 ? horarioAtual : (ultimaSaidaSec > ultimaEntradaSec ? ultimaSaidaSec : horarioAtual);
+
     const horasTrabalhadasSegundos = linha.ponto ? (
-      linha.ponto.total_segundos ? (Math.abs(dif) < 5 ? linha.ponto.total_segundos :
+      ultimaSaidaSec > ultimaEntradaSec ? linha.ponto.total_segundos :
           (
             (horarioFinal - ultimaEntradaSec) + linha.ponto.total_segundos
           )
-      ) : horarioAtual - primeiraEntradaSec) : 0;
+    ):0;
 
-    if (linha && linha.usuario && linha.usuario.nome == 'JOÃO CARLOS COELHO FILHO') {
-      console.log(linha.usuario.nome);
-      console.log(this.formatarSegundos(horarioAtual) + " horarioAtual:" + horarioAtual);
-      console.log(this.formatarSegundos(primeiraEntradaSec) + " primeiraEntradaSegundos:" + primeiraEntradaSec);
-      console.log(this.formatarSegundos(ultimaEntradaSec) + " ultimaEntradaSegundos:" + ultimaEntradaSec);
-      console.log(this.formatarSegundos(ultimaSaidaSec) + " ultimaSaidaSegundos:" + ultimaSaidaSec);
-      console.log(this.formatarSegundos(horarioFinal) + " horarioFinalSegundos:" + horarioFinal);
-      console.log(this.formatarSegundos(horasTrabalhadasSegundos) + " horasTrabalhadasSegundos:" + horasTrabalhadasSegundos);
-
-
-    }
+    // if (linha && linha.usuario && linha.usuario.nome == 'JOÃO CARLOS COELHO FILHO') {
+    //   console.log(linha.usuario.nome);
+    //   console.log(this.formatarSegundos(horarioAtual) + " horarioAtual:" + horarioAtual);
+    //   console.log(this.formatarSegundos(primeiraEntradaSec) + " primeiraEntradaSegundos:" + primeiraEntradaSec);
+    //   console.log(this.formatarSegundos(ultimaEntradaSec) + " ultimaEntradaSegundos:" + ultimaEntradaSec);
+    //   console.log(this.formatarSegundos(ultimaSaidaSec) + " ultimaSaidaSegundos:" + ultimaSaidaSec);
+    //   console.log(this.formatarSegundos(horarioFinal) + " horarioFinalSegundos:" + horarioFinal);
+    //   console.log(this.formatarSegundos(horasTrabalhadasSegundos) + " horasTrabalhadasSegundos:" + horasTrabalhadasSegundos);
+    //
+    //
+    // }
     return horasTrabalhadasSegundos;
   }
 
@@ -212,12 +212,12 @@ export class DashboardTabelaComponent implements OnInit {
       const jornada = linha.usuario.hora_diaria ? linha.usuario.hora_diaria : 7;
       const percentualTrabalhado = (tempoTrabalhado * 100) / (jornada * 60 * 60);
 
-      if (linha && linha.usuario && linha.usuario.nome == 'ANA LUCIA DE OLIVEIRA') {
-        console.log(linha.usuario.nome);
-        console.log("Tempo trabalhado: " + tempoTrabalhado);
-        console.log("Jornada: " + (jornada * 60 * 60));
-        console.log("Percenteual trabalhado:" + percentualTrabalhado);
-      }
+      // if (linha && linha.usuario && linha.usuario.nome == 'ANA LUCIA DE OLIVEIRA') {
+      //   console.log(linha.usuario.nome);
+      //   console.log("Tempo trabalhado: " + tempoTrabalhado);
+      //   console.log("Jornada: " + (jornada * 60 * 60));
+      //   console.log("Percenteual trabalhado:" + percentualTrabalhado);
+      // }
       if (percentualTrabalhado >= 96) {
         return 'jornada_concluida';
       }

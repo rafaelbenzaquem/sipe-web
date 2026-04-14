@@ -118,8 +118,7 @@
                       [class.restantes]="!jornadaConcluida && !emIntervalo"
                       [class.pausado]="emIntervalo && !falhaCatraca"
                       [class.concluida-valor]="jornadaConcluida">
-                  @if (jornadaConcluida) { 00:00:00 }
-                  @else { {{ cronometroExibicao }} }
+                   {{ cronometroExibicao }}
                 </span>
               </div>
               <mat-progress-bar

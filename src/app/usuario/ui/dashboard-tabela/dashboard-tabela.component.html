@@ -1,0 +1,184 @@
+<div fxLayout="row" fxLayoutAlign="center">
+  <div fxLayout="column" fxFlex="95%">
+
+    <!-- Filtro Setorial (apenas Admin e RH) -->
+    @if (isAdminOuRH) {
+      <mat-card appearance="outlined" class="filtro-card">
+        <mat-card-header>
+          <mat-card-title>Filtro Setorial</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="mt-20">
+          <div fxLayout="row">
+            <div fxLayout="column" fxFlex="100%">
+              <mat-form-field class="full-width">
+                <mat-label>Setor</mat-label>
+                <input matInput
+                       aria-label="Lotação"
+                       [matAutocomplete]="auto"
+                       [formControl]="lotacaoCtrl">
+                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onLotacaoSelect()">
+                  @for (lotacao of lotacoesFiltradas | async; track lotacao.id) {
+                    <mat-option [value]="lotacao.sigla">
+                      <span>{{ lotacao.sigla }}</span> |
+                      <small>{{ lotacao.descricao }}</small>
+                    </mat-option>
+                  }
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          @if (carregando) {
+            <div fxLayout="row">
+              <div fxLayout="column" fxFlex="100%">
+                <mat-progress-bar mode="indeterminate" color="primary"></mat-progress-bar>
+              </div>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    }
+
+    <!-- Tabela de Ponto -->
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="card-icon">groups</mat-icon>
+        <mat-card-title>{{ titulo }}</mat-card-title>
+        <mat-card-subtitle>
+          {{ linhasPresentes.length }} presente(s)
+          @if (totalAusentes > 0) {
+            · {{ totalAusentes }} ausente(s)
+          }
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+
+        @if (carregando) {
+          <div class="loading-container">
+            <mat-spinner diameter="40"></mat-spinner>
+          </div>
+        }
+
+        @if (!carregando && linhasPresentes.length === 0) {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">people_outline</mat-icon>
+            <p>Nenhum usuário com registros hoje.</p>
+          </div>
+        }
+
+        @if (!carregando && linhasPresentes.length > 0) {
+          <div class="table-container">
+            <table mat-table [dataSource]="linhasPresentes" class="ponto-table">
+
+              <!-- Nome -->
+              <ng-container matColumnDef="nome">
+                <th mat-header-cell *matHeaderCellDef>Nome</th>
+                <td mat-cell *matCellDef="let linha">{{ linha.usuario.nome }}</td>
+              </ng-container>
+
+              <!-- Matrícula -->
+              <ng-container matColumnDef="matricula">
+                <th mat-header-cell *matHeaderCellDef>Matrícula</th>
+                <td mat-cell *matCellDef="let linha">{{ linha.usuario.matricula }}</td>
+              </ng-container>
+
+              <!-- Primeira Entrada -->
+              <ng-container matColumnDef="entradaInicial">
+                <th mat-header-cell *matHeaderCellDef>1ª Entrada</th>
+                <td mat-cell *matCellDef="let linha" class="hora-cell entrada-cell">
+                  {{ primeiraEntradaLinha(linha) }}
+                </td>
+              </ng-container>
+              <!-- Utilma saída -->
+              <ng-container matColumnDef="saidaFinal">
+                <th mat-header-cell *matHeaderCellDef>Última Saída</th>
+                <td mat-cell *matCellDef="let linha" class="hora-cell entrada-cell">
+                  {{ ultimaSaidaLinha(linha) }}
+                </td>
+              </ng-container>
+
+              <!-- Horas Trabalhadas -->
+              <ng-container matColumnDef="horasTrabalhadas">
+                <th mat-header-cell *matHeaderCellDef>Trabalhadas</th>
+                <td mat-cell *matCellDef="let linha" class="hora-cell">
+                  {{ horasTrabalhadasString(linha) }}
+                </td>
+              </ng-container>
+
+              <!-- Horas Restantes -->
+
+              <ng-container matColumnDef="horasRestantes">
+                <th mat-header-cell *matHeaderCellDef>Restantes</th>
+                <td mat-cell *matCellDef="let linha" class="hora-cell {{horaExtra(linha)?'restantes-cre-cell':'restantes-dec-cell'}}">
+                  {{ horasRestantes(linha)}}
+                </td>
+              </ng-container>
+
+              <!-- Progresso -->
+              <ng-container matColumnDef="progresso">
+                <th mat-header-cell *matHeaderCellDef>Progresso</th>
+                <td mat-cell *matCellDef="let linha" class="progresso-cell">
+                  <div class="progresso-container">
+                    <mat-progress-bar
+                      mode="determinate"
+                      [value]="progresso(linha)"
+                      [color]="corProgresso(linha)">
+                    </mat-progress-bar>
+                    <span class="progresso-valor">{{ progresso(linha) }}%</span>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Status -->
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let linha">
+
+                  @switch (statusJornada(linha)) {
+
+                    @case ('em_expediente') {
+                      <span class="status-badge status-presente"
+                            [matTooltip]="linha.ponto?.descricao || 'Presente'">
+                        <mat-icon class="status-icon">check_circle</mat-icon>
+                        Presente
+                      </span>
+                    }
+                    @case ('em_intervalo') {
+                      <span class="status-badge status-intervalo"
+                            matTooltip="Saiu — pode estar em intervalo">
+                        <mat-icon class="status-icon">pause_circle</mat-icon>
+                        Pausa
+                      </span>
+                    }
+                    @case ('jornada_concluida') {
+                      <span class="status-badge status-concluido"
+                            matTooltip="Saiu — jornada de trabalho concluída.">
+                        <mat-icon class="status-icon">done_all</mat-icon>
+                        Concluída
+                      </span>
+                    }
+                    @case ('falha_catraca') {
+                      <span class="status-badge status-falha"
+                            matTooltip="Saída registrada sem entrada antecedente">
+                        <mat-icon class="status-icon">warning</mat-icon>
+                        Sem entrada
+                      </span>
+                    }
+
+                  }
+
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="colunas"></tr>
+              <tr mat-row *matRowDef="let row; columns: colunas;"></tr>
+
+            </table>
+          </div>
+        }
+
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+</div>

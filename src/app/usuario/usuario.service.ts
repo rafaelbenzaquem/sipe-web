@@ -49,4 +49,13 @@ export class UsuarioService {
     return this.http.put<UsuarioResponse>(`${this.API_BASE}/${usuario.id}`, usuario);
   }
 
+  /**
+   * Lista usuários pertencentes à lotação do diretor informado.
+   * Endpoint esperado: GET /v1/sipe/usuarios/lotacao/usuario/{matricula}
+   * (segue o mesmo padrão de RelatorioService.downloadRelatorioLotacaoPorDiretor)
+   */
+  listarPorDiretor(matricula: string): Observable<UsuarioListResponse> {
+    return this.http.get<UsuarioListResponse>(`${this.API_BASE}/lotacao/usuario/${matricula}`);
+  }
+
 }

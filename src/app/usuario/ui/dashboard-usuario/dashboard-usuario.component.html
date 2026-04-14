@@ -1,0 +1,166 @@
+<div class="dashboard-usuario">
+
+  @if (carregando) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Carregando dados do ponto...</p>
+    </div>
+  }
+
+  @if (!carregando) {
+
+    <div class="dashboard-header">
+      <h2>Olá, {{ usuario?.nome }}</h2>
+      <p class="data-hoje">{{ hojeExibicao }}</p>
+    </div>
+
+    <!-- Estado: sem registros hoje -->
+    @if (estaAusente) {
+      <mat-card appearance="outlined" class="ausente-card">
+        <mat-card-content>
+          <div class="ausente-state">
+            <mat-icon class="ausente-icon">person_off</mat-icon>
+            <p class="ausente-titulo">Sem registros hoje</p>
+            <p class="ausente-subtitulo">Nenhum ponto foi registrado para esta data.</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+
+    @if (!estaAusente) {
+
+      <!-- Alerta: falha de catraca (saída sem entrada antecedente) -->
+      @if (falhaCatraca) {
+        <mat-card appearance="outlined" class="alerta-card alerta-catraca">
+          <mat-card-content>
+            <div class="alerta-row">
+              <mat-icon class="alerta-icon">warning</mat-icon>
+              <div>
+                <p class="alerta-titulo">Entrada não registrada</p>
+                <p class="alerta-subtitulo">Foi detectada uma saída sem registro de entrada antecedente. Verifique a catraca ou solicite uma entrada manual.</p>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <!-- Indicador de intervalo -->
+      @if (emIntervalo && !falhaCatraca) {
+        <mat-card appearance="outlined" class="alerta-card alerta-intervalo">
+          <mat-card-content>
+            <div class="alerta-row">
+              <mat-icon class="alerta-icon">free_breakfast</mat-icon>
+              <div>
+                <p class="alerta-titulo">Em intervalo</p>
+                <p class="alerta-subtitulo">Você saiu às {{ ultimaSaida }}. O cronômetro está pausado até o próximo registro de entrada.</p>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <div class="cards-grid">
+
+        <!-- Card Horários -->
+        <mat-card appearance="outlined" class="ponto-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="card-icon">access_time</mat-icon>
+            <mat-card-title>Registro do Dia</mat-card-title>
+            <mat-card-subtitle>{{ ponto?.descricao || 'Em andamento' }}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="horarios-row">
+              <div class="horario-item">
+                <mat-icon class="icon-entrada">login</mat-icon>
+                <span class="horario-label">Primeira Entrada</span>
+                <span class="horario-value">{{ primeiraEntrada }}</span>
+              </div>
+              <mat-divider [vertical]="true" class="divider-vertical"></mat-divider>
+              <div class="horario-item">
+                <mat-icon class="icon-saida">logout</mat-icon>
+                <span class="horario-label">Última Saída</span>
+                <span class="horario-value">{{ ultimaSaida }}</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Card Cronômetro -->
+        <mat-card appearance="outlined" class="ponto-card"
+                  [class.concluida]="jornadaConcluida"
+                  [class.em-intervalo]="emIntervalo && !falhaCatraca">
+          <mat-card-header>
+            <mat-icon mat-card-avatar class="card-icon">
+              @if (jornadaConcluida) { task_alt }
+              @else if (emIntervalo && !falhaCatraca) { pause_circle }
+              @else { timer }
+            </mat-icon>
+            <mat-card-title>
+              @if (jornadaConcluida) { Jornada Concluída }
+              @else if (emIntervalo && !falhaCatraca) { Cronômetro Pausado }
+              @else { Tempo Restante }
+            </mat-card-title>
+            <mat-card-subtitle>Carga diária: {{ usuario?.hora_diaria }}h</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="horas-container">
+              <div class="horas-row">
+                <span class="horas-label">Trabalhadas</span>
+                <span class="horas-value trabalhadas">{{ horasTrabalhadasString }}</span>
+              </div>
+              <div class="horas-row">
+                <span class="horas-label">
+                  @if (jornadaConcluida) { Carga cumprida }
+                  @else if (emIntervalo && !falhaCatraca) { Pausado (em intervalo) }
+                  @else { Restante }
+                </span>
+                <span class="horas-value"
+                      [class.restantes]="!jornadaConcluida && !emIntervalo"
+                      [class.pausado]="emIntervalo && !falhaCatraca"
+                      [class.concluida-valor]="jornadaConcluida">
+                  @if (jornadaConcluida) { 00:00:00 }
+                  @else { {{ cronometroExibicao }} }
+                </span>
+              </div>
+              <mat-progress-bar
+                mode="determinate"
+                [value]="progresso"
+                [color]="corProgresso"
+                class="progress-bar">
+              </mat-progress-bar>
+              <span class="progresso-label">{{ progresso }}% da carga horária cumprida</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+
+      <!-- Lista de Eventos -->
+      <mat-card appearance="outlined" class="eventos-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar class="card-icon">list_alt</mat-icon>
+          <mat-card-title>Eventos do Dia</mat-card-title>
+          <mat-card-subtitle>{{ registros.length }} registro(s)</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="eventos-lista">
+            @for (registro of registros; track registro.id) {
+              <div class="evento-item"
+                   [class.entrada]="registro.sentido === 'Entrada'"
+                   [class.saida]="registro.sentido === 'Saída'">
+                <mat-icon>{{ registro.sentido === 'Entrada' ? 'login' : 'logout' }}</mat-icon>
+                <div class="evento-info">
+                  <span class="evento-hora">{{ registro.hora }}</span>
+                  <span class="evento-sentido">{{ registro.sentido }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+    }
+
+  }
+
+</div>

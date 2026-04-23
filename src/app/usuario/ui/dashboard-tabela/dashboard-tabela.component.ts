@@ -25,7 +25,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 export type StatusJornada = 'em_expediente' | 'em_intervalo' | 'falha_catraca' | 'jornada_concluida';
 
-export interface LinhaTabela {
+export interface UsuarioModel {
   usuario: Usuario;
   ponto: Ponto | null;
   registros: Registro[];
@@ -54,7 +54,7 @@ export interface LinhaTabela {
 })
 export class DashboardTabelaComponent implements OnInit {
 
-  linhas: LinhaTabela[] = [];
+  usuarios: UsuarioModel[] = [];
   carregando = true;
   readonly colunas = ['nome', 'matricula', 'entradaInicial', 'saidaFinal', 'horasTrabalhadas', 'horasRestantes', 'progresso', 'status'];
 
@@ -96,12 +96,12 @@ export class DashboardTabelaComponent implements OnInit {
   }
 
   /** Linhas exibidas: ponto existe e há ao menos um registro ativo no dia. */
-  get linhasPresentes(): LinhaTabela[] {
-    return this.linhas.filter(l => l.ponto !== null && l.registros.length > 0);
+  get linhasPresentes(): UsuarioModel[] {
+    return this.usuarios.filter(l => l.ponto !== null && l.registros.length > 0);
   }
 
   get totalAusentes(): number {
-    return this.linhas.filter(l => l.ponto !== null && l.registros.length === 0).length;
+    return this.usuarios.filter(l => l.ponto !== null && l.registros.length === 0).length;
   }
 
   onLotacaoSelect(): void {
@@ -110,32 +110,32 @@ export class DashboardTabelaComponent implements OnInit {
     this.carregarDados(this.lotacaoSelecionada?.id);
   }
 
-  horasTrabalhadasString(linha: LinhaTabela): string {
+  horasTrabalhadasString(linha: UsuarioModel): string {
     return this.formatarSegundos(this.horasTrabalhadasSegundos(linha));
   }
 
-  primeiraEntradaSegundos(linha: LinhaTabela): number {
+  primeiraEntradaSegundos(linha: UsuarioModel): number {
     const primeiraEntradaStr = this.primeiraEntradaLinha(linha);
     return this.timeToSeconds(primeiraEntradaStr);
   }
 
-  primeiraSaidaSegundos(linha: LinhaTabela): number {
+  primeiraSaidaSegundos(linha: UsuarioModel): number {
     const primeiraSaidaStr = this.primeiraSaidaLinha(linha);
     return this.timeToSeconds(primeiraSaidaStr);
   }
 
-  ultimaEntradaSegundos(linha: LinhaTabela): number {
+  ultimaEntradaSegundos(linha: UsuarioModel): number {
     const ultimaEntradaStr = this.ultimaEntradaLinha(linha);
     return this.timeToSeconds(ultimaEntradaStr);
   }
 
 
-  ultimaSaidaSegundos(linha: LinhaTabela): number {
+  ultimaSaidaSegundos(linha: UsuarioModel): number {
     const ultimaSaidaStr = this.ultimaSaidaLinha(linha);
     return this.timeToSeconds(ultimaSaidaStr);
   }
 
-  horasTrabalhadasSegundos(linha: LinhaTabela): number {
+  horasTrabalhadasSegundos(linha: UsuarioModel): number {
     const primeiraEntradaSec = this.primeiraEntradaSegundos(linha);
     const primeiraSaidaSec = this.primeiraSaidaLinha(linha);
     const ultimaEntradaSec = this.ultimaEntradaSegundos(linha);
@@ -169,24 +169,24 @@ export class DashboardTabelaComponent implements OnInit {
     return horaAtual.getHours() * 60 * 60 + horaAtual.getMinutes() * 60 + horaAtual.getSeconds();
   }
 
-  horaExtra(linha: LinhaTabela): boolean {
+  horaExtra(linha: UsuarioModel): boolean {
     const jornada = linha.usuario ? linha.usuario.hora_diaria ? linha.usuario.hora_diaria : 7 : 0;
     return this.horasTrabalhadasSegundos(linha) > jornada * 60 * 60;
   }
 
 
-  horasRestantes(linha: LinhaTabela): string {
+  horasRestantes(linha: UsuarioModel): string {
     if (!linha.usuario.hora_diaria || !linha.ponto) return '00:00:00';
     const restantes = Math.abs((linha.usuario.hora_diaria * 3600) - this.horasTrabalhadasSegundos(linha));
     return restantes >= 0 ? this.formatarSegundos(restantes) : '00:00:00';
   }
 
-  progresso(linha: LinhaTabela): number {
+  progresso(linha: UsuarioModel): number {
     if (!linha.usuario.hora_diaria || !linha.ponto) return 0;
     return Math.min(100, Math.round((this.horasTrabalhadasSegundos(linha) / (linha.usuario.hora_diaria * 3600)) * 100));
   }
 
-  corProgresso(linha: LinhaTabela): 'primary' | 'accent' | 'warn' {
+  corProgresso(linha: UsuarioModel): 'primary' | 'accent' | 'warn' {
     const p = this.progresso(linha);
     if (p >= 100) return 'primary';
     if (p >= 75) return 'accent';
@@ -199,7 +199,7 @@ export class DashboardTabelaComponent implements OnInit {
    * - em_intervalo  : último registro é Saída com pelo menos uma Entrada anterior
    * - em_expediente : último registro é Entrada (usuário dentro do setor)
    */
-  statusJornada(linha: LinhaTabela): StatusJornada {
+  statusJornada(linha: UsuarioModel): StatusJornada {
     const regs = [...linha.registros].sort((a, b) => a.hora.localeCompare(b.hora));
     if (regs.length === 0) {
       return 'em_expediente';
@@ -229,28 +229,28 @@ export class DashboardTabelaComponent implements OnInit {
 
   /** Hora do primeiro registro de Entrada do dia. */
 
-  registrosOrdenados(linha: LinhaTabela) {
+  registrosOrdenados(linha: UsuarioModel) {
     return [...linha.registros].sort((a, b) => a.hora.localeCompare(b.hora));
   }
 
-  primeiraEntradaLinha(linha: LinhaTabela): string {
+  primeiraEntradaLinha(linha: UsuarioModel): string {
     const sorted = this.registrosOrdenados(linha);
     const entrada = sorted.find(r => r.sentido === 'Entrada');
     return entrada ? entrada.hora : '---';
   }
 
-  primeiraSaidaLinha(linha: LinhaTabela): string {
+  primeiraSaidaLinha(linha: UsuarioModel): string {
     const sorted = this.registrosOrdenados(linha);
     const entrada = sorted.find(r => r.sentido === 'Saída');
     return entrada ? entrada.hora : '---';
   }
 
-  ultimaSaidaLinha(linha: LinhaTabela): string {
+  ultimaSaidaLinha(linha: UsuarioModel): string {
     const saidas = this.registrosOrdenados(linha).filter(r => r.sentido === 'Saída');
     return saidas.length > 0 ? saidas[saidas.length - 1].hora : '---';
   }
 
-  ultimaEntradaLinha(linha: LinhaTabela): string {
+  ultimaEntradaLinha(linha: UsuarioModel): string {
     const saidas = this.registrosOrdenados(linha).filter(r => r.sentido === 'Entrada');
     return saidas.length > 0 ? saidas[saidas.length - 1].hora : '---';
   }
@@ -278,12 +278,12 @@ export class DashboardTabelaComponent implements OnInit {
    */
   private carregarDados(idLotacao?: number): void {
     this.carregando = true;
-    this.linhas = [];
+    this.usuarios = [];
     const hoje = this.formatarDataApi(new Date());
     const matricula = this.authService.getUsuario()?.matricula ?? '';
 
     const usuarios$ = this.authService.hasRole('GRP_SIPE_DIRETOR')
-      ? this.usuarioService.listarPorDiretor(matricula)
+      ? this.usuarioService.listar()
       : idLotacao !== undefined
         ? this.usuarioService.listar('', '', '', idLotacao)
         : this.usuarioService.listar();
@@ -323,7 +323,7 @@ export class DashboardTabelaComponent implements OnInit {
           )
         ).subscribe({
           next: ({pontos, registrosLista}) => {
-            this.linhas = usuarios.map((u, i) => ({
+            this.usuarios = usuarios.map((u, i) => ({
               usuario: u,
               ponto: pontos[i],
               registros: registrosLista[i]

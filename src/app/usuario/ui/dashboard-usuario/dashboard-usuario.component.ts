@@ -14,7 +14,7 @@ import {RegistroService} from '../../../registro/registro.service';
 import {Usuario} from '../../usuario.model';
 import {Ponto} from '../../../ponto/ponto.model';
 import {Registro} from '../../../registro/registro.model';
-import {LinhaTabela} from '../dashboard-tabela/dashboard-tabela.component';
+import {UsuarioModel} from '../dashboard-tabela/dashboard-tabela.component';
 
 @Component({
   standalone: true,

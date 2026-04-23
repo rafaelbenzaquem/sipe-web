@@ -151,6 +151,7 @@ export class ConsultaComponent implements OnInit {
 
   async baixarRelatorio() {
     if (this.hasAnyRole(['GRP_SIPE_ADMIN', 'GRP_SIPE_RH'])) {
+      console.log("this.hasAnyRole(['GRP_SIPE_ADMIN', 'GRP_SIPE_RH'])")
       this.carregandoSelecao = true;
       try {
         if (this.lotacaoSelecionada) {
@@ -163,6 +164,7 @@ export class ConsultaComponent implements OnInit {
       }
       this.carregandoSelecao = false;
     } else if (this.hasAnyRole(['GRP_SIPE_DIRETOR'])) {
+      console.log("this.hasAnyRole(['GRP_SIPE_DIRETOR'])")
       this.carregandoSelecao = true;
       try {
         if (this.usuario && this.usuario.matricula) {

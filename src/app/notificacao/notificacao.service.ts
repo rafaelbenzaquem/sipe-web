@@ -55,8 +55,8 @@ export class NotificacaoService {
    * Marca uma notificação como lida: persiste em localStorage e re-emite a lista.
    */
   marcarComoLida(id: string): void {
-    this.lidas.add(id);
-    this.salvarLidasNoStorage();
+    // this.lidas.add(id);
+    // this.salvarLidasNoStorage();
     this._notificacoes.next(this._notificacoes.value); // re-emite para o pipe filtrar
   }
 
@@ -88,7 +88,7 @@ export class NotificacaoService {
   private carregarParaDiretor(matriculaDiretor: string): void {
     const {inicio, fim} = this.getPeriodo();
 
-    this.usuarioService.listarPorDiretor(matriculaDiretor).subscribe({
+    this.usuarioService.listar().subscribe({
       next: (response) => {
         const usuarios = (response._embedded?.usuarios ?? []).map(u => Usuario.toModel(u));
         this.verificarPendentes(usuarios, inicio, fim);

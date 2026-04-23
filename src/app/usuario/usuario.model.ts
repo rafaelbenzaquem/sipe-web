@@ -5,6 +5,7 @@ export class Usuario {
   matricula?: string;
   cracha?: string;
   hora_diaria?: number;
+  id_lotacao?:number;
 
   static toModel(usuario: UsuarioResponse) {
     let usuarioModel = new Usuario();
@@ -13,6 +14,7 @@ export class Usuario {
     usuarioModel.matricula = usuario.matricula;
     usuarioModel.cracha = usuario.cracha;
     usuarioModel.hora_diaria = usuario.hora_diaria;
+    usuarioModel.id_lotacao = usuario.id_lotacao;
     return usuarioModel;
   }
 
@@ -44,6 +46,7 @@ export interface UsuarioResponse {
   matricula: string;
   cracha: string;
   hora_diaria: number;
+  id_lotacao: number;
   _links: {
     self: { href: string };
     delete: { href: string };

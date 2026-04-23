@@ -61,11 +61,9 @@
           <div fxLayout="row">
             <div fxLayout="column" fxFlex="100%">
               <button matButton="filled"
-                      (click)="baixarRelatorio()" [disabled]="lotacaoSelecionada==undefined||lotacaoSelecionada.id==15">
+                      (click)="baixarRelatorio()">
                 <mat-icon fontIcon="assignment"/>
-                Emitir Relatório Setorial @if (lotacaoSelecionada) {
-                {{ lotacaoSelecionada.sigla }}
-              }
+                Emitir Relatório Setorial
               </button>
             </div>
           </div>
